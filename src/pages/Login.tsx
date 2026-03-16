@@ -42,10 +42,13 @@ export function LoginPage() {
         {/* Logo/Brand */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-4">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <Sparkles className="w-6 h-6 text-primary-foreground" />
+            <div className="relative">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary via-primary to-secondary shadow-lg">
+                <Sparkles className="h-5 w-5 text-white" />
+              </div>
+              <div className="absolute -inset-0.5 rounded-lg bg-gradient-to-br from-primary/50 to-secondary/50 blur opacity-75" />
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            <span className="text-2xl font-display font-bold text-foreground">
               Marketing Muse AI
             </span>
           </div>

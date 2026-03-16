@@ -61,123 +61,126 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between px-6">
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl ai-gradient glow animate-pulse-glow">
-              <Sparkles className="h-5 w-5 text-primary-foreground" />
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 max-w-screen-2xl items-center">
+        {/* Logo Section */}
+        <div className="mr-4 flex">
+          <a href="/" className="mr-6 flex items-center space-x-2">
+            <div className="relative">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary via-primary to-secondary shadow-lg">
+                <Sparkles className="h-4 w-4 text-white" />
+              </div>
+              <div className="absolute -inset-0.5 rounded-lg bg-gradient-to-br from-primary/50 to-secondary/50 blur opacity-75" />
             </div>
-            <div className="absolute -inset-1 rounded-xl bg-gradient-to-r from-primary/20 to-secondary/20 blur-sm" />
-          </div>
-          <div>
-            <span className="font-display font-bold text-xl tracking-tight bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              MarketAI
+            <span className="hidden font-display text-xl font-bold tracking-tight text-foreground sm:inline-block">
+              Marketing Muse AI
             </span>
-            <div className="text-xs text-muted-foreground font-mono">v2.0</div>
-          </div>
+          </a>
         </div>
 
-        <nav className="hidden md:flex items-center space-x-2">
-          {tasks.map((task) => {
-            const Icon = task.icon;
-            const isActive = activeTask === task.id;
-            return (
-              <Button
-                key={task.id}
-                variant={isActive ? "default" : "ghost"}
-                size="sm"
-                onClick={() => onTaskChange(task.id)}
-                disabled={!hasCompanyData}
-                className={cn(
-                  "gap-2 transition-all duration-200 hover:scale-105",
-                  isActive
-                    ? "bg-primary/10 text-primary border border-primary/20 glow"
-                    : "hover:bg-muted/50 text-muted-foreground hover:text-foreground",
-                  !hasCompanyData && "opacity-40 cursor-not-allowed"
-                )}
-              >
-                <Icon className="h-4 w-4" />
-                {task.label}
-              </Button>
-            );
-          })}
-        </nav>
-
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-muted/30 border border-border/50">
-            <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-xs text-muted-foreground font-mono">AI Online</span>
+        {/* Navigation Links */}
+        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+          <div className="w-full flex-1 md:w-auto md:flex-none">
+            <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
+              {tasks.map((task) => {
+                const Icon = task.icon;
+                const isActive = activeTask === task.id;
+                return (
+                  <button
+                    key={task.id}
+                    onClick={() => onTaskChange(task.id)}
+                    disabled={!hasCompanyData}
+                    className={cn(
+                      "flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-accent hover:text-accent-foreground",
+                      isActive
+                        ? "bg-primary/10 text-primary border border-primary/20"
+                        : "text-muted-foreground",
+                      !hasCompanyData && "opacity-50 cursor-not-allowed hover:bg-transparent"
+                    )}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span>{task.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
           </div>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="h-9 w-9 rounded-lg hover:bg-muted/50 transition-all duration-200 hover:scale-105"
-          >
-            <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            <span className="sr-only">Toggle theme</span>
-          </Button>
+          <div className="flex items-center space-x-2">
+            {/* Status Indicator */}
+            <div className="hidden sm:flex items-center space-x-2 rounded-full bg-muted/50 px-3 py-1">
+              <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-xs text-muted-foreground font-mono">AI Online</span>
+            </div>
 
-          {/* User Menu */}
-          {user && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-                  <Avatar className="h-9 w-9">
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback className="bg-primary/10 text-primary">
-                      {user.name.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <div className="flex items-center justify-start gap-2 p-2">
-                  <div className="flex flex-col space-y-1 leading-none">
-                    <p className="font-medium">{user.name}</p>
-                    <p className="w-[200px] truncate text-sm text-muted-foreground">
-                      {user.email}
-                    </p>
+            {/* Theme Toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="h-9 w-9"
+            >
+              <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+
+            {/* User Menu */}
+            {user && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                    <Avatar className="h-9 w-9">
+                      <AvatarImage src={user.avatar} alt={user.name} />
+                      <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                        {user.name.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <div className="flex items-center justify-start gap-2 p-2">
+                    <div className="flex flex-col space-y-1 leading-none">
+                      <p className="font-medium">{user.name}</p>
+                      <p className="w-[200px] truncate text-sm text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Mobile navigation */}
-      <div className="md:hidden border-t border-border/50 bg-background/50 backdrop-blur-sm">
+      {/* Mobile Navigation */}
+      <div className="md:hidden border-t border-border/40">
         <nav className="flex overflow-x-auto px-4 py-3 space-x-2 scrollbar-hide">
           {tasks.map((task) => {
             const Icon = task.icon;
             const isActive = activeTask === task.id;
             return (
-              <Button
+              <button
                 key={task.id}
-                variant={isActive ? "default" : "ghost"}
-                size="sm"
                 onClick={() => onTaskChange(task.id)}
                 disabled={!hasCompanyData}
                 className={cn(
-                  "flex-shrink-0 gap-1.5 text-xs px-3 py-2 rounded-lg transition-all duration-200",
+                  "flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-200",
                   isActive
-                    ? "bg-primary/10 text-primary border border-primary/20 glow"
-                    : "hover:bg-muted/50 text-muted-foreground hover:text-foreground",
-                  !hasCompanyData && "opacity-40 cursor-not-allowed"
+                    ? "bg-primary/10 text-primary border border-primary/20"
+                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                  !hasCompanyData && "opacity-50 cursor-not-allowed"
                 )}
               >
                 <Icon className="h-3.5 w-3.5" />
-                {task.label}
-              </Button>
+                <span>{task.label}</span>
+              </button>
             );
           })}
         </nav>
