@@ -61,24 +61,24 @@ export default function ResultsCanvas({
   const hasContent = content.length > 0;
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 lg:p-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="mb-6">
-          <h1 className="font-display text-2xl font-bold">{config.title}</h1>
-          <p className="text-sm text-muted-foreground mt-1">{config.description}</p>
+    <div className="h-full overflow-y-auto p-6 lg:p-8">
+      <div className="mx-auto max-w-4xl">
+        <div className="mb-6 rounded-2xl border border-white/10 bg-slate-900/40 p-5">
+          <h1 className="font-display text-2xl font-bold text-white">{config.title}</h1>
+          <p className="mt-1 text-sm text-slate-300">{config.description}</p>
         </div>
 
         {!hasContent && !isGenerating && (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="h-16 w-16 rounded-2xl ai-gradient flex items-center justify-center mb-4">
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/20 bg-slate-900/30 py-20 text-center">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl ai-gradient">
               <Sparkles className="h-7 w-7 text-primary-foreground" />
             </div>
-            <h3 className="font-display font-semibold text-lg mb-2">
+            <h3 className="mb-2 font-display text-lg font-semibold text-white">
               Ready to generate
             </h3>
-            <p className="text-sm text-muted-foreground mb-6 max-w-sm">
+            <p className="mb-6 max-w-sm text-sm text-slate-300">
               Click below to generate {config.title.toLowerCase()} for{" "}
-              <span className="font-medium text-foreground">{companyData?.name}</span>
+              <span className="font-medium text-white">{companyData?.name}</span>
             </p>
             <Button variant="ai" size="lg" onClick={() => onGenerate(activeTask)}>
               <Sparkles className="h-4 w-4" />
@@ -106,7 +106,7 @@ export default function ResultsCanvas({
               />
             ))}
             <div className="flex justify-center pt-2">
-              <Button variant="outline" onClick={() => onGenerate(activeTask)}>
+              <Button variant="outline" className="border-white/20 bg-white/5 text-slate-100 hover:bg-white/10" onClick={() => onGenerate(activeTask)}>
                 <Sparkles className="h-4 w-4" />
                 Regenerate All
               </Button>
