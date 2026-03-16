@@ -1,5 +1,5 @@
 import { useState } from "react";
-import AppSidebar, { type TaskId } from "@/components/marketing/AppSidebar";
+import TopNavigation, { type TaskId } from "@/components/marketing/TopNavigation";
 import CompanyForm, { type CompanyData } from "@/components/marketing/CompanyForm";
 import ResultsCanvas from "@/components/marketing/ResultsCanvas";
 import { toast } from "sonner";
@@ -76,19 +76,33 @@ export default function Index() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <AppSidebar
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Background effects */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+
+      <TopNavigation
         activeTask={activeTask}
         onTaskChange={setActiveTask}
         hasCompanyData={!!companyData}
       />
 
-      <main className="flex-1 flex overflow-hidden">
+      <main className="container mx-auto px-6 py-12 relative z-10">
         {!companyData ? (
-          <div className="flex-1 flex items-center justify-center p-6">
-            <div className="w-full max-w-lg">
-              <CompanyForm onSubmit={handleCompanySubmit} />
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl ai-gradient mb-6 glow animate-pulse-glow">
+                <Sparkles className="h-12 w-12 text-primary-foreground" />
+              </div>
+              <h1 className="font-display text-5xl font-bold mb-4 bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent">
+                Welcome to MarketAI
+              </h1>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                Generate tailored marketing content for your business with AI-powered insights and creative strategies.
+              </p>
             </div>
+            <CompanyForm onSubmit={handleCompanySubmit} />
           </div>
         ) : (
           <ResultsCanvas
