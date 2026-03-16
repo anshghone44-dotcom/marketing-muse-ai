@@ -3,6 +3,7 @@ import TopNavigation, { type TaskId } from "@/components/marketing/TopNavigation
 import CompanyForm, { type CompanyData } from "@/components/marketing/CompanyForm";
 import ResultsCanvas from "@/components/marketing/ResultsCanvas";
 import { toast } from "sonner";
+import { Sparkles } from "lucide-react";
 
 // Mock generation - will be replaced with AI
 function generateMockContent(task: TaskId, data: CompanyData): string[] {
