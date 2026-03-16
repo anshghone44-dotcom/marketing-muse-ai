@@ -3,6 +3,7 @@ import AppSidebar, { type TaskId } from "@/components/marketing/AppSidebar";
 import CompanyForm, { type CompanyData } from "@/components/marketing/CompanyForm";
 import ResultsCanvas from "@/components/marketing/ResultsCanvas";
 import { toast } from "sonner";
+import { Sparkles } from "lucide-react";
 
 // Mock generation - will be replaced with AI
 function generateMockContent(task: TaskId, data: CompanyData): string[] {
@@ -62,7 +63,6 @@ export default function Index() {
   const handleGenerate = (task: TaskId) => {
     if (!companyData) return;
     setIsGenerating(true);
-    // Simulate AI generation delay
     setTimeout(() => {
       const content = generateMockContent(task, companyData);
       setGeneratedContent((prev) => ({ ...prev, [task]: content }));
@@ -76,31 +76,51 @@ export default function Index() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <AppSidebar
-        activeTask={activeTask}
-        onTaskChange={setActiveTask}
-        hasCompanyData={!!companyData}
-      />
+    <div className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.2),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(16,185,129,0.16),transparent_35%)]" />
 
-      <main className="flex-1 flex overflow-hidden">
-        {!companyData ? (
-          <div className="flex-1 flex items-center justify-center p-6">
-            <div className="w-full max-w-lg">
-              <CompanyForm onSubmit={handleCompanySubmit} />
+      <div className="relative mx-auto flex min-h-screen w-full max-w-[1500px] gap-4 p-4 lg:gap-6 lg:p-6">
+        <AppSidebar
+          activeTask={activeTask}
+          onTaskChange={setActiveTask}
+          hasCompanyData={!!companyData}
+        />
+
+        <main className="flex min-w-0 flex-1 flex-col rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl">
+          <div className="border-b border-white/10 px-6 py-5 lg:px-8">
+            <p className="text-xs uppercase tracking-[0.18em] text-slate-300/90">AI Marketing Studio</p>
+            <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h1 className="text-2xl font-semibold text-white lg:text-3xl">Build campaign-ready content in minutes</h1>
+                <p className="mt-1 text-sm text-slate-300">Complete your brand profile once and generate ideas for every growth channel.</p>
+              </div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-indigo-300/30 bg-indigo-400/10 px-3 py-1 text-xs font-medium text-indigo-200">
+                <Sparkles className="h-3.5 w-3.5" />
+                {companyData ? `Brand loaded: ${companyData.name}` : "Setup required"}
+              </div>
             </div>
           </div>
-        ) : (
-          <ResultsCanvas
-            activeTask={activeTask}
-            companyData={companyData}
-            generatedContent={generatedContent}
-            isGenerating={isGenerating}
-            onGenerate={handleGenerate}
-            onRegenerate={handleRegenerate}
-          />
-        )}
-      </main>
+
+          <div className="min-h-0 flex-1 overflow-hidden">
+            {!companyData ? (
+              <div className="flex h-full items-start justify-center overflow-y-auto p-6 lg:p-8">
+                <div className="w-full max-w-3xl rounded-2xl border border-white/10 bg-slate-900/60 p-6 shadow-2xl shadow-indigo-950/40 lg:p-8">
+                  <CompanyForm onSubmit={handleCompanySubmit} />
+                </div>
+              </div>
+            ) : (
+              <ResultsCanvas
+                activeTask={activeTask}
+                companyData={companyData}
+                generatedContent={generatedContent}
+                isGenerating={isGenerating}
+                onGenerate={handleGenerate}
+                onRegenerate={handleRegenerate}
+              />
+            )}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
