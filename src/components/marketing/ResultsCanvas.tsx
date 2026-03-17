@@ -20,7 +20,7 @@ const TASK_CONFIG: Record<TaskId, { title: string; description: string }> = {
   ads: {
     title: "Ad Campaign Ideas",
     description:
-      "Generate ad campaigns using interactive formats: mini quiz ads (e.g., “Check your Canada PR score in 30 seconds”), poll ads (e.g., “Which country do you want to move?”), and swipe decision ads (e.g., “Choose: Study / Work / PR”).",
+      "Develop sophisticated ad campaigns featuring interactive elements such as mini quiz ads (e.g., 'Check your Canada PR score in 30 seconds'), poll ads (e.g., 'Which country do you want to move?'), and swipe decision ads (e.g., 'Choose: Study / Work / PR') to engage prospects and drive high-quality lead generation.",
   },
   keywords: {
     title: "Keyword Strategy",
