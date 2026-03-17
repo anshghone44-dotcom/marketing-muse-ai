@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Eye, EyeOff, Mail, Lock, User, Sparkles } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 
 export function SignupPage() {
   const [formData, setFormData] = useState({
@@ -67,14 +67,8 @@ export function SignupPage() {
         {/* Logo/Brand */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-4">
-            <div className="relative">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary via-primary to-secondary shadow-lg">
-                <Sparkles className="h-5 w-5 text-white" />
-              </div>
-              <div className="absolute -inset-0.5 rounded-lg bg-gradient-to-br from-primary/50 to-secondary/50 blur opacity-75" />
-            </div>
             <span className="text-2xl font-display font-bold text-foreground">
-              Marketing Muse AI
+              LeadBot
             </span>
           </div>
           <p className="text-muted-foreground">
@@ -87,7 +81,7 @@ export function SignupPage() {
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl text-center">Create Account</CardTitle>
             <CardDescription className="text-center">
-              Join Marketing Muse AI and start creating amazing content
+              Join LeadBot and start creating amazing content
             </CardDescription>
           </CardHeader>
           <CardContent>

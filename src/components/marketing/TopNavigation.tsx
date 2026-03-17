@@ -10,7 +10,6 @@ import {
   Users,
   Moon,
   Sun,
-  Sparkles,
   User,
   LogOut,
   ChevronDown,
@@ -66,14 +65,8 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
         {/* Logo Section */}
         <div className="mr-4 flex">
           <a href="/" className="mr-6 flex items-center space-x-2">
-            <div className="relative">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary via-primary to-secondary shadow-lg">
-                <Sparkles className="h-4 w-4 text-white" />
-              </div>
-              <div className="absolute -inset-0.5 rounded-lg bg-gradient-to-br from-primary/50 to-secondary/50 blur opacity-75" />
-            </div>
             <span className="hidden font-display text-xl font-bold tracking-tight text-foreground sm:inline-block">
-              Marketing Muse AI
+              LeadBot
             </span>
           </a>
         </div>
