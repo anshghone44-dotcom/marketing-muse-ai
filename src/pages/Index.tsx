@@ -3,7 +3,7 @@ import TopNavigation, { type TaskId } from "@/components/marketing/TopNavigation
 import CompanyForm, { type CompanyData } from "@/components/marketing/CompanyForm";
 import ResultsCanvas from "@/components/marketing/ResultsCanvas";
 import { toast } from "sonner";
-import { Sparkles } from "lucide-react";
+
 
 // Mock generation - will be replaced with AI
 function generateMockContent(task: TaskId, data: CompanyData): string[] {
@@ -93,11 +93,8 @@ export default function Index() {
         {!companyData ? (
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
-              <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl ai-gradient mb-6 glow animate-pulse-glow">
-                <Sparkles className="h-12 w-12 text-primary-foreground" />
-              </div>
               <h1 className="font-display text-5xl font-bold mb-4 bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent">
-                Welcome to MarketAI
+                Welcome to LeadBot
               </h1>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
                 Generate tailored marketing content for your business with AI-powered insights and creative strategies.

@@ -1,18 +1,9 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import {
-  Megaphone,
-  Search,
-  FileText,
-  Share2,
-  Flame,
-  BarChart3,
-  Users,
   Moon,
   Sun,
-  User,
   LogOut,
-  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -35,14 +26,14 @@ export type TaskId =
   | "competitor"
   | "engagement";
 
-const tasks: { id: TaskId; label: string; icon: React.ElementType }[] = [
-  { id: "ads", label: "Ad Creation", icon: Megaphone },
-  { id: "keywords", label: "Keyword Gen", icon: Search },
-  { id: "content", label: "Content Gen", icon: FileText },
-  { id: "social", label: "Social Strategy", icon: Share2 },
-  { id: "viral", label: "Viral Ideas", icon: Flame },
-  { id: "competitor", label: "Competitor Analysis", icon: BarChart3 },
-  { id: "engagement", label: "Engagement", icon: Users },
+const tasks: { id: TaskId; label: string }[] = [
+  { id: "ads", label: "Ad Creation" },
+  { id: "keywords", label: "Keyword Gen" },
+  { id: "content", label: "Content Gen" },
+  { id: "social", label: "Social Strategy" },
+  { id: "viral", label: "Viral Ideas" },
+  { id: "competitor", label: "Competitor Analysis" },
+  { id: "engagement", label: "Engagement" },
 ];
 
 interface Props {
@@ -76,7 +67,6 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
           <div className="w-full flex-1 md:w-auto md:flex-none">
             <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
               {tasks.map((task) => {
-                const Icon = task.icon;
                 const isActive = activeTask === task.id;
                 return (
                   <button
@@ -84,14 +74,13 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
                     onClick={() => onTaskChange(task.id)}
                     disabled={!hasCompanyData}
                     className={cn(
-                      "flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-accent hover:text-accent-foreground",
+                      "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-accent hover:text-accent-foreground",
                       isActive
                         ? "bg-primary/10 text-primary border border-primary/20"
                         : "text-muted-foreground",
                       !hasCompanyData && "opacity-50 cursor-not-allowed hover:bg-transparent"
                     )}
                   >
-                    <Icon className="h-4 w-4" />
                     <span>{task.label}</span>
                   </button>
                 );
@@ -156,7 +145,6 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
       <div className="md:hidden border-t border-border/40">
         <nav className="flex overflow-x-auto px-4 py-3 space-x-2 scrollbar-hide">
           {tasks.map((task) => {
-            const Icon = task.icon;
             const isActive = activeTask === task.id;
             return (
               <button
@@ -164,14 +152,13 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
                 onClick={() => onTaskChange(task.id)}
                 disabled={!hasCompanyData}
                 className={cn(
-                  "flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-200",
+                  "flex items-center px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-200",
                   isActive
                     ? "bg-primary/10 text-primary border border-primary/20"
                     : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
                   !hasCompanyData && "opacity-50 cursor-not-allowed"
                 )}
               >
-                <Icon className="h-3.5 w-3.5" />
                 <span>{task.label}</span>
               </button>
             );
