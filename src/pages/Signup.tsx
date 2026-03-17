@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Bot, CheckCircle2 } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 
 export function SignupPage() {
   const [formData, setFormData] = useState({
@@ -69,141 +69,121 @@ export function SignupPage() {
         <div className="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-white/5 blur-2xl" />
 
         <div className="relative z-10 text-white">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/15 border border-white/20 backdrop-blur-sm mb-8 shadow-xl">
-            <Bot className="h-10 w-10 text-white" strokeWidth={1.5} />
-          </div>
-
-          <h1 className="text-4xl font-bold tracking-tight mb-3">Start with LeadBot</h1>
-          <p className="text-lg text-white/70 max-w-xs leading-relaxed mb-10">
+          <h1 className="text-5xl font-bold tracking-tight mb-4 text-center">LeadBot</h1>
+          <p className="text-xl text-white/80 max-w-sm mx-auto leading-relaxed mb-12 text-center text-balance">
             Join thousands of marketers using AI to supercharge their content and campaigns.
           </p>
 
-          <ul className="space-y-3">
+          <div className="space-y-4 max-w-sm mx-auto">
             {perks.map((perk) => (
-              <li key={perk} className="flex items-start gap-3 text-sm text-white/80">
-                <CheckCircle2 className="h-4 w-4 text-green-400 mt-0.5 flex-shrink-0" />
+              <div key={perk} className="flex items-center text-sm bg-white/10 border border-white/15 rounded-md px-5 py-3 text-white/90">
                 {perk}
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       </div>
 
       {/* Right panel — form */}
       <div className="flex-1 flex items-center justify-center p-6 sm:p-10">
         <div className="w-full max-w-md">
-          {/* Mobile logo */}
-          <div className="flex lg:hidden items-center gap-2 mb-8">
-            <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
-              <Bot className="h-5 w-5 text-white" strokeWidth={1.5} />
-            </div>
-            <span className="text-xl font-bold text-foreground">LeadBot</span>
+          {/* Mobile branding */}
+          <div className="lg:hidden mb-12">
+            <h1 className="text-2xl font-bold text-primary">LeadBot</h1>
           </div>
 
-          <div className="mb-8">
+          <div className="mb-10">
             <h2 className="text-3xl font-bold text-foreground tracking-tight">Create account</h2>
-            <p className="text-muted-foreground mt-1.5">Get started free — no credit card required</p>
+            <p className="text-muted-foreground mt-2">Get started free — no credit card required</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
               <Alert variant="destructive" className="py-3">
                 <AlertDescription className="text-sm">{error}</AlertDescription>
               </Alert>
             )}
 
-            {/* Full Name */}
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-medium">Full name</Label>
-              <div className="relative">
-                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="Jane Smith"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
-                  className="pl-10 h-11 bg-background border-border/70 focus:border-primary/60 transition-colors"
-                  required
-                />
-              </div>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Jane Smith"
+                value={formData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                className="h-12 bg-background border-border/60 focus:border-primary/60 transition-colors"
+                required
+              />
             </div>
 
-            {/* Email */}
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium">Email address</Label>
-              <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@company.com"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  className="pl-10 h-11 bg-background border-border/70 focus:border-primary/60 transition-colors"
-                  required
-                />
-              </div>
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@company.com"
+                value={formData.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                className="h-12 bg-background border-border/60 focus:border-primary/60 transition-colors"
+                required
+              />
             </div>
 
-            {/* Password row */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-medium">Password</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     placeholder="Min. 6 chars"
                     value={formData.password}
                     onChange={(e) => handleInputChange('password', e.target.value)}
-                    className="pl-9 pr-9 h-11 bg-background border-border/70 focus:border-primary/60 transition-colors"
+                    className="pr-10 h-12 bg-background border-border/60 focus:border-primary/60 transition-colors"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirm</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="confirmPassword"
                     type={showConfirmPassword ? 'text' : 'password'}
-                    placeholder="Repeat password"
+                    placeholder="Repeat"
                     value={formData.confirmPassword}
                     onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                    className="pl-9 pr-9 h-11 bg-background border-border/70 focus:border-primary/60 transition-colors"
+                    className="pr-10 h-12 bg-background border-border/60 focus:border-primary/60 transition-colors"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    {showConfirmPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Terms */}
-            <div className="flex items-start space-x-2.5 pt-1">
+            <div className="flex items-start space-x-3 pt-2">
               <Checkbox
                 id="terms"
                 checked={formData.agreeToTerms}
                 onCheckedChange={(checked) => handleInputChange('agreeToTerms', !!checked)}
-                className="mt-0.5"
+                className="mt-1"
               />
-              <Label htmlFor="terms" className="text-sm text-muted-foreground leading-snug">
+              <Label htmlFor="terms" className="text-sm text-balance text-muted-foreground leading-relaxed">
                 I agree to the{' '}
                 <Link to="/terms" className="text-primary hover:underline font-medium">Terms of Service</Link>
                 {' '}and{' '}
@@ -213,27 +193,21 @@ export function SignupPage() {
 
             <Button
               type="submit"
-              className="w-full h-11 font-semibold text-sm gap-2 mt-1"
+              className="w-full h-12 text-base font-semibold mt-2 transition-all duration-200"
               disabled={isLoading}
             >
               {isLoading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                  Creating account...
-                </>
+                <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
               ) : (
-                <>
-                  Create Account
-                  <ArrowRight className="h-4 w-4" />
-                </>
+                'Create Account'
               )}
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-muted-foreground">
+          <p className="mt-8 text-center text-sm text-muted-foreground">
             Already have an account?{' '}
             <Link to="/login" className="text-primary font-medium hover:underline transition-colors">
-              Sign in →
+              Sign in
             </Link>
           </p>
         </div>
