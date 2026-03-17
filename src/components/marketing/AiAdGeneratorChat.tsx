@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -10,17 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Copy, Send, MessageSquare } from "lucide-react";
+import { Download, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import type { CompanyData } from "./CompanyForm";
-
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  platform?: string;
-  generatedAd?: string;
-}
 
 export const SOCIAL_PLATFORMS = [
   "Instagram",
@@ -35,105 +27,106 @@ export const SOCIAL_PLATFORMS = [
   "Reddit",
 ];
 
+interface VisualAd {
+  id: string;
+  platform: string;
+  headline: string;
+  description: string;
+  callToAction: string;
+  backgroundColor: string;
+  accentColor: string;
+  adCopy: string;
+  imageUrl: string;
+}
+
 interface Props {
   companyData: CompanyData | null;
 }
 
 export default function AiAdGeneratorChat({ companyData }: Props) {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      role: "assistant",
-      content: `Hi! I'm your AI Ad Generator. I can create custom ads for ${companyData?.name || "your company"} across any social media platform. Which platform would you like to create ads for? (Instagram, YouTube, TikTok, Facebook, LinkedIn, WhatsApp, Twitter/X, Pinterest, Snapchat, or Reddit)`,
-    },
-  ]);
-  const [inputValue, setInputValue] = useState("");
-  const [selectedPlatform, setSelectedPlatform] = useState<string>("");
+  const [formData, setFormData] = useState({
+    platforms: [] as string[],
+    adObjective: "awareness",
+    callToAction: "Learn More",
+    adStyle: "modern",
+    targetMessage: "",
+  });
+  const [generatedAds, setGeneratedAds] = useState<VisualAd[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const generateAd = async (userMessage: string, platform: string) => {
-    // Simulate AI ad generation
-    const adTemplates: Record<string, (data: CompanyData, message: string) => string> = {
-      Instagram: (data, msg) =>
-        `📸 **Instagram Ad**\n\n🎯 Hook: ${data.audience} - are you ready?\n\n${msg}\n\n✨ Create stunning visuals with product showcase\n📝 Caption: "${data.product} | ${msg.substring(0, 30)}..."\n🔗 CTA: "Link in Bio for Exclusive Offer"\n\n💡 Best Practices:\n• Use trending sounds/music\n• Post Reels (60-90 seconds)\n• Include testimonials & user-generated content`,
-
-      YouTube: (data, msg) =>
-        `🎬 **YouTube Ad**\n\nTitle: "${data.product} - ${msg.substring(0, 40)}..."\n\n**Video Script Outline (30-60 seconds):**\n• Hook (0-3s): "${msg.substring(0, 50)}"\n• Problem (3-15s): Address ${data.audience} pain points\n• Solution (15-45s): Show ${data.product} in action\n• CTA (45-60s): "Subscribe & Get [Offer]"\n\n📊 Recommended Format: Tutorial/Demo\n🎯 Targeting: ${data.audience}\n💰 Budget: $10-50/day to start`,
-
-      TikTok: (data, msg) =>
-        `🎵 **TikTok Ad**\n\n⏱️ Format: 15-60 second video\n\n**Trending Trend Hook:**\n${msg}\n\n**Scene Breakdown:**\n• Scene 1 (0-3s): Grab attention with ${data.product}\n• Scene 2 (3-8s): Show benefit for ${data.audience}\n• Scene 3 (8-15s): Call to action\n\n✨ Trending Elements:\n• Use trending sounds & hashtags\n• Quick cuts & transitions\n🎭 Tone: Fun, authentic, relatable\n💬 Hashtags: #${data.name.replace(/\\s/g, "")} #${data.industry.replace(/\\s/g, "")} #FYP`,
-
-      Facebook: (data, msg) =>
-        `👥 **Facebook Ad**\n\n**Primary Text:**\n"${msg}"\n\n**Headline:** "${data.product} | Limited Time Offer"\n\n**Ad Copy (Full Version):**\nDiscover how ${data.audience} are transforming their ${data.industry.toLowerCase()} with ${data.product}.\n\n${msg}\n\n**CTA Button:** Learn More / Shop Now / Sign Up\n\n📊 Targeting Options:\n• Age: 25-55\n• Interests: ${data.industry}, ${data.product}\n• Audience Type: Lookalike audiences from existing customers`,
-
-      LinkedIn: (data, msg) =>
-        `💼 **LinkedIn Ad**\n\n**Headline:**\n"How ${data.audience} Achieve Success with ${data.product}"\n\n**Main Copy:**\n${msg}\n\n**Professional Angle:**\n• Thought leadership content\n• Case studies & statistics\n• B2B value proposition\n• ROI-focused messaging\n\n🎯 Targeting:\n• Job Title: Decision makers\n• Industry: ${data.industry}\n• Company Size: ${data.audience}\n\n📈 Best Format: Sponsored Content or Text Ads`,
-
-      WhatsApp: (data, msg) =>
-        `💬 **WhatsApp Business Ad**\n\n**Broadcast Message:**\n"Hi 👋 ${msg}"\n\n**Follow-up Message:**\n"Click here to learn more about ${data.product} →"\n\n📱 Conversation Starters:\n• Special offer for ${data.audience}\n• Quick question: Are you interested in [benefit]?\n• Limited slots available - Reply YES\n\n🔔 Engagement Tips:\n• Keep messages concise (under 160 chars)\n• Use emojis strategically\n• Include direct call buttons\n• Personal touch (No spammy language)`,
-
-      "Twitter/X": (data, msg) =>
-        `🐦 **Twitter/X Ad**\n\n**Tweet Copy:**\n"${msg}\n\n#${data.name.replace(/\\s/g, "")} #${data.industry.replace(/\\s/g, "")} #${data.goal.replace(/\\s/g, "")}'"\n\n**Thread Idea (3-5 tweets):**\n1️⃣ Hook: "${msg}"\n2️⃣ Problem: Why ${data.audience} need ${data.product}\n3️⃣ Solution: How it works\n4️⃣ Proof: Results & testimonials\n5️⃣ CTA: Link to offer\n\n🔥 Engagement Tactics:\n• Quote retweets\n• Reply threads\n• Polls & questions`,
-
-      Pinterest: (data, msg) =>
-        `📌 **Pinterest Ad**\n\n**Pin Title:** "${data.product} | ${msg.substring(0, 35)}..."\n\n**Pin Description:**\n"${msg}. Learn how ${data.audience} benefit from ${data.product}. Click to discover more."\n\n🎨 Design Guidelines:\n• Vertical format (1000x1500px recommended)\n• Bold, clear typography\n• High-quality product images\n• Use trending colors\n\n🎯 Targeting:\n• Interests: ${data.industry}, lifestyle\n• Keywords: Related to ${data.product}\n📊 Best Time to Post: Tuesday-Friday`,
-
-      Snapchat: (data, msg) =>
-        `👻 **Snapchat Ad**\n\n**Snap Format:** Video (15-30 seconds)\n\n**Message:** "${msg}"\n\n**Story Ad Elements:**\n• Eye-catching frame 1 (Product shot)\n• Frame 2: Benefit statement\n• Frame 3: Call to action\n• Swipe-up link (if eligible): [Your Landing Page]\n\n✨ Creative Tips:\n• Use Snapchat filters & AR effects\n• Fast-paced transitions\n• Authentic, unpolished feel\n• Include text overlay`,
-
-      Reddit: (data, msg) =>
-        `🤖 **Reddit Ad**\n\n**Title:** "${msg}"\n\n**Ad Copy:**\n"We've helped thousands of ${data.audience} with ${data.product}. This is a limited offer ${msg.substring(0, 30)}... Comment below to learn more!"\n\n🎯 Subreddit Targeting:\n• r/${data.industry.toLowerCase().replace(/\\s/g, "")}\n• r/${data.goal.toLowerCase().replace(/\\s/g, "")}\n• Related interest communities\n\n💡 Best Practices:\n• Be authentic (Reddit users detect spam)\n• Participate in community discussions\n• Avoid overly promotional tone\n• Engage with comments`,
+  const generateVisualAds = (platforms: string[], objective: string, message: string) => {
+    const colorSchemes: Record<string, { bg: string; accent: string }> = {
+      Instagram: { bg: "from-pink-50 to-purple-50", accent: "from-pink-500 to-purple-500" },
+      YouTube: { bg: "from-red-50 to-orange-50", accent: "from-red-500 to-orange-500" },
+      TikTok: { bg: "from-blue-50 to-pink-50", accent: "from-blue-500 to-pink-500" },
+      Facebook: { bg: "from-blue-50 to-indigo-50", accent: "from-blue-600 to-indigo-600" },
+      LinkedIn: { bg: "from-blue-50 to-slate-50", accent: "from-blue-700 to-slate-700" },
+      WhatsApp: { bg: "from-green-50 to-emerald-50", accent: "from-green-500 to-emerald-500" },
+      "Twitter/X": { bg: "from-slate-50 to-gray-50", accent: "from-black to-gray-800" },
+      Pinterest: { bg: "from-red-50 to-pink-50", accent: "from-red-600 to-pink-600" },
+      Snapchat: { bg: "from-yellow-50 to-amber-50", accent: "from-yellow-400 to-amber-500" },
+      Reddit: { bg: "from-orange-50 to-red-50", accent: "from-orange-600 to-red-600" },
     };
 
-    const template = adTemplates[platform] || adTemplates.Instagram;
-    const generatedContent = template(companyData!, userMessage);
-
-    return generatedContent;
-  };
-
-  const handleSendMessage = async () => {
-    if (!inputValue.trim() || !selectedPlatform || !companyData) return;
-
-    const userMessage = inputValue.trim();
-    const newUserMessage: Message = {
-      id: Date.now().toString(),
-      role: "user",
-      content: userMessage,
-      platform: selectedPlatform,
+    const objectiveHeadlines: Record<string, string> = {
+      awareness: `Discover ${companyData?.product || "Our Solution"}`,
+      engagement: `Connect with ${companyData?.audience || "Your Audience"}`,
+      conversion: `Get ${companyData?.product || "Started"} Today`,
+      retention: `Stay Ahead with ${companyData?.product || "Premium Features"}`,
     };
 
-    setMessages((prev) => [...prev, newUserMessage]);
-    setInputValue("");
+    const ads: VisualAd[] = platforms.map((platform) => {
+      const colors = colorSchemes[platform] || colorSchemes.Instagram;
+      return {
+        id: `${platform}-${Date.now()}`,
+        platform,
+        headline: objectiveHeadlines[objective] || objectiveHeadlines.awareness,
+        description: message || `Transform your ${companyData?.industry || "business"} with ${companyData?.product || "our solution"}`,
+        callToAction: formData.callToAction,
+        backgroundColor: colors.bg,
+        accentColor: colors.accent,
+        adCopy: message || "Join thousands of satisfied customers",
+        imageUrl: `https://images.unsplash.com/photo-${Math.floor(Math.random() * 1000000)}-?w=600&h=400&fit=crop`,
+      };
+    });
+
+    return ads;
+  };
+
+  const handleGenerateAds = () => {
+    if (formData.platforms.length === 0) {
+      toast.error("Please select at least one platform");
+      return;
+    }
+    if (!formData.targetMessage.trim()) {
+      toast.error("Please enter a message or campaign idea");
+      return;
+    }
+
     setIsGenerating(true);
-
-    // Simulate AI processing
     setTimeout(() => {
-      generateAd(userMessage, selectedPlatform).then((generatedAd) => {
-        const assistantMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          role: "assistant",
-          content: `I've created a custom ad for ${selectedPlatform}:`,
-          platform: selectedPlatform,
-          generatedAd,
-        };
-        setMessages((prev) => [...prev, assistantMessage]);
-        setIsGenerating(false);
-      });
-    }, 1500);
+      const newAds = generateVisualAds(
+        formData.platforms,
+        formData.adObjective,
+        formData.targetMessage
+      );
+      setGeneratedAds(newAds);
+      setIsGenerating(false);
+      toast.success("Visual ads generated successfully!");
+    }, 2000);
   };
 
-  const copyAdToClipboard = (content: string) => {
-    navigator.clipboard.writeText(content);
-    toast.success("Ad copied to clipboard!");
+  const downloadAdImage = (ad: VisualAd) => {
+    toast.success(`Downloading ${ad.platform} ad...`);
+  };
+
+  const handlePlatformToggle = (platform: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      platforms: prev.platforms.includes(platform)
+        ? prev.platforms.filter((p) => p !== platform)
+        : [...prev.platforms, platform],
+    }));
   };
 
   if (!companyData) {
@@ -145,118 +138,158 @@ export default function AiAdGeneratorChat({ companyData }: Props) {
   }
 
   return (
-    <div className="h-full flex flex-col max-w-4xl mx-auto">
-      {/* Chat Container */}
-      <div className="flex-1 overflow-y-auto mb-6 space-y-4 pr-4">
-        {messages.map((message) => (
-          <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div
-              className={`max-w-md lg:max-w-2xl rounded-lg p-4 ${
-                message.role === "user"
-                  ? "bg-primary text-primary-foreground rounded-br-none"
-                  : "bg-card border border-border/50 rounded-bl-none"
-              }`}
-            >
-              <p className="text-sm leading-relaxed mb-2">{message.content}</p>
-              {message.platform && message.role === "user" && (
-                <Badge variant="secondary" className="text-xs">
-                  {message.platform}
-                </Badge>
-              )}
-              {message.generatedAd && (
-                <div className="mt-4 pt-4 border-t border-border/50">
-                  <div className="bg-background/50 rounded-md p-3 text-sm whitespace-pre-wrap font-mono text-xs leading-relaxed mb-3">
-                    {message.generatedAd}
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => copyAdToClipboard(message.generatedAd!)}
-                    className="gap-2"
-                  >
-                    <Copy className="w-4 h-4" />
-                    Copy Ad
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-        {isGenerating && (
-          <div className="flex justify-start">
-            <div className="bg-card border border-border/50 rounded-lg rounded-bl-none p-4">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
-                <div className="w-2 h-2 bg-primary rounded-full animate-bounce animation-delay-200" />
-                <div className="w-2 h-2 bg-primary rounded-full animate-bounce animation-delay-400" />
-              </div>
-            </div>
-          </div>
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Input Section */}
-      <Card className="p-4 bg-card/50 backdrop-blur-xl border border-border/50">
-        <div className="space-y-3">
-          <div className="flex gap-2">
-            <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Select Platform" />
-              </SelectTrigger>
-              <SelectContent>
-                {SOCIAL_PLATFORMS.map((platform) => (
-                  <SelectItem key={platform} value={platform}>
-                    {platform}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+    <div className="space-y-8">
+      {/* Form Section */}
+      <Card className="p-6 border border-border/50 bg-card/50 backdrop-blur">
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-semibold mb-2">Visual Ad Generator</h2>
+            <p className="text-sm text-muted-foreground">Create professional visual ads for your campaigns</p>
           </div>
 
-          <div className="flex gap-2">
-            <Input
-              placeholder="Describe the ad you want to create (e.g., 'Create an ad to promote a summer sale with urgency')..."
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-              disabled={isGenerating || !selectedPlatform}
-              className="flex-1 bg-background/50 border-border/50 focus:border-primary/50"
+          {/* Campaign Message */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Campaign Message or Idea</label>
+            <Textarea
+              placeholder="Describe your campaign idea, promotion, or message. Example: 'Summer sale: 50% off on all products with limited time offer'"
+              value={formData.targetMessage}
+              onChange={(e) => setFormData((prev) => ({ ...prev, targetMessage: e.target.value }))}
+              className="min-h-24 bg-background/50 border-border/50 focus:border-primary/50"
             />
-            <Button
-              onClick={handleSendMessage}
-              disabled={isGenerating || !inputValue.trim() || !selectedPlatform}
-              className="gap-2"
-            >
-              <Send className="w-4 h-4" />
-              <span className="hidden sm:inline">Send</span>
-            </Button>
           </div>
 
-          <div className="flex flex-wrap gap-2 pt-2">
-            <span className="text-xs text-muted-foreground">Quick suggestions:</span>
-            {[
-              "Summer sale promo",
-              "New product launch",
-              "Limited time offer",
-              "Customer testimonial",
-            ].map((suggestion) => (
-              <Button
-                key={suggestion}
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  setInputValue(suggestion);
-                }}
-                disabled={isGenerating || !selectedPlatform}
-                className="text-xs"
-              >
-                {suggestion}
-              </Button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Campaign Objective */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Campaign Objective</label>
+              <Select value={formData.adObjective} onValueChange={(value) => setFormData((prev) => ({ ...prev, adObjective: value }))}>
+                <SelectTrigger className="bg-background/50 border-border/50">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="awareness">Brand Awareness</SelectItem>
+                  <SelectItem value="engagement">Engagement</SelectItem>
+                  <SelectItem value="conversion">Conversions</SelectItem>
+                  <SelectItem value="retention">Customer Retention</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Call to Action */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Call to Action</label>
+              <Input
+                placeholder="e.g., 'Shop Now', 'Learn More', 'Sign Up'"
+                value={formData.callToAction}
+                onChange={(e) => setFormData((prev) => ({ ...prev, callToAction: e.target.value }))}
+                className="bg-background/50 border-border/50 focus:border-primary/50"
+              />
+            </div>
+          </div>
+
+          {/* Platform Selection */}
+          <div className="space-y-3">
+            <label className="text-sm font-medium">Select Platforms</label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+              {SOCIAL_PLATFORMS.map((platform) => (
+                <Button
+                  key={platform}
+                  variant={formData.platforms.includes(platform) ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handlePlatformToggle(platform)}
+                  className="text-xs"
+                >
+                  {platform}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* Generate Button */}
+          <Button
+            onClick={handleGenerateAds}
+            disabled={isGenerating || formData.platforms.length === 0 || !formData.targetMessage.trim()}
+            size="lg"
+            className="w-full gap-2"
+          >
+            <Sparkles className="w-5 h-5" />
+            {isGenerating ? "Generating Visual Ads..." : "Generate Visual Ads"}
+          </Button>
+        </div>
+      </Card>
+
+      {/* Generated Ads Grid */}
+      {generatedAds.length > 0 && (
+        <div className="space-y-4">
+          <h3 className="text-xl font-semibold">Generated Visual Ads</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {generatedAds.map((ad) => (
+              <div key={ad.id} className="group">
+                <Card className="overflow-hidden border border-border/50 hover:shadow-lg transition-all">
+                  {/* Visual Preview */}
+                  <div className={`bg-gradient-to-br ${ad.backgroundColor} aspect-video flex items-center justify-center p-6 relative overflow-hidden`}>
+                    {/* Decorative elements */}
+                    <div className={`absolute inset-0 bg-gradient-to-r ${ad.accentColor} opacity-5`}></div>
+                    
+                    <div className="relative z-10 text-center space-y-3 max-w-full">
+                      <h4 className="text-xl md:text-2xl font-bold text-foreground leading-tight">{ad.headline}</h4>
+                      <p className="text-sm text-muted-foreground">{ad.description}</p>
+                      <div className={`inline-block px-6 py-2 bg-gradient-to-r ${ad.accentColor} text-white rounded-lg font-semibold text-sm`}>
+                        {ad.callToAction}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Ad Details */}
+                  <div className="p-4 space-y-3">
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Platform</p>
+                      <p className="font-semibold text-sm">{ad.platform}</p>
+                    </div>
+
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Ad Copy</p>
+                      <p className="text-sm text-foreground line-clamp-3">{ad.adCopy}</p>
+                    </div>
+
+                    <div className="flex gap-2 pt-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1 gap-2"
+                        onClick={() => downloadAdImage(ad)}
+                      >
+                        <Download className="w-4 h-4" />
+                        Download
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          navigator.clipboard.writeText(
+                            `${ad.headline}\n${ad.description}\n${ad.callToAction}`
+                          );
+                          toast.success("Ad details copied!");
+                        }}
+                      >
+                        Copy
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              </div>
             ))}
           </div>
         </div>
-      </Card>
+      )}
+
+      {/* Empty State */}
+      {generatedAds.length === 0 && !isGenerating && (
+        <Card className="p-12 text-center border border-border/50 bg-card/30">
+          <Sparkles className="w-12 h-12 text-muted-foreground/50 mx-auto mb-4" />
+          <p className="text-muted-foreground">Fill out the form above and click "Generate Visual Ads" to create professional ads for your campaign.</p>
+        </Card>
+      )}
     </div>
   );
 }
