@@ -35,32 +35,21 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
   const { theme, setTheme } = useTheme();
 
   return (
-    <header className="sticky top-0 z-50 w-full">
-      {/* Premium gradient border */}
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-      
-      <div className="relative bg-background/80 backdrop-blur-xl border-b border-border/40">
-        <div className="container flex h-16 max-w-screen-2xl items-center justify-between">
-          {/* Logo Section - Modern Branding */}
-          <div className="flex items-center">
-            <a href="/" className="group flex items-center space-x-3 transition-transform duration-300 hover:scale-105">
-              {/* Logo Badge */}
-              <div className="relative h-10 w-10 rounded-lg bg-gradient-to-br from-primary via-primary/80 to-secondary flex items-center justify-center shadow-lg shadow-primary/20">
-                <span className="text-sm font-bold text-primary-foreground">LB</span>
-              </div>
-              {/* Brand Name */}
-              <div className="hidden sm:flex flex-col">
-                <span className="font-display text-lg font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                  LeadBot
-                </span>
-                <span className="text-xs text-muted-foreground font-medium">AI Marketing Engine</span>
-              </div>
-            </a>
-          </div>
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 max-w-screen-2xl items-center">
+        {/* Logo Section */}
+        <div className="mr-4 flex">
+          <a href="/" className="mr-6 flex items-center space-x-2">
+            <span className="hidden font-display text-xl font-bold tracking-tight text-foreground sm:inline-block">
+              LeadBot
+            </span>
+          </a>
+        </div>
 
-          {/* Navigation Links - Modern Desktop */}
-          <div className="hidden md:flex flex-1 items-center justify-center px-8">
-            <nav className="flex items-center space-x-1 bg-muted/30 rounded-full px-4 py-2 backdrop-blur-sm border border-border/50">
+        {/* Navigation Links */}
+        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+          <div className="w-full flex-1 md:w-auto md:flex-none">
+            <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
               {tasks.map((task) => {
                 const isActive = activeTask === task.id;
                 return (
@@ -69,38 +58,38 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
                     onClick={() => onTaskChange(task.id)}
                     disabled={!hasCompanyData}
                     className={cn(
-                      "px-4 py-2 rounded-full text-xs font-semibold transition-all duration-300 whitespace-nowrap",
+                      "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-accent hover:text-accent-foreground",
                       isActive
-                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
-                      !hasCompanyData && "opacity-40 cursor-not-allowed hover:bg-transparent"
+                        ? "bg-primary/10 text-primary border border-primary/20"
+                        : "text-muted-foreground",
+                      !hasCompanyData && "opacity-50 cursor-not-allowed hover:bg-transparent"
                     )}
                   >
-                    {task.label}
+                    <span>{task.label}</span>
                   </button>
                 );
               })}
             </nav>
           </div>
 
-          {/* Right Actions - Theme Toggle */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2">
+            {/* Theme Toggle */}
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="h-10 w-10 rounded-full bg-muted/50 hover:bg-muted/80 transition-all duration-200"
+              className="h-9 w-9"
             >
-              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-amber-500" />
-              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-blue-400" />
+              <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
               <span className="sr-only">Toggle theme</span>
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Navigation - Modern Compact */}
-      <div className="md:hidden bg-background/80 backdrop-blur-xl border-t border-border/40">
+      {/* Mobile Navigation */}
+      <div className="md:hidden border-t border-border/40">
         <nav className="flex overflow-x-auto px-4 py-3 space-x-2 scrollbar-hide">
           {tasks.map((task) => {
             const isActive = activeTask === task.id;
@@ -110,14 +99,14 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
                 onClick={() => onTaskChange(task.id)}
                 disabled={!hasCompanyData}
                 className={cn(
-                  "px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-300",
+                  "flex items-center px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-200",
                   isActive
-                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
-                  !hasCompanyData && "opacity-40 cursor-not-allowed"
+                    ? "bg-primary/10 text-primary border border-primary/20"
+                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                  !hasCompanyData && "opacity-50 cursor-not-allowed"
                 )}
               >
-                {task.label}
+                <span>{task.label}</span>
               </button>
             );
           })}
