@@ -1,6 +1,7 @@
 import type { TaskId } from "./AppSidebar";
 import type { CompanyData } from "./CompanyForm";
 import ResultCard from "./ResultCard";
+import AiAdGeneratorChat from "./AiAdGeneratorChat";
 import { Button } from "@/components/ui/button";
 
 interface GeneratedContent {
@@ -59,6 +60,25 @@ export default function ResultsCanvas({
   const config = TASK_CONFIG[activeTask];
   const content = generatedContent[activeTask] || [];
   const hasContent = content.length > 0;
+
+  // Show AI Ad Generator Chat for ad creation task
+  if (activeTask === "ads") {
+    return (
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-8">
+          <h1 className="font-display text-4xl font-bold mb-3 bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent">
+            {config.title}
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed">
+            Use the AI ad generator below to create custom ads for your company across any social media platform. Describe what you want, select a platform, and let our AI create professional ads tailored to your needs.
+          </p>
+        </div>
+        <div className="bg-card/30 backdrop-blur-xl rounded-2xl border border-border/50 p-6 shadow-lg">
+          <AiAdGeneratorChat companyData={companyData} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-5xl mx-auto">
