@@ -61,7 +61,7 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
                       "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-accent hover:text-accent-foreground",
                       isActive
                         ? "bg-primary/10 text-primary border border-primary/20"
-                        : "text-muted-foreground",
+                        : "text-foreground",
                       !hasCompanyData && "opacity-50 cursor-not-allowed hover:bg-transparent"
                     )}
                   >
@@ -102,7 +102,7 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
                   "flex items-center px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-200",
                   isActive
                     ? "bg-primary/10 text-primary border border-primary/20"
-                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                    : "text-foreground hover:bg-accent hover:text-accent-foreground",
                   !hasCompanyData && "opacity-50 cursor-not-allowed"
                 )}
               >
