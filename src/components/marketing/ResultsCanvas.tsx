@@ -1,7 +1,6 @@
 import type { TaskId } from "./AppSidebar";
 import type { CompanyData } from "./CompanyForm";
 import ResultCard from "./ResultCard";
-import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface GeneratedContent {
@@ -20,7 +19,8 @@ interface Props {
 const TASK_CONFIG: Record<TaskId, { title: string; description: string }> = {
   ads: {
     title: "Ad Campaign Ideas",
-    description: "Headlines, ad copy, CTAs, visual concepts, and emotional hooks",
+    description:
+      "Generate ads tailored to target audiences (country, age, job, income, rejection history) and drive engagement with interactive formats like mini quiz ads, poll ads, and swipe decision ads.",
   },
   keywords: {
     title: "Keyword Strategy",
@@ -63,9 +63,6 @@ export default function ResultsCanvas({
   return (
     <div className="max-w-5xl mx-auto">
       <div className="mb-10 text-center">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl ai-gradient mb-6 glow animate-pulse-glow">
-          <Sparkles className="h-10 w-10 text-primary-foreground" />
-        </div>
         <h1 className="font-display text-4xl font-bold mb-3 bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent">
           {config.title}
         </h1>
@@ -76,12 +73,6 @@ export default function ResultsCanvas({
 
       {!hasContent && !isGenerating && (
         <div className="flex flex-col items-center justify-center py-24 text-center">
-          <div className="relative mb-8">
-            <div className="w-32 h-32 rounded-3xl ai-gradient flex items-center justify-center glow animate-float">
-              <Sparkles className="h-16 w-16 text-primary-foreground" />
-            </div>
-            <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-primary/20 to-secondary/20 blur-xl animate-pulse" />
-          </div>
           <h3 className="font-display font-bold text-2xl mb-3 text-foreground">
             Ready to Generate Content
           </h3>
@@ -95,7 +86,6 @@ export default function ResultsCanvas({
             onClick={() => onGenerate(activeTask)}
             className="h-16 px-8 text-lg font-semibold glow hover:scale-105 transition-all duration-300"
           >
-            <Sparkles className="h-6 w-6 mr-3" />
             Generate {config.title}
           </Button>
         </div>
@@ -120,7 +110,6 @@ export default function ResultsCanvas({
           ))}
           <div className="flex justify-center pt-2">
             <Button variant="outline" onClick={() => onGenerate(activeTask)}>
-              <Sparkles className="h-4 w-4" />
               Regenerate All
             </Button>
           </div>
