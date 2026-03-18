@@ -2,6 +2,7 @@ import type { TaskId } from "./AppSidebar";
 import type { CompanyData } from "./CompanyForm";
 import ResultCard from "./ResultCard";
 import AiAdGeneratorChat from "./AiAdGeneratorChat";
+import AiKeywordGenerator from "./AiKeywordGenerator";
 import { Button } from "@/components/ui/button";
 
 interface GeneratedContent {
@@ -25,7 +26,7 @@ const TASK_CONFIG: Record<TaskId, { title: string; description: string }> = {
   },
   keywords: {
     title: "Keyword Strategy",
-    description: "High-intent, long-tail, trending, and competitor gap keywords",
+    description: "AI-powered, high-intent, long-tail, and catchy keywords tailored for your brand goals.",
   },
   content: {
     title: "Content Generation",
@@ -76,6 +77,23 @@ export default function ResultsCanvas({
         <div className="bg-card/30 backdrop-blur-xl rounded-2xl border border-border/50 p-6 shadow-lg">
           <AiAdGeneratorChat companyData={companyData} />
         </div>
+      </div>
+    );
+  }
+
+  // Show AI Keyword Generator for keywords task
+  if (activeTask === "keywords") {
+    return (
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-8">
+          <h1 className="font-display text-4xl font-bold mb-3 bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent">
+            {config.title}
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed">
+            Generate high-quality keywords based on your brand and target audience. Our AI considers factors like lead generation, catchy messaging, and brand awareness to provide you with the best keyword strategy.
+          </p>
+        </div>
+        <AiKeywordGenerator companyData={companyData} />
       </div>
     );
   }
