@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import {
   Moon,
@@ -40,6 +41,17 @@ interface Props {
 
 export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData }: Props) {
   const { theme, setTheme } = useTheme();
+  const [openDropdownId, setOpenDropdownId] = useState<TaskId | null>(null);
+  const [openMobileDropdownId, setOpenMobileDropdownId] = useState<TaskId | null>(null);
+
+  const dropdownLabels: Record<string, string> = {
+    ads: "AI Ad generator",
+    keywords: "AI Keyword generator",
+    content: "AI Content generator",
+    viral: "AI Viral ideas generator",
+    competitor: "AI Competitor analyst",
+    engagement: "AI Engagement generator",
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -59,34 +71,50 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
             <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
               {tasks.map((task) => {
                 const isActive = activeTask === task.id;
+                const hasDropdown = !!dropdownLabels[task.id];
                 
-                if (task.id === "ads") {
+                if (hasDropdown) {
                   return (
-                    <DropdownMenu key={task.id}>
-                      <DropdownMenuTrigger asChild>
-                        <button
-                          disabled={!hasCompanyData}
-                          className={cn(
-                            "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-accent hover:text-accent-foreground gap-1.5",
-                            isActive
-                              ? "bg-primary/10 text-primary border border-primary/20"
-                              : "text-foreground",
-                            !hasCompanyData && "opacity-50 cursor-not-allowed hover:bg-transparent"
-                          )}
-                        >
-                          <span>{task.label}</span>
-                          <ChevronDown className={cn("h-4 w-4 transition-transform duration-200 opacity-50", isActive && "opacity-100")} />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="w-48 bg-background/95 backdrop-blur-xl border-border/50">
-                        <DropdownMenuItem 
-                          onClick={() => onTaskChange("ads")}
-                          className="cursor-pointer focus:bg-primary/10 focus:text-primary transition-colors duration-200"
-                        >
-                          AI Ad generator
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <div
+                      key={task.id}
+                      onMouseEnter={() => setOpenDropdownId(task.id)}
+                      onMouseLeave={() => setOpenDropdownId(null)}
+                      className="relative"
+                    >
+                      <DropdownMenu 
+                        open={openDropdownId === task.id} 
+                        onOpenChange={(open) => setOpenDropdownId(open ? task.id : null)}
+                      >
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            className={cn(
+                              "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-accent hover:text-accent-foreground gap-1.5",
+                              isActive
+                                ? "bg-primary/10 text-primary border border-primary/20"
+                                : "text-foreground"
+                            )}
+                          >
+                            <span>{task.label}</span>
+                            <ChevronDown className={cn(
+                              "h-4 w-4 transition-transform duration-200 opacity-50", 
+                              isActive && "opacity-100",
+                              openDropdownId === task.id && "rotate-180"
+                            )} />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-48 bg-background/95 backdrop-blur-xl border-border/50">
+                          <DropdownMenuItem 
+                            onClick={() => {
+                              onTaskChange(task.id);
+                              setOpenDropdownId(null);
+                            }}
+                            className="cursor-pointer focus:bg-primary/10 focus:text-primary transition-colors duration-200"
+                          >
+                            {dropdownLabels[task.id]}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   );
                 }
 
@@ -131,31 +159,40 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
         <nav className="flex overflow-x-auto px-4 py-3 space-x-2 scrollbar-hide">
           {tasks.map((task) => {
             const isActive = activeTask === task.id;
+            const hasDropdown = !!dropdownLabels[task.id];
 
-            if (task.id === "ads") {
+            if (hasDropdown) {
               return (
-                <DropdownMenu key={task.id}>
+                <DropdownMenu 
+                  key={task.id} 
+                  open={openMobileDropdownId === task.id} 
+                  onOpenChange={(open) => setOpenMobileDropdownId(open ? task.id : null)}
+                >
                   <DropdownMenuTrigger asChild>
                     <button
-                      disabled={!hasCompanyData}
                       className={cn(
                         "flex items-center px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-200 gap-1",
                         isActive
                           ? "bg-primary/10 text-primary border border-primary/20"
-                          : "text-foreground hover:bg-accent hover:text-accent-foreground",
-                        !hasCompanyData && "opacity-50 cursor-not-allowed"
+                          : "text-foreground hover:bg-accent hover:text-accent-foreground"
                       )}
                     >
                       <span>{task.label}</span>
-                      <ChevronDown className="h-3 w-3 opacity-50" />
+                      <ChevronDown className={cn(
+                        "h-3 w-3 opacity-50 transition-transform duration-200", 
+                        openMobileDropdownId === task.id && "rotate-180"
+                      )} />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-40 bg-background/95 backdrop-blur-xl border-border/50">
                     <DropdownMenuItem 
-                      onClick={() => onTaskChange("ads")}
+                      onClick={() => {
+                        onTaskChange(task.id);
+                        setOpenMobileDropdownId(null);
+                      }}
                       className="text-xs py-2 cursor-pointer focus:bg-primary/10 focus:text-primary"
                     >
-                      AI Ad generator
+                      {dropdownLabels[task.id]}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
