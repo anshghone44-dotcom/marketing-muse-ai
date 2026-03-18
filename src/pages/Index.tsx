@@ -104,7 +104,7 @@ export default function Index() {
       />
 
       <main className="container mx-auto px-6 py-12 relative z-10">
-        {!companyData ? (
+        {!companyData && activeTask === "social" ? (
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
               <h1 className="font-display text-5xl font-bold mb-4 bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent">

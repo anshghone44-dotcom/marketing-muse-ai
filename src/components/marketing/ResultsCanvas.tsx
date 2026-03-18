@@ -109,7 +109,13 @@ export default function ResultsCanvas({
         </p>
       </div>
 
-      {!hasContent && !isGenerating && (
+      {!companyData && (
+        <div className="flex items-center justify-center h-96">
+          <p className="text-muted-foreground">Please submit your company details first.</p>
+        </div>
+      )}
+
+      {companyData && !hasContent && !isGenerating && (
         <div className="flex flex-col items-center justify-center py-24 text-center">
           <h3 className="font-display font-bold text-2xl mb-3 text-foreground">
             Ready to Generate Content
