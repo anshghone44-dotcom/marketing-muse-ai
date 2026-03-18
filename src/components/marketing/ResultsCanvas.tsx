@@ -70,17 +70,7 @@ export default function ResultsCanvas({
   if (activeTask === "ads") {
     return (
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="font-display text-4xl font-bold mb-3 bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent">
-            {config.title}
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed">
-            Use the AI ad generator below to create custom ads for your company across any social media platform. Describe what you want, select a platform, and let our AI create professional ads tailored to your needs.
-          </p>
-        </div>
-        <div className="bg-card/30 backdrop-blur-xl rounded-2xl border border-border/50 p-6 shadow-lg">
-          <AiAdGeneratorChat companyData={companyData} onCompanySubmit={onCompanySubmit} />
-        </div>
+        <AiAdGeneratorChat companyData={companyData} onCompanySubmit={onCompanySubmit} />
       </div>
     );
   }
@@ -89,14 +79,6 @@ export default function ResultsCanvas({
   if (activeTask === "keywords") {
     return (
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="font-display text-4xl font-bold mb-3 bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent">
-            {config.title}
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed">
-            Generate high-quality keywords based on your brand and target audience. Our AI considers factors like lead generation, catchy messaging, and brand awareness to provide you with the best keyword strategy.
-          </p>
-        </div>
         <AiKeywordGenerator companyData={companyData} onCompanySubmit={onCompanySubmit} />
       </div>
     );
@@ -106,14 +88,6 @@ export default function ResultsCanvas({
   if (activeTask === "content") {
     return (
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="font-display text-4xl font-bold mb-3 bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent">
-            {config.title}
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed">
-            Create high-converting blogs, landing pages, and email campaigns with our AI content engine.
-          </p>
-        </div>
         <AiContentGeneratorChat companyData={companyData} onCompanySubmit={onCompanySubmit} />
       </div>
     );
