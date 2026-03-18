@@ -3,6 +3,7 @@ import type { CompanyData } from "./CompanyForm";
 import ResultCard from "./ResultCard";
 import AiAdGeneratorChat from "./AiAdGeneratorChat";
 import AiKeywordGenerator from "./AiKeywordGenerator";
+import CompanyForm from "./CompanyForm";
 import { Button } from "@/components/ui/button";
 
 interface GeneratedContent {
@@ -16,6 +17,7 @@ interface Props {
   isGenerating: boolean;
   onGenerate: (task: TaskId) => void;
   onRegenerate: (task: TaskId, index: number) => void;
+  onCompanySubmit: (data: CompanyData) => void;
 }
 
 const TASK_CONFIG: Record<TaskId, { title: string; description: string }> = {
@@ -57,6 +59,7 @@ export default function ResultsCanvas({
   isGenerating,
   onGenerate,
   onRegenerate,
+  onCompanySubmit,
 }: Props) {
   const config = TASK_CONFIG[activeTask];
   const content = generatedContent[activeTask] || [];
@@ -75,7 +78,7 @@ export default function ResultsCanvas({
           </p>
         </div>
         <div className="bg-card/30 backdrop-blur-xl rounded-2xl border border-border/50 p-6 shadow-lg">
-          <AiAdGeneratorChat companyData={companyData} />
+          <AiAdGeneratorChat companyData={companyData} onCompanySubmit={onCompanySubmit} />
         </div>
       </div>
     );
@@ -93,7 +96,7 @@ export default function ResultsCanvas({
             Generate high-quality keywords based on your brand and target audience. Our AI considers factors like lead generation, catchy messaging, and brand awareness to provide you with the best keyword strategy.
           </p>
         </div>
-        <AiKeywordGenerator companyData={companyData} />
+        <AiKeywordGenerator companyData={companyData} onCompanySubmit={onCompanySubmit} />
       </div>
     );
   }
@@ -110,8 +113,12 @@ export default function ResultsCanvas({
       </div>
 
       {!companyData && (
-        <div className="flex items-center justify-center h-96">
-          <p className="text-muted-foreground">Please submit your company details first.</p>
+        <div className="max-w-2xl mx-auto py-8">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold mb-2">Complete Your Profile</h2>
+            <p className="text-muted-foreground">To generate tailored {config.title.toLowerCase()}, please provide your company details below.</p>
+          </div>
+          <CompanyForm onSubmit={onCompanySubmit} />
         </div>
       )}
 

@@ -13,6 +13,7 @@ import {
 import { Download, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import type { CompanyData } from "./CompanyForm";
+import CompanyForm from "./CompanyForm";
 
 export const SOCIAL_PLATFORMS = [
   "Instagram",
@@ -43,9 +44,10 @@ interface VisualAd {
 
 interface Props {
   companyData: CompanyData | null;
+  onCompanySubmit: (data: CompanyData) => void;
 }
 
-export default function AiAdGeneratorChat({ companyData }: Props) {
+export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Props) {
   const [formData, setFormData] = useState({
     platforms: [] as string[],
     adObjective: "awareness",
@@ -239,8 +241,12 @@ export default function AiAdGeneratorChat({ companyData }: Props) {
 
   if (!companyData) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <p className="text-muted-foreground">Please submit your company details first.</p>
+      <div className="max-w-2xl mx-auto py-8">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold mb-2">Complete Your Profile</h2>
+          <p className="text-muted-foreground">To use the AI Ad Generator, please provide your company details below.</p>
+        </div>
+        <CompanyForm onSubmit={onCompanySubmit} />
       </div>
     );
   }

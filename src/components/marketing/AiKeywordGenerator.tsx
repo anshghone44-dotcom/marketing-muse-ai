@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import type { CompanyData } from "./CompanyForm";
+import CompanyForm from "./CompanyForm";
 
 export const KEYWORD_FACTORS = [
   { id: "lead", label: "Lead-Generating", description: "High-intent keywords for conversions" },
@@ -24,9 +25,10 @@ interface GeneratedKeywordGroup {
 
 interface Props {
   companyData: CompanyData | null;
+  onCompanySubmit: (data: CompanyData) => void;
 }
 
-export default function AiKeywordGenerator({ companyData }: Props) {
+export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Props) {
   const [formData, setFormData] = useState({
     topic: "",
     selectedFactors: ["lead", "catchy", "awareness"] as string[],
@@ -139,8 +141,12 @@ export default function AiKeywordGenerator({ companyData }: Props) {
 
   if (!companyData) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <p className="text-muted-foreground">Please submit your company details first.</p>
+      <div className="max-w-2xl mx-auto py-8">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold mb-2">Complete Your Profile</h2>
+          <p className="text-muted-foreground">To use the AI Keyword Generator, please provide your company details below.</p>
+        </div>
+        <CompanyForm onSubmit={onCompanySubmit} />
       </div>
     );
   }

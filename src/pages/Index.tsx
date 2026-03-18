@@ -124,6 +124,7 @@ export default function Index() {
             isGenerating={isGenerating}
             onGenerate={handleGenerate}
             onRegenerate={handleRegenerate}
+            onCompanySubmit={handleCompanySubmit}
           />
         )}
       </main>
