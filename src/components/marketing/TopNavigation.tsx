@@ -2,9 +2,16 @@ import { cn } from "@/lib/utils";
 import {
   Moon,
   Sun,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/hooks/use-theme";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export type TaskId =
   | "ads"
@@ -52,6 +59,37 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
             <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
               {tasks.map((task) => {
                 const isActive = activeTask === task.id;
+                
+                if (task.id === "ads") {
+                  return (
+                    <DropdownMenu key={task.id}>
+                      <DropdownMenuTrigger asChild>
+                        <button
+                          disabled={!hasCompanyData}
+                          className={cn(
+                            "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-accent hover:text-accent-foreground gap-1.5",
+                            isActive
+                              ? "bg-primary/10 text-primary border border-primary/20"
+                              : "text-foreground",
+                            !hasCompanyData && "opacity-50 cursor-not-allowed hover:bg-transparent"
+                          )}
+                        >
+                          <span>{task.label}</span>
+                          <ChevronDown className={cn("h-4 w-4 transition-transform duration-200 opacity-50", isActive && "opacity-100")} />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start" className="w-48 bg-background/95 backdrop-blur-xl border-border/50">
+                        <DropdownMenuItem 
+                          onClick={() => onTaskChange("ads")}
+                          className="cursor-pointer focus:bg-primary/10 focus:text-primary transition-colors duration-200"
+                        >
+                          AI Ad generator
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  );
+                }
+
                 return (
                   <button
                     key={task.id}
@@ -93,6 +131,37 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
         <nav className="flex overflow-x-auto px-4 py-3 space-x-2 scrollbar-hide">
           {tasks.map((task) => {
             const isActive = activeTask === task.id;
+
+            if (task.id === "ads") {
+              return (
+                <DropdownMenu key={task.id}>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      disabled={!hasCompanyData}
+                      className={cn(
+                        "flex items-center px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-200 gap-1",
+                        isActive
+                          ? "bg-primary/10 text-primary border border-primary/20"
+                          : "text-foreground hover:bg-accent hover:text-accent-foreground",
+                        !hasCompanyData && "opacity-50 cursor-not-allowed"
+                      )}
+                    >
+                      <span>{task.label}</span>
+                      <ChevronDown className="h-3 w-3 opacity-50" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-40 bg-background/95 backdrop-blur-xl border-border/50">
+                    <DropdownMenuItem 
+                      onClick={() => onTaskChange("ads")}
+                      className="text-xs py-2 cursor-pointer focus:bg-primary/10 focus:text-primary"
+                    >
+                      AI Ad generator
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              );
+            }
+
             return (
               <button
                 key={task.id}
