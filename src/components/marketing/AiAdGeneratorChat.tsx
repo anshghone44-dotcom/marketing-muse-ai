@@ -36,7 +36,9 @@ interface VisualAd {
   backgroundColor: string;
   accentColor: string;
   adCopy: string;
-  imageUrl: string;
+  mediaType: "image" | "video";
+  mediaUrl: string;
+  videoScript?: string;
 }
 
 interface Props {
@@ -75,18 +77,124 @@ export default function AiAdGeneratorChat({ companyData }: Props) {
       retention: `Stay Ahead with ${companyData?.product || "Premium Features"}`,
     };
 
+    const makePlatformCopy = (platform: string) => {
+      const base = message || `Transform your ${companyData?.industry || "business"} with ${companyData?.product || "our solution"}`;
+      const callToAction = formData.callToAction;
+
+      const videoScript = (intro: string, hook: string, close: string) =>
+        `🎬 Video Script\n\n1) Intro (0-5s): ${intro}\n2) Hook (5-15s): ${hook}\n3) Call to action (15-30s): ${close}`;
+
+      switch (platform) {
+        case "YouTube":
+          return {
+            mediaType: "video" as const,
+            mediaUrl: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+            adCopy: videoScript(
+              `Introduce ${companyData?.name || "your brand"} with a strong value prop.`, 
+              base,
+              `Ask viewers to click ${callToAction} to learn more.`
+            ),
+            videoScript: videoScript(
+              `Introduce ${companyData?.name || "your brand"} with a strong value prop.`, 
+              base,
+              `Ask viewers to click ${callToAction} to learn more.`
+            ),
+            description: `A short, attention-grabbing video spot for YouTube.`,
+          };
+        case "TikTok":
+          return {
+            mediaType: "video" as const,
+            mediaUrl: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+            adCopy: `${base} \n\n🎵 Think fast-paced, authentic footage with a quick call to action: ${callToAction}.`,
+            videoScript: videoScript(
+              `Start with a relatable problem in a fun tone.`, 
+              base,
+              `End with a trendy prompt & ${callToAction}.`
+            ),
+            description: `A short vertical video ad formatted for TikTok viewers.`,
+          };
+        case "Instagram":
+          return {
+            mediaType: "image" as const,
+            mediaUrl: `https://source.unsplash.com/600x400/?${companyData?.industry || "business"},${platform}`,
+            adCopy: `${base} \n\nUse bold visuals and concise text to drive attention.`,
+            description: `A polished visual ad designed for Instagram feeds and stories.`,
+          };
+        case "Facebook":
+          return {
+            mediaType: "image" as const,
+            mediaUrl: `https://source.unsplash.com/600x400/?${companyData?.industry || "business"},${platform}`,
+            adCopy: `${base} \n\nCombine a relatable message with a clear ${callToAction} button.`,
+            description: `A scroll-stopping image ad tailored to Facebook audiences.`,
+          };
+        case "LinkedIn":
+          return {
+            mediaType: "image" as const,
+            mediaUrl: `https://source.unsplash.com/600x400/?business,professional,${platform}`,
+            adCopy: `${base} \n\nPosition your product as the smart choice for professionals.`,
+            description: `A professional ad format that resonates with LinkedIn decision-makers.`,
+          };
+        case "WhatsApp":
+          return {
+            mediaType: "image" as const,
+            mediaUrl: `https://source.unsplash.com/600x400/?chat,${platform}`,
+            adCopy: `${base} \n\nUse conversational tone and a direct ask to ${callToAction}.`,
+            description: `A chat-style campaign idea for WhatsApp Broadcasts or Status updates.`,
+          };
+        case "Twitter/X":
+          return {
+            mediaType: "image" as const,
+            mediaUrl: `https://source.unsplash.com/600x400/?${companyData?.industry || "business"},${platform}`,
+            adCopy: `${base} \n\nCraft a concise headline and use relevant hashtags.`,
+            description: `A crisp, shareable ad concept for Twitter/X.`,
+          };
+        case "Pinterest":
+          return {
+            mediaType: "image" as const,
+            mediaUrl: `https://source.unsplash.com/600x400/?design,${platform}`,
+            adCopy: `${base} \n\nFocus on aspirational imagery and a strong ${callToAction}.`,
+            description: `A visual-first idea optimized for Pinterest boards.`,
+          };
+        case "Snapchat":
+          return {
+            mediaType: "image" as const,
+            mediaUrl: `https://source.unsplash.com/600x400/?snapchat,${companyData?.industry || "business"}`,
+            adCopy: `${base} \n\nKeep it quick, playful, and full-screen ready.`,
+            description: `A vertical-like style ad that matches Snapchat's immersive experience.`,
+          };
+        case "Reddit":
+          return {
+            mediaType: "image" as const,
+            mediaUrl: `https://source.unsplash.com/600x400/?community,${platform}`,
+            adCopy: `${base} \n\nUse an authentic voice and tie into subreddit interests.`,
+            description: `A community-minded ad idea for Reddit audiences.`,
+          };
+        default:
+          return {
+            mediaType: "image" as const,
+            mediaUrl: `https://source.unsplash.com/600x400/?${companyData?.industry || "business"}`,
+            adCopy: base,
+            description: base,
+          };
+      }
+    };
+
     const ads: VisualAd[] = platforms.map((platform) => {
       const colors = colorSchemes[platform] || colorSchemes.Instagram;
+      const platformAd = makePlatformCopy(platform);
+
       return {
         id: `${platform}-${Date.now()}`,
         platform,
         headline: objectiveHeadlines[objective] || objectiveHeadlines.awareness,
-        description: message || `Transform your ${companyData?.industry || "business"} with ${companyData?.product || "our solution"}`,
+        description: platformAd.description,
         callToAction: formData.callToAction,
         backgroundColor: colors.bg,
         accentColor: colors.accent,
-        adCopy: message || "Join thousands of satisfied customers",
-        imageUrl: `https://images.unsplash.com/photo-${Math.floor(Math.random() * 1000000)}-?w=600&h=400&fit=crop`,
+        adCopy: platformAd.adCopy,
+        mediaType: platformAd.mediaType,
+        mediaUrl: platformAd.mediaUrl,
+        videoScript: platformAd.videoScript,
       };
     });
 
@@ -229,9 +337,32 @@ export default function AiAdGeneratorChat({ companyData }: Props) {
                   {/* Visual Preview */}
                   <div className={`bg-gradient-to-br ${ad.backgroundColor} aspect-video flex items-center justify-center p-6 relative overflow-hidden`}>
                     {/* Decorative elements */}
-                    <div className={`absolute inset-0 bg-gradient-to-r ${ad.accentColor} opacity-5`}></div>
-                    
+                    <div className={`absolute inset-0 bg-gradient-to-r ${ad.accentColor} opacity-10`}></div>
+
+                    {ad.mediaType === "video" ? (
+                      <video
+                        className="absolute inset-0 w-full h-full object-cover"
+                        src={ad.mediaUrl}
+                        muted
+                        loop
+                        playsInline
+                        controls
+                      />
+                    ) : (
+                      <img
+                        className="absolute inset-0 w-full h-full object-cover"
+                        src={ad.mediaUrl}
+                        alt={`${ad.platform} ad preview`}
+                      />
+                    )}
+
                     <div className="relative z-10 text-center space-y-3 max-w-full">
+                      <div className="inline-flex items-center justify-center gap-2 px-3 py-1 rounded-full bg-black/40 text-xs text-white">
+                        {ad.mediaType === "video" ? "Video Ad" : "Image Ad"}
+                        <span className="opacity-70">•</span>
+                        {ad.platform}
+                      </div>
+
                       <h4 className="text-xl md:text-2xl font-bold text-foreground leading-tight">{ad.headline}</h4>
                       <p className="text-sm text-muted-foreground">{ad.description}</p>
                       <div className={`inline-block px-6 py-2 bg-gradient-to-r ${ad.accentColor} text-white rounded-lg font-semibold text-sm`}>
@@ -251,6 +382,13 @@ export default function AiAdGeneratorChat({ companyData }: Props) {
                       <p className="text-xs text-muted-foreground mb-1">Ad Copy</p>
                       <p className="text-sm text-foreground line-clamp-3">{ad.adCopy}</p>
                     </div>
+
+                    {ad.videoScript && (
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Video Script</p>
+                        <pre className="text-sm text-foreground whitespace-pre-wrap line-clamp-4">{ad.videoScript}</pre>
+                      </div>
+                    )}
 
                     <div className="flex gap-2 pt-2">
                       <Button
