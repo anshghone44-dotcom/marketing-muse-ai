@@ -68,9 +68,8 @@ export default function Index() {
   const handleCompanySubmit = (data: CompanyData) => {
     setCompanyData(data);
     setGeneratedContent({});
-    setActiveTask("social");
     toast.success(`Profile saved for ${data.name}`, {
-      description: "Generating your platform-specific marketing strategy...",
+      description: "Generating your tailored marketing strategy and content...",
     });
   };
 
