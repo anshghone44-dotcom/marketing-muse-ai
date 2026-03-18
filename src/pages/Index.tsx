@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import TopNavigation, { type TaskId } from "@/components/marketing/TopNavigation";
 import CompanyForm, { type CompanyData } from "@/components/marketing/CompanyForm";
 import ResultsCanvas from "@/components/marketing/ResultsCanvas";
