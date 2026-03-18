@@ -3,6 +3,7 @@ import type { CompanyData } from "./CompanyForm";
 import ResultCard from "./ResultCard";
 import AiAdGeneratorChat from "./AiAdGeneratorChat";
 import AiKeywordGenerator from "./AiKeywordGenerator";
+import AiContentGeneratorChat from "./AiContentGeneratorChat";
 import CompanyForm from "./CompanyForm";
 import { Button } from "@/components/ui/button";
 
@@ -97,6 +98,23 @@ export default function ResultsCanvas({
           </p>
         </div>
         <AiKeywordGenerator companyData={companyData} onCompanySubmit={onCompanySubmit} />
+      </div>
+    );
+  }
+
+  // Show AI Content Generator for content task
+  if (activeTask === "content") {
+    return (
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-8">
+          <h1 className="font-display text-4xl font-bold mb-3 bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent">
+            {config.title}
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed">
+            Create high-converting blogs, landing pages, and email campaigns with our AI content engine.
+          </p>
+        </div>
+        <AiContentGeneratorChat companyData={companyData} onCompanySubmit={onCompanySubmit} />
       </div>
     );
   }

@@ -4,6 +4,12 @@ import {
   Moon,
   Sun,
   ChevronDown,
+  Sparkles,
+  Search,
+  PenTool,
+  Zap,
+  Shield,
+  MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/hooks/use-theme";
@@ -51,6 +57,15 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
     viral: "AI Viral ideas generator",
     competitor: "AI Competitor analyst",
     engagement: "AI Engagement generator",
+  };
+
+  const dropdownIcons: Record<string, any> = {
+    ads: Sparkles,
+    keywords: Search,
+    content: PenTool,
+    viral: Zap,
+    competitor: Shield,
+    engagement: MessageSquare,
   };
 
   return (
@@ -102,16 +117,27 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
                             )} />
                           </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-48 bg-background/95 backdrop-blur-xl border-border/50">
-                          <DropdownMenuItem 
-                            onClick={() => {
-                              onTaskChange(task.id);
-                              setOpenDropdownId(null);
-                            }}
-                            className="cursor-pointer focus:bg-primary/10 focus:text-primary transition-colors duration-200"
-                          >
-                            {dropdownLabels[task.id]}
-                          </DropdownMenuItem>
+                        <DropdownMenuContent 
+                          align="start" 
+                          className="w-56 p-1 bg-background/80 backdrop-blur-2xl border-white/10 shadow-2xl animate-in fade-in-0 zoom-in-95 duration-200"
+                        >
+                          {(() => {
+                            const Icon = dropdownIcons[task.id];
+                            return (
+                              <DropdownMenuItem 
+                                onClick={() => {
+                                  onTaskChange(task.id);
+                                  setOpenDropdownId(null);
+                                }}
+                                className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200 hover:bg-primary/10 hover:text-primary group"
+                              >
+                                <div className="p-1 rounded-md bg-primary/5 group-hover:bg-primary/20 transition-colors">
+                                  {Icon && <Icon className="h-3.5 w-3.5" />}
+                                </div>
+                                <span className="text-xs font-semibold tracking-tight">{dropdownLabels[task.id]}</span>
+                              </DropdownMenuItem>
+                            );
+                          })()}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
