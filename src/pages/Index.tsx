@@ -60,15 +60,16 @@ function generateMockContent(task: TaskId, data: CompanyData): string[] {
 
 export default function Index() {
   const [companyData, setCompanyData] = useState<CompanyData | null>(null);
-  const [activeTask, setActiveTask] = useState<TaskId>("ads");
+  const [activeTask, setActiveTask] = useState<TaskId>("social");
   const [generatedContent, setGeneratedContent] = useState<Record<string, string[]>>({});
   const [isGenerating, setIsGenerating] = useState(false);
 
   const handleCompanySubmit = (data: CompanyData) => {
     setCompanyData(data);
     setGeneratedContent({});
+    setActiveTask("social");
     toast.success(`Profile saved for ${data.name}`, {
-      description: "Select a task from the sidebar to generate content.",
+      description: "Generating your platform-specific marketing strategy...",
     });
   };
 
