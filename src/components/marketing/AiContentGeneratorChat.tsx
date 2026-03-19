@@ -76,88 +76,171 @@ export default function AiContentGeneratorChat({ companyData, onCompanySubmit }:
 
       switch (contentType) {
         case "blog":
-          mockBody = `# The Ultimate Guide to ${topic}\n\n*Target Audience:* ${audience || "Professionals"} in ${industry || "the industry"}\n*Reading Time:* 4 minutes\n\n## Introduction\nIn today's fast-paced ${industry || "market"}, businesses like yours are looking for ways to optimize ${product || "their workflow"}. Finding the right approach to ${topic} isn't just a competitive advantage—it's essential for survival. Whether you're a seasoned pro or just starting out, understanding the impact of ${topic} is crucial.\n\n## Why ${topic} Matters for ${audience || "Modern Professionals"}\n\nThe landscape of ${industry || "our industry"} has dramatically shifted over the past three years. Here are the core reasons why paying attention to ${topic} is critical:\n\n1. **Increased Efficiency**: Our data shows that implementing ${name || "a specialized solution"} can reduce overhead by up to 30%, freeing your team to focus on high-impact strategic work.\n2. **Unprecedented Scalability**: As ${topic} evolves, your strategy must adapt. Legacy systems bottleneck growth, whereas modern solutions scale effortlessly with your ambitions.\n3. **Enhanced Customer Experience**: At the end of the day, how you handle ${topic} directly impacts your end users. A streamlined approach ensures maximum satisfaction and retention.\n\n## Actionable Strategies to Implement Today\n\nTransitioning to a new model might seem daunting, but it doesn't have to be. Start by auditing your current processes for ${product || "core tasks"}. Identify the biggest time-sinks and look for automated solutions.\n\n> "The organizations that thrive tomorrow are the ones that embrace ${topic} today."\n\n## Conclusion\nWrapping up, the future of ${industry || "industry innovation"} lies in how we leverage tools and strategies today. Don't wait until your competitors force your hand. Start small, track your metrics, and scale what works.\n\n**Ready to take the next step?**\nDiscover how ${name || "our platform"} can help you master ${topic}. [Click here to learn more](#).`;
+          mockBody = `# Professional Guide: Mastering ${topic} in ${new Date().getFullYear()}
+
+**Target Audience:** ${audience || "Industry Professionals"}
+**Estimated Reading Time:** 6 Minutes
+**Tone:** ${tone || "Professional, Authoritative, yet Accessible"}
+
+---
+
+## Executive Summary
+The rapid evolution of the ${industry || "business"} sector has forced organizations to rethink how they approach ${topic}. In this comprehensive guide, we explore the fundamental shifts affecting ${audience || "your peers"} and provide actionable strategies to ensure your team remains competitive.
+
+## The State of ${topic}
+In recent years, the reliance on outdated processes has become a significant liability. Organizations that fail to adopt advanced ${product || "solutions"} are seeing a steady decline in efficiency. For ${name || "our clients"}, the ability to streamline and automate these workflows is no longer optional—it is a critical driver for sustainable growth.
+
+### Three Key Pillars of Modernization:
+1. **Strategic Alignment**: Ensuring your new ${product || "technology"} aligns with overarching business objectives.
+2. **Process Automation**: Removing the manual friction involved in administrative tasks, which our data indicates can save up to 40% of weekly operational hours.
+3. **Data-Driven Decision Making**: Utilizing intelligent analytics to preemptively address market shifts before they impact the bottom line.
+
+## Implementing the Solution
+Deploying a modern approach to ${topic} requires a structured timeline. Leadership must champion the transition, focusing on training and gradual integration rather than disruptive overhauls. 
+
+> *“Innovation distinguishes between a leader and a follower. Adapting to ${topic} determines which side of history your organization will stand on.”*
+
+## Conclusion and Next Steps
+The cost of inaction far outweighs the investment in modernization. By adopting a proactive stance on ${topic}, ${audience || "professionals"} can unlock unprecedented scalability. 
+
+**Call to Action:** To discover how ${name || "our specialized platform"} can facilitate this transition for your team, [Schedule a Professional Consultation](#) with our enterprise specialists today.`;
           break;
         case "landing":
           mockBody = `---
-*Recommended Layout: Modern SaaS or B2B Lead Gen*
+**Creative Layout Structure: High-Converting B2B Lead Generation**
 ---
 
-# Hero Section
-**Headline:** Transform Your ${industry || "Business"} with Next-Gen ${topic}
-**Sub-headline:** ${topic} is no longer just an option—it's a requirement for ${audience || "success"}. Our ${tone.toLowerCase()} approach ensures you get results without the typical ${industry || "technical"} headaches. Built specifically for ${audience || "teams like yours"}.
-**Primary CTA Button:** Start Your Free Trial
-**Secondary CTA Button:** Watch 2-Min Demo
+# [HERO SECTION]
+*(Visual: Clean, high-contrast background with abstract, motion-driven 3D elements)*
 
----
-
-# Social Proof & Trust Bar
-*Logos of 5 industry-leading companies*
-*"Trusted by over 10,000 ${audience || "professionals"} worldwide to streamline their ${product || "workflow"}."*
+**Pre-Headline:** THE FUTURE OF ${industry?.toUpperCase() || "BUSINESS"} IS HERE
+**Headline:** Unleash Creative Scalability with Next-Generation ${topic}
+**Sub-Headline:** Specifically engineered for ${audience || "forward-thinking teams"}. ${name || "LeadBot"} replaces repetitive manual labor with an elegant, ${tone.toLowerCase()} solution that drives measurable ROI from day one.
+**Primary CTA:** Start Building for Free (No Credit Card Required)
+**Secondary CTA:** Watch the Product Tour (3 Min)
 
 ---
 
-# Core Features (3-Column Grid)
-### 1. Seamless Integration
-Connect with your existing tools in minutes, not months. Our API guarantees zero downtime.
-### 2. AI-Powered Insights
-Let our models do the heavy lifting for ${topic}. Get predictive analytics that actually make sense.
-### 3. Enterprise-Grade Security
-Your data is protected by bank-level encryption and 24/7 dedicated support.
+# [SOCIAL PROOF BANNER]
+*(Visual: Minimalist logos in greyscale)*
+**"Empowering over 15,000 ${audience || "innovators"} across the globe to redefine their ${product || "workflow"}."**
 
 ---
 
-# Problem/Agitation/Solution Section
-**The Problem:** Managing ${topic} manually is draining your team's resources and causing costly errors.
-**The Agitation:** Every hour spent on admin tasks is an hour stolen from strategic growth. Competitors using automated ${product || "systems"} are moving 3x faster.
-**The Solution:** ${name || "LeadBot"} automates the busywork. We combine powerful logic with an intuitive interface so you can focus on what matters.
+# [VALUE PROPOSITION / FEATURES]
+**Headline:** Why Settle for Average When You Can Dominate?
+
+**Feature 1: Frictionless Integration**
+*Icon: Puzzle Piece*
+Connect directly into your existing infrastructure. Our robust API and native plugins mean zero downtime and an instant productivity boost.
+
+**Feature 2: AI-Powered ${topic} Insights**
+*Icon: Brain with Nodes*
+Stop guessing. Our proprietary algorithms analyze millions of data points to provide actionable insights tailored to your unique objectives.
+
+**Feature 3: Uncompromising Security**
+*Icon: Shield lock*
+Your intellectual property is sacred. We utilize enterprise-grade encryption and comply with global privacy standards to keep your data bulletproof.
 
 ---
 
-# Bottom CTA
-**Headline:** Ready to revolutionize your approach to ${topic}?
-**Sub-headline:** Join thousands of successful ${audience || "users"} today.
-**CTA Button:** Get Started for Free (No credit card required)`;
+# [TRANSFORMATION / BEFORE & AFTER]
+**The Old Way:** Disjointed communication, lost data, and 20+ hours wasted weekly on manual ${topic}.
+**The ${name || "LeadBot"} Way:** Centralized intelligence, automated reporting, and a team that is finally free to focus on strategic, high-impact creative work.
+
+---
+
+# [FINAL CTA SECTION]
+*(Visual: Vibrant gradient background matching brand colors)*
+**Headline:** Ready to Elevate Your ${industry || "Industry"} Strategy?
+**Sub-Headline:** Join the ranks of industry leaders who have already modernized their approach to ${topic}.
+**Primary CTA:** Get Started Now — Free for 14 Days`;
           break;
         case "email":
           mockBody = `---
-**Email 1: The "Soft Pitch" / Value Add**
-**Subject:** Quick question about your ${topic} strategy
-**Preview Text:** I noticed something about your workflow...
+**Campaign Type:** Professional B2B Outreach Sequence
+**Objective:** Schedule a discovery call regarding ${topic}
 ---
+
+### Email 1: The Insightful Introduction
+**Subject:** A new approach to ${topic} for {{company_name}}
+**Preview Text:** I've been researching your recent expansion in...
 
 Hi {{first_name}},
 
-I was looking into ${name || "the latest research"} regarding ${industry || "your industry"} and thought of you. Many ${audience || "industry leaders"} are currently struggling to optimize ${topic}, and I'm curious how you're approaching it at the moment.
+I've been following {{company_name}}'s recent developments in the ${industry || "market"} sector, and I was particularly impressed by your commitment to innovation. 
 
-We've been helping folks in the ${industry || "business"} sector achieve significantly better results through ${product || "our new tools"}. In fact, one of our clients recently reduced their processing time by 40% just by adjusting how they handle ${topic}.
+In my work with other ${audience || "executives and leaders"}, a recurring challenge is optimizing ${topic} without sacrificing quality or overwhelming the team. We recently developed a unique, ${tone.toLowerCase()} methodology at ${name || "LeadBot"} that directly addresses this by utilizing advanced ${product || "automation techniques"}.
 
-I put together a quick 1-page cheat sheet on this. Would you like me to send it over?
+One of our clients in a similar vertical recently saw a 35% reduction in operational bottlenecks within the first month. 
 
-Best,
-The ${name || "LeadBot"} Team
+I've prepared a brief, personalized overview showing how this framework could specifically apply to {{company_name}}. Would you be open to a brief 10-minute introduction next Tuesday to discuss it?
+
+Best regards,
+
+**[Your Name]**
+*Director of Strategic Partnerships*
+${name || "Company Name"}
 
 ---
-**Email 2: Value Delivery & Case Study (Sent 3 days later)**
-**Subject:** How [Company X] solved their ${topic} bottleneck
-**Preview Text:** As promised, here is the cheat sheet...
----
+### Email 2: The Value-Add Follow-up (Wait 3 Days)
+**Subject:** Re: A new approach to ${topic} for {{company_name}}
+**Preview Text:** I meant to include this resource...
 
 Hi {{first_name}},
 
-Following up on my last email. Even if you hold off on the cheat sheet, I thought you might find this interesting. 
+I'm following up on my previous note. I know how busy things can get for ${audience || "management teams"}, so I want to keep this brief.
 
-When [Company X] first approached us, their team was spending 15 hours a week managing ${topic}. By implementing our ${product || "solution"}, they not only eliminated that manual work but also increased their lead conversion rate by 22%.
+I wanted to share a recent case study we published titled *"The Executive's Guide to Modernizing ${topic}."* It formally outlines the exact strategies our top-performing clients use to increase overall throughput by leveraging ${product || "our technology"}.
 
-You can read the full 2-minute breakdown here: [Link to Case Study]
+[Link to Professional Case Study]
 
-Would you be open to a brief 5-minute chat next week to see if we could do something similar for your team?
+If optimizing this area of your business is a priority for this quarter, I'd love to connect. Are you available for a quick chat later this week?
 
-Cheers,
-The ${name || "LeadBot"} Team`;
+Best regards,
+**[Your Name]**`;
           break;
         case "social":
-          mockBody = `🚀 Are you ready to level up your ${topic} game?\n\nIn the ${industry || "marketing"} world, staying ahead means embracing ${product || "new tech"}. Here's 3 reasons why ${name || "our solution"} is an absolute game-changer for ${audience || "your team"}:\n\n✅ Automation that actually works (say goodbye to manual data entry)\n✅ Data-driven insights for ${topic} that you can act on immediately\n✅ Built to scale with your growth, not hold it back\n\nStop letting your competitors outpace you. \n\nDouble tap if you agree, and click the link in our bio to see how it works! 💡 \n\n#AI #${industry || "innovation"} #${topic} #BusinessGrowth #TechTrends`;
+          mockBody = `### Platform: LinkedIn (Professional Formatting)
+
+**Hook:** Is the traditional approach to ${topic} holding your team back in ${new Date().getFullYear()}?
+
+**Body:** 
+After analyzing the workflows of over 500 ${industry || "industry"} leaders, the data reveals a stark reality: teams that rely on manual processes are losing an average of 15 hours per week. That is time stolen from strategic innovation.
+
+At ${name || "our organization"}, we believe that technology should empower, not encumber. 
+
+By implementing an automated ${product || "solution"}, our partners have been able to:
+🔹 Reduce administrative overhead by 40%
+🔹 Scale their operations without proportional headcount increases
+🔹 Maintain a rigorous, ${tone.toLowerCase()} standard of quality across all outputs
+
+The future belongs to those who adapt. How is your team addressing the complexities of ${topic} today? 
+
+**Call to Action:** Read our latest comprehensive report on operational modernization at the link in the comments below. 👇
+
+#${industry ? industry.replace(/\\s+/g, '') : "Business"}Strategy #${topic ? topic.replace(/\\s+/g, '') : "Innovation"} #Leadership #Productivity #${name ? name.replace(/\\s+/g, '') : "Tech"}`;
+          break;
+        case "ad":
+          mockBody = `### Ad Variation 1: Problem/Solution (LinkedIn/Facebook)
+**Headline:** Stop Wasting Time on Manual ${topic}.
+**Primary Text:** For ${audience || "professionals"} in the ${industry || "business"} sector, time is your most valuable asset. Why spend 15+ hours a week managing ${topic} when ${name || "our platform"} can automate it? Gain unparalleled insights, streamline your ${product || "workflow"}, and focus on strategic growth. Built for teams that demand excellence.
+**Description:** Discover the ${tone.toLowerCase()} solution trusted by industry leaders.
+**Call to Action:** Learn More ->
+
+---
+### Ad Variation 2: Social Proof / Metrics (Google Search / Display)
+**Headline:** Top Rated ${topic} Solution | ${name || "Brand Name"}
+**Primary Text:** Join 10,000+ ${audience || "experts"} who have modernized their approach. Increase efficiency by up to 40% with our advanced ${product || "technologies"}. Secure, scalable, and built for the modern enterprise.
+**Description:** Start your 14-day free trial today. Zero commitment.
+**Call to Action:** Start Free Trial ->
+
+---
+### Ad Variation 3: Direct Offer (Retargeting)
+**Headline:** Ready to Master ${topic}? Download the Executive Playbook.
+**Primary Text:** You explored our solutions for ${topic}—now see the exact blueprint top companies use to implement it. This comprehensive 20-page guide breaks down the financial and operational benefits of adopting ${product || "our technology"}. 
+**Description:** Free professional download tailored for ${industry || "your industry"}.
+**Call to Action:** Download Now ->`;
           break;
         default:
           mockBody = `Generated ${tone} ${typeLabel} about ${topic} for ${name || "your brand"}. Targeted at ${audience || "your customers"} in the ${industry || "industry"}.`;
