@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import {
   Sparkles,
   Copy,
@@ -198,7 +199,7 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
   };
 
   const copyToClipboard = (keywords: string[], factor: string) => {
-    navigator.clipboard.writeText(keywords.join("\\n"));
+    navigator.clipboard.writeText(keywords.join("\n"));
     setCopiedGroup(factor);
     toast.success(`${factor} keywords copied to clipboard!`);
     setTimeout(() => setCopiedGroup(null), 2000);
@@ -254,10 +255,12 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className={\`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all duration-300 flex flex-col items-center justify-center gap-3 min-h-[120px]
-                  \${isDragging ? 'border-primary bg-primary/5 scale-[1.02] shadow-lg' : 'border-border/60 hover:border-primary/50 hover:bg-muted/30'}\`}
+                className={cn(
+                  "border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all duration-300 flex flex-col items-center justify-center gap-3 min-h-[120px]",
+                  isDragging ? "border-primary bg-primary/5 scale-[1.02] shadow-lg" : "border-border/60 hover:border-primary/50 hover:bg-muted/30"
+                )}
               >
-                <div className={\`p-3 rounded-full \${isDragging ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}\`}>
+                <div className={cn("p-3 rounded-full", isDragging ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground")}>
                   <UploadCloud className="w-6 h-6" />
                 </div>
                 <div>
@@ -304,14 +307,15 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
                     <div
                       key={factor.id}
                       onClick={() => handleFactorToggle(factor.id)}
-                      className={\`cursor-pointer p-3 rounded-lg border flex items-center justify-between transition-all duration-200 \${
+                      className={cn(
+                        "cursor-pointer p-3 rounded-lg border flex items-center justify-between transition-all duration-200",
                         isSelected
                           ? "bg-primary/10 border-primary/40 shadow-sm"
                           : "bg-background/40 border-border/40 hover:border-border/80 hover:bg-muted/30"
-                      }\`}
+                      )}
                     >
                       <div className="flex items-center gap-3">
-                        <div className={\`\${isSelected ? 'text-primary' : 'text-muted-foreground'}\`}>
+                        <div className={cn(isSelected ? "text-primary" : "text-muted-foreground")}>
                           <Icon className="w-4 h-4" />
                         </div>
                         <div>
@@ -353,7 +357,7 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
 
             <div className="grid grid-cols-1 gap-4">
               {generatedKeywords.map((group, groupIdx) => (
-                <Card key={group.factor} className="overflow-hidden border border-border/40 bg-card/60 backdrop-blur-md shadow-lg" style={{ animationDelay: \`\${groupIdx * 100}ms\` }}>
+                <Card key={group.factor} className="overflow-hidden border border-border/40 bg-card/60 backdrop-blur-md shadow-lg" style={{ animationDelay: `${groupIdx * 100}ms` }}>
                   <div className="px-5 py-3 border-b border-border/30 flex items-center justify-between bg-muted/30">
                     <div className="flex items-center gap-3">
                       <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary">
