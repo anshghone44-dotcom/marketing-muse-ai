@@ -1,14 +1,11 @@
 import { useState, useRef, ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
 import {
   Sparkles,
   Copy,
   Check,
-  UploadCloud,
   X,
   File as FileIcon,
   Image as ImageIcon,
@@ -17,6 +14,8 @@ import {
   TrendingUp,
   Search,
   Zap,
+  Paperclip,
+  SendHorizontal
 } from "lucide-react";
 import { toast } from "sonner";
 import type { CompanyData } from "./CompanyForm";
@@ -55,22 +54,11 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
   });
   
   const [files, setFiles] = useState<UploadedFile[]>([]);
-  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [generatedKeywords, setGeneratedKeywords] = useState<GeneratedKeywordGroup[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [copiedGroup, setCopiedGroup] = useState<string | null>(null);
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
 
   const processFiles = (newFiles: FileList | File[]) => {
     const fileArray = Array.from(newFiles).map(f => ({
@@ -90,14 +78,6 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
     toast.success(`${fileArray.length} file(s) attached for context.`);
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      processFiles(e.dataTransfer.files);
-    }
-  };
-
   const handleFileInput = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       processFiles(e.target.files);
@@ -108,9 +88,21 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
     setFiles(prev => prev.filter(f => f.id !== id));
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      generateKeywords();
+    }
+  };
+
   const generateKeywords = () => {
     if (!formData.topic && !companyData && files.length === 0) {
       toast.error("Please provide a topic, upload context files, or fill company details.");
+      return;
+    }
+
+    if (formData.selectedFactors.length === 0) {
+      toast.error("Please select at least one strategy vector.");
       return;
     }
 
@@ -199,7 +191,7 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
   };
 
   const copyToClipboard = (keywords: string[], factor: string) => {
-    navigator.clipboard.writeText(keywords.join("\n"));
+    navigator.clipboard.writeText(keywords.join("\\n"));
     setCopiedGroup(factor);
     toast.success(`${factor} keywords copied to clipboard!`);
     setTimeout(() => setCopiedGroup(null), 2000);
@@ -218,129 +210,123 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 max-w-7xl mx-auto">
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-8 max-w-7xl mx-auto">
       {/* LEFT COLUMN: Input & Configuration */}
-      <div className="md:col-span-5 space-y-6">
-        <Card className="p-6 border border-border/50 bg-card/60 backdrop-blur-xl shadow-2xl relative overflow-hidden h-full">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 to-primary"></div>
-          
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-primary" />
-                Keyword Context Engine
-              </h2>
-              <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                Provide a prompt and upload supplementary files to generate hyper-targeted keywords.
-              </p>
-            </div>
+      <div className="md:col-span-5 space-y-6 flex flex-col h-full min-h-[500px]">
+        {/* Strategy Configuration */}
+        <div className="space-y-4 flex-1">
+          <div>
+            <h2 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-primary" />
+              Keyword Generation Chatbot
+            </h2>
+            <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+              Configure your strategy and prompt the AI Chatbot to generate target keywords.
+            </p>
+          </div>
 
-            {/* Prompt Input */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-foreground/80 uppercase tracking-wider">Topic / Campaign Goal</label>
-              <Textarea
-                placeholder="Describe your campaign, target product, or specific niche..."
-                value={formData.topic}
-                onChange={(e) => setFormData((prev) => ({ ...prev, topic: e.target.value }))}
-                className="min-h-[100px] bg-background/50 border-border/50 focus:border-primary/50 text-sm resize-none"
-              />
-            </div>
-
-            {/* File Upload Zone */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-foreground/80 uppercase tracking-wider">Contextual Assets (Optional)</label>
-              
-              <div 
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
-                className={cn(
-                  "border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all duration-300 flex flex-col items-center justify-center gap-3 min-h-[120px]",
-                  isDragging ? "border-primary bg-primary/5 scale-[1.02] shadow-lg" : "border-border/60 hover:border-primary/50 hover:bg-muted/30"
-                )}
-              >
-                <div className={cn("p-3 rounded-full", isDragging ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground")}>
-                  <UploadCloud className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground/80">Click or drag files here</p>
-                  <p className="text-xs text-muted-foreground/80 mt-1">Images, PDFs, or Text (max 5)</p>
-                </div>
-                <input 
-                  type="file" 
-                  ref={fileInputRef} 
-                  onChange={handleFileInput} 
-                  multiple 
-                  className="hidden" 
-                  accept="image/*,.pdf,.doc,.docx,.txt"
-                />
-              </div>
-
-              {/* Uploaded Files Chips */}
-              {files.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-4 animate-in fade-in slide-in-from-bottom-2">
-                  {files.map(file => (
-                    <div key={file.id} className="flex items-center gap-1.5 bg-background border border-border/60 rounded-lg px-2.5 py-1 text-xs shadow-sm hover:border-primary/40 transition-colors">
-                      {file.type.startsWith('image/') ? <ImageIcon className="w-3.5 h-3.5 text-blue-500" /> : <FileIcon className="w-3.5 h-3.5 text-orange-500" />}
-                      <span className="max-w-[120px] truncate font-medium">{file.name}</span>
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); removeFile(file.id); }}
-                        className="opacity-50 hover:opacity-100 hover:text-destructive transition-colors ml-1 p-0.5 rounded-full hover:bg-destructive/10"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Keyword Strategy Factors */}
-            <div className="space-y-3 pt-2">
-              <label className="text-xs font-bold text-foreground/80 uppercase tracking-wider">Strategy Vectors</label>
-              <div className="grid grid-cols-1 gap-2">
-                {KEYWORD_FACTORS.map((factor) => {
-                  const Icon = factor.icon;
-                  const isSelected = formData.selectedFactors.includes(factor.id);
-                  return (
-                    <div
-                      key={factor.id}
-                      onClick={() => handleFactorToggle(factor.id)}
-                      className={cn(
-                        "cursor-pointer p-3 rounded-lg border flex items-center justify-between transition-all duration-200",
-                        isSelected
-                          ? "bg-primary/10 border-primary/40 shadow-sm"
-                          : "bg-background/40 border-border/40 hover:border-border/80 hover:bg-muted/30"
-                      )}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={cn(isSelected ? "text-primary" : "text-muted-foreground")}>
-                          <Icon className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-xs">{factor.label}</p>
-                        </div>
+          {/* Keyword Strategy Factors */}
+          <div className="space-y-3 pt-4">
+            <label className="text-xs font-bold text-foreground/80 uppercase tracking-wider">Strategy Vectors</label>
+            <div className="grid grid-cols-1 gap-2">
+              {KEYWORD_FACTORS.map((factor) => {
+                const Icon = factor.icon;
+                const isSelected = formData.selectedFactors.includes(factor.id);
+                return (
+                  <div
+                    key={factor.id}
+                    onClick={() => handleFactorToggle(factor.id)}
+                    className={\`cursor-pointer p-3 rounded-lg border flex items-center justify-between transition-all duration-200 \${
+                      isSelected
+                        ? "bg-primary/5 border-primary/40 shadow-sm"
+                        : "bg-background/40 border-border/40 hover:border-border/80 hover:bg-muted/30"
+                    }\`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={\`\${isSelected ? 'text-primary' : 'text-muted-foreground'}\`}>
+                        <Icon className="w-4 h-4" />
                       </div>
-                      {isSelected && <Check className="w-4 h-4 text-primary" />}
+                      <div>
+                        <p className="font-semibold text-xs text-foreground/90">{factor.label}</p>
+                      </div>
                     </div>
-                  );
-                })}
-              </div>
+                    {isSelected && <Check className="w-4 h-4 text-primary" />}
+                  </div>
+                );
+              })}
             </div>
+          </div>
+        </div>
 
-            {/* Generate Action */}
+        {/* Unified Chatbot Input Container */}
+        <div className="relative mt-8 bg-card border border-border/60 rounded-2xl shadow-xl shadow-primary/5 overflow-hidden transition-all focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20">
+          {/* Uploaded Files Chips inside Chat Input */}
+          {files.length > 0 && (
+            <div className="flex flex-wrap gap-2 p-3 pb-0">
+              {files.map(file => (
+                <div key={file.id} className="flex items-center gap-1.5 bg-muted/50 border border-border/40 rounded-full px-3 py-1 text-[11px] font-medium animate-in fade-in slide-in-from-bottom-2">
+                  {file.type.startsWith('image/') ? <ImageIcon className="w-3.5 h-3.5 text-blue-500" /> : <FileIcon className="w-3.5 h-3.5 text-orange-500" />}
+                  <span className="max-w-[100px] truncate">{file.name}</span>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); removeFile(file.id); }}
+                    className="ml-1 text-muted-foreground hover:text-destructive transition-colors"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <Textarea
+            placeholder="Message AI Keyword Generator... (e.g. Find keywords for a SaaS project management tool)"
+            value={formData.topic}
+            onChange={(e) => setFormData((prev) => ({ ...prev, topic: e.target.value }))}
+            onKeyDown={handleKeyDown}
+            className="min-h-[100px] max-h-[250px] border-0 focus-visible:ring-0 bg-transparent resize-none p-4 pb-14 text-sm"
+          />
+          
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleFileInput} 
+            multiple 
+            className="hidden" 
+            accept="image/*,.pdf,.doc,.docx,.txt"
+          />
+
+          <div className="absolute bottom-3 left-3 flex items-center gap-2 bg-background/50 rounded-full backdrop-blur">
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="p-2 rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors group flex items-center justify-center border border-transparent hover:border-border"
+              title="Attach File"
+            >
+              <Paperclip className="w-4 h-4 group-hover:scale-110 transition-transform" />
+            </button>
+          </div>
+
+          <div className="absolute bottom-3 right-3">
             <Button
               onClick={generateKeywords}
               disabled={isGenerating || formData.selectedFactors.length === 0}
-              className="w-full h-12 text-sm font-bold shadow-xl hover:shadow-primary/25 transition-all duration-300 relative overflow-hidden group mt-4"
+              size="icon"
+              className={\`h-10 w-10 rounded-full transition-all duration-300 \${
+                formData.topic.trim().length > 0 || files.length > 0
+                  ? "bg-primary text-primary-foreground shadow-lg hover:shadow-primary/25 hover:scale-105"
+                  : "bg-muted text-muted-foreground cursor-not-allowed opacity-50"
+              }\`}
             >
-              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out"></div>
-              <Sparkles className="w-4 h-4 mr-2" />
-              {isGenerating ? "Analyzing Context..." : "Generate Professional Keywords"}
+              {isGenerating ? (
+                <Search className="w-4 h-4 animate-spin" />
+              ) : (
+                <SendHorizontal className="w-4 h-4 ml-0.5" />
+              )}
             </Button>
           </div>
-        </Card>
+        </div>
+        <p className="text-[10px] text-center text-muted-foreground/60 mt-3 flex items-center justify-center gap-1.5">
+          <Sparkles className="w-3 h-3" /> AI Keywords can make mistakes. Review generated strategies carefully.
+        </p>
       </div>
 
       {/* RIGHT COLUMN: Results Display */}
@@ -350,14 +336,14 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
             <div className="flex items-center justify-between mb-2">
               <div>
                 <h3 className="text-xl font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
-                  Keyword Research Results
+                  Keyword Strategies
                 </h3>
               </div>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
               {generatedKeywords.map((group, groupIdx) => (
-                <Card key={group.factor} className="overflow-hidden border border-border/40 bg-card/60 backdrop-blur-md shadow-lg" style={{ animationDelay: `${groupIdx * 100}ms` }}>
+                <Card key={group.factor} className="overflow-hidden border border-border/40 bg-card/60 backdrop-blur-md shadow-lg" style={{ animationDelay: \`\${groupIdx * 100}ms\` }}>
                   <div className="px-5 py-3 border-b border-border/30 flex items-center justify-between bg-muted/30">
                     <div className="flex items-center gap-3">
                       <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary">
@@ -402,7 +388,7 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
         ) : (
           <div className="h-full min-h-[500px] flex flex-col items-center justify-center p-8 text-center border-2 border-dashed border-border/40 rounded-2xl bg-muted/10 bg-[radial-gradient(circle_at_center,theme(colors.primary.DEFAULT/0.05)_0%,transparent_100%)]">
             <div className="relative">
-              <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 shadow-2xl backdrop-blur-3xl transform rotate-3">
+              <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 shadow-2xl backdrop-blur-3xl transform rotate-3 animate-pulse">
                 <Search className="w-10 h-10 text-primary/60" />
               </div>
               <div className="absolute -top-2 -right-2 w-6 h-6 bg-background rounded-full flex items-center justify-center shadow-lg transform -rotate-12">
@@ -410,9 +396,9 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
               </div>
             </div>
             
-            <h3 className="text-xl font-bold text-foreground">Awaiting Context</h3>
+            <h3 className="text-xl font-bold text-foreground">Awaiting Your Prompt</h3>
             <p className="text-sm text-muted-foreground mt-3 max-w-sm mx-auto leading-relaxed">
-              Upload related documents, images, or define your primary campaign goal on the left to generate sophisticated, data-driven keyword strategies tailored to your exact niche.
+              Use the chatbot interface on the left to write a prompt, attach relevant competitor files, and select vectors to generate hyper-targeted keyword datasets.
             </p>
           </div>
         )}
