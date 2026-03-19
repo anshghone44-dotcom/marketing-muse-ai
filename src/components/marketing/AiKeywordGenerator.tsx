@@ -191,7 +191,7 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
   };
 
   const copyToClipboard = (keywords: string[], factor: string) => {
-    navigator.clipboard.writeText(keywords.join("\\n"));
+    navigator.clipboard.writeText(keywords.join("\n"));
     setCopiedGroup(factor);
     toast.success(`${factor} keywords copied to clipboard!`);
     setTimeout(() => setCopiedGroup(null), 2000);
@@ -236,14 +236,14 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
                   <div
                     key={factor.id}
                     onClick={() => handleFactorToggle(factor.id)}
-                    className={\`cursor-pointer p-3 rounded-lg border flex items-center justify-between transition-all duration-200 \${
+                    className={`cursor-pointer p-3 rounded-lg border flex items-center justify-between transition-all duration-200 ${
                       isSelected
                         ? "bg-primary/5 border-primary/40 shadow-sm"
                         : "bg-background/40 border-border/40 hover:border-border/80 hover:bg-muted/30"
-                    }\`}
+                    }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={\`\${isSelected ? 'text-primary' : 'text-muted-foreground'}\`}>
+                      <div className={`${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>
                         <Icon className="w-4 h-4" />
                       </div>
                       <div>
@@ -310,11 +310,11 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
               onClick={generateKeywords}
               disabled={isGenerating || formData.selectedFactors.length === 0}
               size="icon"
-              className={\`h-10 w-10 rounded-full transition-all duration-300 \${
+              className={`h-10 w-10 rounded-full transition-all duration-300 ${
                 formData.topic.trim().length > 0 || files.length > 0
                   ? "bg-primary text-primary-foreground shadow-lg hover:shadow-primary/25 hover:scale-105"
                   : "bg-muted text-muted-foreground cursor-not-allowed opacity-50"
-              }\`}
+              }`}
             >
               {isGenerating ? (
                 <Search className="w-4 h-4 animate-spin" />
@@ -343,7 +343,7 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
 
             <div className="grid grid-cols-1 gap-4">
               {generatedKeywords.map((group, groupIdx) => (
-                <Card key={group.factor} className="overflow-hidden border border-border/40 bg-card/60 backdrop-blur-md shadow-lg" style={{ animationDelay: \`\${groupIdx * 100}ms\` }}>
+                <Card key={group.factor} className="overflow-hidden border border-border/40 bg-card/60 backdrop-blur-md shadow-lg" style={{ animationDelay: `${groupIdx * 100}ms` }}>
                   <div className="px-5 py-3 border-b border-border/30 flex items-center justify-between bg-muted/30">
                     <div className="flex items-center gap-3">
                       <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary">
