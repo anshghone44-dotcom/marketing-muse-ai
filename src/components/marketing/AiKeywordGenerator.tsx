@@ -1,4 +1,4 @@
-import { useState, useRef, ChangeEvent } from "react";
+import { useState, useRef, ChangeEvent, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,18 +15,22 @@ import {
   Search,
   Zap,
   Paperclip,
-  SendHorizontal
+  SendHorizontal,
+  User,
+  Bot,
+  Loader2
 } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 import type { CompanyData } from "./CompanyForm";
 import CompanyForm from "./CompanyForm";
 
 export const KEYWORD_FACTORS = [
-  { id: "lead", label: "Lead-Generating", description: "High-intent keywords for conversions", icon: Target },
-  { id: "catchy", label: "Catchy & Viral", description: "Social-friendly and attention-grabbing", icon: Zap },
-  { id: "awareness", label: "Brand Awareness", description: "Establish authority and reach", icon: Search },
-  { id: "long-tail", label: "Long-Tail Queries", description: "Specific, multi-word search queries", icon: BarChart },
-  { id: "trending", label: "Market Trending", description: "Current market trends and hot topics", icon: TrendingUp },
+  { id: "lead", label: "Lead-Gen", description: "High-intent keywords", icon: Target },
+  { id: "catchy", label: "Catchy", description: "Social-friendly", icon: Zap },
+  { id: "awareness", label: "Awareness", description: "Establish authority", icon: Search },
+  { id: "long-tail", label: "Long-Tail", description: "Specific queries", icon: BarChart },
+  { id: "trending", label: "Trending", description: "Market trends", icon: TrendingUp },
 ];
 
 interface GeneratedKeywordGroup {
@@ -42,23 +46,36 @@ interface UploadedFile {
   url?: string;
 }
 
+interface Message {
+  id: string;
+  role: "user" | "ai";
+  content: string;
+  files?: UploadedFile[];
+  keywords?: GeneratedKeywordGroup[];
+  timestamp: Date;
+}
+
 interface Props {
   companyData: CompanyData | null;
   onCompanySubmit: (data: CompanyData) => void;
 }
 
 export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Props) {
-  const [formData, setFormData] = useState({
-    topic: "",
-    selectedFactors: ["lead", "awareness"] as string[],
-  });
-  
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [selectedFactors, setSelectedFactors] = useState<string[]>(["lead", "awareness"]);
   const [files, setFiles] = useState<UploadedFile[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [generatedKeywords, setGeneratedKeywords] = useState<GeneratedKeywordGroup[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [copiedGroup, setCopiedGroup] = useState<string | null>(null);
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, isGenerating]);
 
   const processFiles = (newFiles: FileList | File[]) => {
     const fileArray = Array.from(newFiles).map(f => ({
@@ -70,12 +87,12 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
     }));
     
     if (files.length + fileArray.length > 5) {
-      toast.error("Maximum 5 files allowed per context upload.");
+      toast.error("Maximum 5 files allowed.");
       return;
     }
     
     setFiles(prev => [...prev, ...fileArray]);
-    toast.success(`${fileArray.length} file(s) attached for context.`);
+    toast.success(`${fileArray.length} file(s) attached.`);
   };
 
   const handleFileInput = (e: ChangeEvent<HTMLInputElement>) => {
@@ -88,6 +105,82 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
     setFiles(prev => prev.filter(f => f.id !== id));
   };
 
+  const generateKeywords = async () => {
+    if (!input.trim() && files.length === 0) {
+      toast.error("Please enter a prompt or upload files.");
+      return;
+    }
+
+    if (selectedFactors.length === 0) {
+      toast.error("Select at least one strategy vector.");
+      return;
+    }
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: "user",
+      content: input,
+      files: [...files],
+      timestamp: new Date(),
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInput("");
+    setFiles([]);
+    setIsGenerating(true);
+
+    // Simulate AI generation
+    setTimeout(() => {
+      const topic = userMessage.content || "Target Context";
+      
+      const mockKeywords: Record<string, string[]> = {
+        lead: [
+          `best ${topic.toLowerCase()} for ${companyData?.audience || "B2B client"}`,
+          `${companyData?.industry || "industry"} expert consultation`,
+          `${topic.toLowerCase()} performance metrics`,
+          `hire ${companyData?.name || "brand"} services`,
+          `high ROI ${topic.toLowerCase()} strategies`,
+        ],
+        catchy: [
+          `the #1 ${topic.toLowerCase()} secret of ${new Date().getFullYear()}`,
+          `why ${companyData?.name || "we"} outperform competitors in ${topic.toLowerCase()}`,
+          `unleash growth with ${topic.toLowerCase()}`,
+          `${topic.toLowerCase()} revolution ${new Date().getFullYear()}`,
+        ],
+        awareness: [
+          `what is ${topic.toLowerCase()} in ${industry || "business"}`,
+          `how to implement ${topic.toLowerCase()} effectively`,
+          `${companyData?.name || "Brand"} guide to ${topic.toLowerCase()}`,
+        ],
+        "long-tail": [
+          `step by step ${topic.toLowerCase()} for small startups`,
+          `integrated ${topic.toLowerCase()} for enterprise ecosystems`,
+        ],
+        trending: [
+          `AI powered ${topic.toLowerCase()} in ${new Date().getFullYear()}`,
+          `the future of ${companyData?.industry || "market"} ${topic.toLowerCase()}`,
+        ],
+      };
+
+      const results = selectedFactors.map(factorId => ({
+        factor: KEYWORD_FACTORS.find(f => f.id === factorId)?.label || factorId,
+        keywords: mockKeywords[factorId] || mockKeywords["lead"],
+      }));
+
+      const aiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "ai",
+        content: `I've analyzed your context and generated a specialized keyword architecture. Based on your "${selectedFactors.join(', ')}" vectors, here are the most effective strategies for ${companyData?.name || "your brand"}:`,
+        keywords: results,
+        timestamp: new Date(),
+      };
+
+      setMessages(prev => [...prev, aiMessage]);
+      setIsGenerating(false);
+      toast.success("Keywords generated!");
+    }, 2500);
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -95,183 +188,196 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
     }
   };
 
-  const generateKeywords = () => {
-    if (!formData.topic && !companyData && files.length === 0) {
-      toast.error("Please provide a topic, upload context files, or fill company details.");
-      return;
-    }
-
-    if (formData.selectedFactors.length === 0) {
-      toast.error("Please select at least one strategy vector.");
-      return;
-    }
-
-    setIsGenerating(true);
-    
-    setTimeout(() => {
-      const topic = formData.topic || companyData?.product || "Business Solution";
-      const audience = companyData?.audience || "Target Audience";
-      const industry = companyData?.industry || "Industry";
-      
-      const fileContext = files.length > 0 ? " (Enhanced via uploaded context)" : "";
-
-      const mockKeywords: Record<string, string[]> = {
-        lead: [
-          `best ${topic.toLowerCase()} software for ${audience.toLowerCase()}${files.length > 0 ? ' analysis' : ''}`,
-          `top rated ${industry.toLowerCase()} agencies ${new Date().getFullYear()}`,
-          `${topic.toLowerCase()} pricing calculator`,
-          `hire a ${topic.toLowerCase()} expert near me`,
-          `${companyData?.name?.toLowerCase() || "brand"} vs competitors reviews`,
-          `enterprise ${topic.toLowerCase()} solutions`,
-          `affordable ${topic.toLowerCase()} packages for small business`,
-          `schedule ${industry.toLowerCase()} consultation`,
-          `custom ${topic.toLowerCase()} strategy development`,
-          `request quote for ${topic.toLowerCase()} services`,
-        ],
-        catchy: [
-          `the #1 ${industry.toLowerCase()} growth hack for ${new Date().getFullYear()}`,
-          `why top ${audience.toLowerCase()} are switching to ${companyData?.name || "our solution"}`,
-          `stop losing money on outdated ${industry.toLowerCase()}`,
-          `10 secrets the ${industry.toLowerCase()} experts won't tell you`,
-          `${companyData?.name || "LeadBot"}: the ultimate ${topic.toLowerCase()} toolkit${fileContext}`,
-          `viral ${topic.toLowerCase()} case studies that convert`,
-          `transform your ${industry.toLowerCase()} approach in 7 days`,
-          `unleashing the hidden ROI of ${topic.toLowerCase()}`,
-          `the ${topic.toLowerCase()} revolution for ${audience.toLowerCase()}`,
-          `how to dominate ${industry.toLowerCase()} with AI`,
-        ],
-        awareness: [
-          `what is the future of ${industry.toLowerCase()}`,
-          `comprehensive guide to ${topic.toLowerCase()}`,
-          `${industry.toLowerCase()} best practices and standards`,
-          `understanding the role of ${topic.toLowerCase()} in modern business`,
-          `expert insights on ${industry.toLowerCase()} trends${fileContext}`,
-          `common challenges with ${topic.toLowerCase()} and how to fix them`,
-          `the evolution of ${industry.toLowerCase()} technology`,
-          `step by step introduction to ${topic.toLowerCase()}`,
-          `${companyData?.name || "Brand"} official blog on ${industry.toLowerCase()}`,
-          `webinars and courses on ${topic.toLowerCase()}`,
-        ],
-        "long-tail": [
-          `how to optimize ${topic.toLowerCase()} workflow for enterprise teams`,
-          `step by step tutorial for implementing ${industry.toLowerCase()} solutions`,
-          `differences between B2B and B2C ${topic.toLowerCase()} strategies${fileContext}`,
-          `what is the average ROI of investing in ${topic.toLowerCase()}`,
-          `case studies demonstrating ${companyData?.name || "brand"} success in ${industry.toLowerCase()}`,
-          `common pitfalls ${audience.toLowerCase()} make when starting with ${topic.toLowerCase()}`,
-          `how much does it cost to outsource ${industry.toLowerCase()}`,
-        ],
-        trending: [
-          `AI impact on ${topic.toLowerCase()} in ${new Date().getFullYear()}`,
-          `machine learning applications in ${industry.toLowerCase()}`,
-          `ethical considerations for ${topic.toLowerCase()} automation`,
-          `data privacy compliance in modern ${industry.toLowerCase()}`,
-          `remote-first approaches to ${topic.toLowerCase()} management${fileContext}`,
-        ],
-      };
-
-      const results = formData.selectedFactors.map(factorId => ({
-        factor: KEYWORD_FACTORS.find(f => f.id === factorId)?.label || factorId,
-        keywords: mockKeywords[factorId] || mockKeywords["lead"],
-      }));
-
-      setGeneratedKeywords(results);
-      setIsGenerating(false);
-      toast.success("Professional keywords generated successfully!");
-    }, 2000);
-  };
-
   const handleFactorToggle = (factorId: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      selectedFactors: prev.selectedFactors.includes(factorId)
-        ? prev.selectedFactors.filter((id) => id !== factorId)
-        : [...prev.selectedFactors, factorId],
-    }));
+    setSelectedFactors(prev => 
+      prev.includes(factorId) ? prev.filter(id => id !== factorId) : [...prev, factorId]
+    );
   };
 
   const copyToClipboard = (keywords: string[], factor: string) => {
     navigator.clipboard.writeText(keywords.join("\n"));
     setCopiedGroup(factor);
-    toast.success(`${factor} keywords copied to clipboard!`);
+    toast.success(`${factor} keywords copied!`);
     setTimeout(() => setCopiedGroup(null), 2000);
   };
 
   if (!companyData) {
     return (
-      <div className="max-w-2xl mx-auto py-8">
+      <div className="max-w-2xl mx-auto py-12">
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold mb-2">Complete Your Profile</h2>
-          <p className="text-muted-foreground">To use the AI Keyword Generator, please provide your company details below.</p>
+          <h2 className="text-3xl font-bold mb-3">Initialize AI Context</h2>
+          <p className="text-muted-foreground">Please set up your profile to enable the AI Keyword Chatbot.</p>
         </div>
         <CompanyForm onSubmit={onCompanySubmit} />
       </div>
     );
   }
 
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-12 gap-8 max-w-7xl mx-auto">
-      {/* LEFT COLUMN: Input & Configuration */}
-      <div className="md:col-span-5 space-y-6 flex flex-col h-full min-h-[500px]">
-        {/* Strategy Configuration */}
-        <div className="space-y-4 flex-1">
-          <div>
-            <h2 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-primary" />
-              Keyword Generation Chatbot
-            </h2>
-            <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-              Configure your strategy and prompt the AI Chatbot to generate target keywords.
-            </p>
-          </div>
+  const industry = companyData?.industry || "Industry";
 
-          {/* Keyword Strategy Factors */}
-          <div className="space-y-3 pt-4">
-            <label className="text-xs font-bold text-foreground/80 uppercase tracking-wider">Strategy Vectors</label>
-            <div className="grid grid-cols-1 gap-2">
-              {KEYWORD_FACTORS.map((factor) => {
-                const Icon = factor.icon;
-                const isSelected = formData.selectedFactors.includes(factor.id);
-                return (
-                  <div
-                    key={factor.id}
-                    onClick={() => handleFactorToggle(factor.id)}
-                    className={`cursor-pointer p-3 rounded-lg border flex items-center justify-between transition-all duration-200 ${
-                      isSelected
-                        ? "bg-primary/5 border-primary/40 shadow-sm"
-                        : "bg-background/40 border-border/40 hover:border-border/80 hover:bg-muted/30"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>
-                        <Icon className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-xs text-foreground/90">{factor.label}</p>
-                      </div>
-                    </div>
-                    {isSelected && <Check className="w-4 h-4 text-primary" />}
-                  </div>
-                );
-              })}
+  return (
+    <div className="flex flex-col h-[75vh] max-w-4xl mx-auto relative bg-background/50 border border-border/40 rounded-3xl overflow-hidden shadow-2xl backdrop-blur-sm">
+      {/* Search/Context Header */}
+      <div className="p-4 border-b border-border/30 bg-card/30 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+            <Bot className="w-4 h-4" />
+          </div>
+          <div>
+            <h2 className="text-sm font-bold">Keyword Intelligence Agent</h2>
+            <div className="flex items-center gap-2">
+              <span className="flex h-2 w-2 rounded-full bg-green-500"></span>
+              <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-tighter">AI Online</span>
             </div>
           </div>
         </div>
+        <div className="flex gap-1.5 overflow-x-auto pb-1 max-w-[200px] md:max-w-none">
+          {KEYWORD_FACTORS.map(f => (
+            <button
+              key={f.id}
+              onClick={() => handleFactorToggle(f.id)}
+              className={cn(
+                "px-2.5 py-1 rounded-full text-[10px] font-bold border transition-all whitespace-nowrap",
+                selectedFactors.includes(f.id) 
+                  ? "bg-primary/20 border-primary/50 text-foreground" 
+                  : "bg-muted/50 border-border/50 text-muted-foreground hover:bg-muted"
+              )}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
-        {/* Unified Chatbot Input Container */}
-        <div className="relative mt-8 bg-card border border-border/60 rounded-2xl shadow-xl shadow-primary/5 overflow-hidden transition-all focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20">
-          {/* Uploaded Files Chips inside Chat Input */}
+      {/* Chat History Area */}
+      <div 
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 scroll-smooth"
+      >
+        {messages.length === 0 && !isGenerating ? (
+          <div className="h-full flex flex-col items-center justify-center text-center max-w-md mx-auto space-y-6">
+            <div className="w-16 h-16 rounded-3xl bg-primary/10 flex items-center justify-center animate-pulse">
+              <Sparkles className="w-8 h-8 text-primary" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold mb-2">Hello {companyData.name}!</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                I'm your dedicated AI Keyword Strategist. Upload any competitor documents, marketing briefs, or images, or just type a campaign goal below to start generating high-impact keyword clusters.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-3 w-full">
+              <div className="p-3 rounded-xl border border-border/50 bg-muted/20 text-[10px] font-medium text-left">
+                "Find lead-generating keywords for our new ${companyData.product.toLowerCase()} launch."
+              </div>
+              <div className="p-3 rounded-xl border border-border/50 bg-muted/20 text-[10px] font-medium text-left">
+                "What are some catchy viral phrases for ${companyData.industry.toLowerCase()} target audience?"
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            {messages.map((m) => (
+              <div 
+                key={m.id} 
+                className={cn(
+                  "flex animate-in fade-in slide-in-from-bottom-4 duration-300",
+                  m.role === "user" ? "justify-end" : "justify-start"
+                )}
+              >
+                <div className={cn(
+                  "max-w-[85%] space-y-2",
+                  m.role === "user" ? "items-end flex flex-col" : "items-start flex flex-col"
+                )}>
+                  <div className="flex items-center gap-2 mb-1 px-1">
+                    {m.role === "ai" && <Bot className="w-3.5 h-3.5 text-primary" />}
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase opacity-70">
+                      {m.role === "user" ? "You" : "Strategic Agent"}
+                    </span>
+                    {m.role === "user" && <User className="w-3.5 h-3.5 text-muted-foreground" />}
+                  </div>
+
+                  <div className={cn(
+                    "p-4 rounded-2xl text-sm leading-relaxed shadow-sm",
+                    m.role === "user" 
+                      ? "bg-primary text-primary-foreground rounded-tr-none" 
+                      : "bg-card border border-border/50 rounded-tl-none backdrop-blur-md"
+                  )}>
+                    {m.files && m.files.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {m.files.map(f => (
+                          <div key={f.id} className="flex items-center gap-1.5 bg-black/10 rounded-lg px-2 py-1 text-[10px] font-bold">
+                            {f.type.startsWith('image/') ? <ImageIcon className="w-3 h-3" /> : <FileIcon className="w-3 h-3" />}
+                            <span className="max-w-[80px] truncate">{f.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {m.content}
+                    
+                    {m.keywords && (
+                      <div className="mt-4 space-y-4 pt-4 border-t border-border/30">
+                        {m.keywords.map((group, gIdx) => (
+                          <div key={gIdx} className="space-y-2">
+                            <div className="flex items-center justify-between group">
+                              <span className="text-[10px] font-black text-primary uppercase tracking-widest">{group.factor} Cluster</span>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-6 text-[9px] gap-1 px-2 group-hover:bg-primary/10"
+                                onClick={() => copyToClipboard(group.keywords, group.factor)}
+                              >
+                                {copiedGroup === group.factor ? <Check className="w-2.5 h-2.5" /> : <Copy className="w-2.5 h-2.5" />}
+                                {copiedGroup === group.factor ? "Copied" : "Copy"}
+                              </Button>
+                            </div>
+                            <div className="flex flex-wrap gap-1.5">
+                              {group.keywords.map((kw, kIdx) => (
+                                <span key={kIdx} className="px-2 py-1 rounded bg-muted/60 border border-border/30 text-[11px] font-medium text-foreground/80 hover:border-primary/50 transition-colors">
+                                  {kw}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-[9px] text-muted-foreground px-1">
+                    {m.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+              </div>
+            ))}
+            
+            {isGenerating && (
+              <div className="flex justify-start animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <div className="max-w-[85%] space-y-2 flex flex-col items-start">
+                  <div className="flex items-center gap-2 mb-1 px-1">
+                    <Bot className="w-3.5 h-3.5 text-primary" />
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase opacity-70">Strategic Agent</span>
+                  </div>
+                  <div className="bg-card border border-border/50 p-4 rounded-2xl rounded-tl-none flex items-center gap-3">
+                    <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                    <span className="text-xs font-medium text-muted-foreground">Architecting keyword strategies...</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Input Action Console */}
+      <div className="p-4 bg-card/60 border-t border-border/30 shadow-inner">
+        <div className="relative bg-background/80 border border-border/50 rounded-2xl focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 transition-all">
           {files.length > 0 && (
             <div className="flex flex-wrap gap-2 p-3 pb-0">
               {files.map(file => (
-                <div key={file.id} className="flex items-center gap-1.5 bg-muted/50 border border-border/40 rounded-full px-3 py-1 text-[11px] font-medium animate-in fade-in slide-in-from-bottom-2">
+                <div key={file.id} className="flex items-center gap-1.5 bg-muted border border-border rounded-full px-3 py-1 text-[10px] font-bold animate-in fade-in zoom-in group">
                   {file.type.startsWith('image/') ? <ImageIcon className="w-3.5 h-3.5 text-blue-500" /> : <FileIcon className="w-3.5 h-3.5 text-orange-500" />}
-                  <span className="max-w-[100px] truncate">{file.name}</span>
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); removeFile(file.id); }}
-                    className="ml-1 text-muted-foreground hover:text-destructive transition-colors"
-                  >
-                    <X className="w-3 h-3" />
+                  <span className="max-w-[120px] truncate">{file.name}</span>
+                  <button onClick={() => removeFile(file.id)} className="text-muted-foreground hover:text-destructive ml-1">
+                    <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
               ))}
@@ -279,129 +385,49 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
           )}
 
           <Textarea
-            placeholder="Message AI Keyword Generator... (e.g. Find keywords for a SaaS project management tool)"
-            value={formData.topic}
-            onChange={(e) => setFormData((prev) => ({ ...prev, topic: e.target.value }))}
+            placeholder={`Message AI strategist regarding ${companyData.product.toLowerCase()}...`}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="min-h-[100px] max-h-[250px] border-0 focus-visible:ring-0 bg-transparent resize-none p-4 pb-14 text-sm"
+            className="min-h-[80px] max-h-[200px] border-0 focus-visible:ring-0 bg-transparent resize-none p-4 pb-12 text-sm leading-relaxed"
           />
-          
+
           <input 
             type="file" 
             ref={fileInputRef} 
             onChange={handleFileInput} 
             multiple 
             className="hidden" 
-            accept="image/*,.pdf,.doc,.docx,.txt"
           />
 
-          <div className="absolute bottom-3 left-3 flex items-center gap-2 bg-background/50 rounded-full backdrop-blur">
-            <button
+          <div className="absolute bottom-3 left-3 flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => fileInputRef.current?.click()}
-              className="p-2 rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors group flex items-center justify-center border border-transparent hover:border-border"
-              title="Attach File"
+              className="h-8 w-8 rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
             >
-              <Paperclip className="w-4 h-4 group-hover:scale-110 transition-transform" />
-            </button>
+              <Paperclip className="w-4 h-4" />
+            </Button>
           </div>
 
           <div className="absolute bottom-3 right-3">
             <Button
               onClick={generateKeywords}
-              disabled={isGenerating || formData.selectedFactors.length === 0}
+              disabled={isGenerating || (!input.trim() && files.length === 0)}
               size="icon"
-              className={`h-10 w-10 rounded-full transition-all duration-300 ${
-                formData.topic.trim().length > 0 || files.length > 0
-                  ? "bg-primary text-primary-foreground shadow-lg hover:shadow-primary/25 hover:scale-105"
-                  : "bg-muted text-muted-foreground cursor-not-allowed opacity-50"
-              }`}
-            >
-              {isGenerating ? (
-                <Search className="w-4 h-4 animate-spin" />
-              ) : (
-                <SendHorizontal className="w-4 h-4 ml-0.5" />
+              className={cn(
+                "h-8 w-8 rounded-full transition-all duration-300",
+                input.trim() || files.length > 0 ? "bg-primary text-primary-foreground shadow-lg" : "bg-muted text-muted-foreground"
               )}
+            >
+              <SendHorizontal className="w-4 h-4" />
             </Button>
           </div>
         </div>
-        <p className="text-[10px] text-center text-muted-foreground/60 mt-3 flex items-center justify-center gap-1.5">
-          <Sparkles className="w-3 h-3" /> AI Keywords can make mistakes. Review generated strategies carefully.
+        <p className="text-[9px] text-center text-muted-foreground mt-3 flex items-center justify-center gap-1">
+          <Sparkles className="w-3 h-3" /> AI Keyword Chatbot v2.0 • Data-driven precision for your exact target industry.
         </p>
-      </div>
-
-      {/* RIGHT COLUMN: Results Display */}
-      <div className="md:col-span-7 space-y-6">
-        {generatedKeywords.length > 0 ? (
-          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center justify-between mb-2">
-              <div>
-                <h3 className="text-xl font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
-                  Keyword Strategies
-                </h3>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4">
-              {generatedKeywords.map((group, groupIdx) => (
-                <Card key={group.factor} className="overflow-hidden border border-border/40 bg-card/60 backdrop-blur-md shadow-lg" style={{ animationDelay: `${groupIdx * 100}ms` }}>
-                  <div className="px-5 py-3 border-b border-border/30 flex items-center justify-between bg-muted/30">
-                    <div className="flex items-center gap-3">
-                      <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                        <Target className="w-3.5 h-3.5" />
-                      </div>
-                      <h4 className="font-bold text-primary tracking-wide text-sm">
-                        {group.factor.toUpperCase()}
-                      </h4>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-8 gap-2 text-xs bg-background/50 hover:bg-background border-border/50"
-                      onClick={() => copyToClipboard(group.keywords, group.factor)}
-                    >
-                      {copiedGroup === group.factor ? (
-                        <Check className="w-3.5 h-3.5 text-green-500" />
-                      ) : (
-                        <Copy className="w-3.5 h-3.5" />
-                      )}
-                      {copiedGroup === group.factor ? "Copied" : "Copy Cluster"}
-                    </Button>
-                  </div>
-                  
-                  <div className="p-4 bg-muted/10">
-                    <div className="flex flex-wrap gap-2">
-                      {group.keywords.map((kw, i) => (
-                        <div 
-                          key={i} 
-                          className="px-3 py-1.5 rounded-md bg-background border border-border/40 text-[13px] font-medium text-foreground/90 hover:text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors cursor-text select-text flex items-center gap-2 group/kw"
-                        >
-                          <span className="text-primary/40 font-mono text-[10px] select-none group-hover/kw:text-primary/70">{i + 1}</span>
-                          {kw}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className="h-full min-h-[500px] flex flex-col items-center justify-center p-8 text-center border-2 border-dashed border-border/40 rounded-2xl bg-muted/10 bg-[radial-gradient(circle_at_center,theme(colors.primary.DEFAULT/0.05)_0%,transparent_100%)]">
-            <div className="relative">
-              <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 shadow-2xl backdrop-blur-3xl transform rotate-3 animate-pulse">
-                <Search className="w-10 h-10 text-primary/60" />
-              </div>
-              <div className="absolute -top-2 -right-2 w-6 h-6 bg-background rounded-full flex items-center justify-center shadow-lg transform -rotate-12">
-                <Sparkles className="w-3.5 h-3.5 text-yellow-500" />
-              </div>
-            </div>
-            
-            <h3 className="text-xl font-bold text-foreground">Awaiting Your Prompt</h3>
-            <p className="text-sm text-muted-foreground mt-3 max-w-sm mx-auto leading-relaxed">
-              Use the chatbot interface on the left to write a prompt, attach relevant competitor files, and select vectors to generate hyper-targeted keyword datasets.
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );
