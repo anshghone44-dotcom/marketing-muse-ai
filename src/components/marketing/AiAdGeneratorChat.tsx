@@ -445,7 +445,7 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
             )}
             
             <Textarea
-              placeholder={`Describe the goal for your ${companyData.industry.toLowerCase()} ad campaign...`}
+              placeholder="Generate any ad campaign for your business"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}

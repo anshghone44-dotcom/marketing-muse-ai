@@ -377,7 +377,7 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
           )}
 
           <Textarea
-            placeholder={`Message AI strategist regarding ${companyData.product.toLowerCase()}...`}
+            placeholder="Generate all types of keywords for your business"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
