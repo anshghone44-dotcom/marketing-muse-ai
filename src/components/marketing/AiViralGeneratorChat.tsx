@@ -125,28 +125,37 @@ export default function AiViralGeneratorChat({ companyData, onCompanySubmit }: P
       const campaigns: ViralCampaign[] = [
         {
           id: "1",
-          title: `The "${companyData?.industry || 'Industry'} Referral Roulette"`,
-          description: `A gamified referral program designed for ${companyData?.name || 'your business'}.`,
-          mechanics: `Users invite their network to sign up. Every successful referral unlocks a "Spin" on the AI reward wheel. Higher stakes for more referrals.`,
-          prize: `Exclusive access to premium features, custom consultations, or branded merchandise.`,
-          platforms: ["Instagram", "WhatsApp", "LinkedIn"],
-          whyItWorks: "Leverages social proof and the 'thrill of the win' through gamification."
+          title: `The "${companyData?.product || 'Product'} VIP Referral Loop"`,
+          description: `A high-conversion referral ecosystem designed to turn every customer into a lead-generating advocate for ${companyData?.name || 'your business'}.`,
+          mechanics: `Users share a personalized "Golden Ticket" link. For every sign-up, the referrer earns "Impact Points". At 50 points, they unlock a 1-on-1 strategy session. At 100 points, they gain lifetime "Legacy Status" with exclusive perks.`,
+          prize: `1-on-1 Executive Consulting, Lifetime Premium Access, and a "Founder's Circle" physical welcome kit.`,
+          platforms: ["WhatsApp", "LinkedIn", "Email"],
+          whyItWorks: "Combines scarcity (Golden Ticket) with high-value professional incentives, driving quality leads over quantity."
         },
         {
           id: "2",
-          title: `"Leaderboard of Legends" Challenge`,
-          description: `A competition-based campaign to drive user-generated content and brand engagement.`,
-          mechanics: `Weekly leaderboard showing top users who share ${topic || 'creative content'}. Points awarded based on engagement and unique reach.`,
-          prize: `Featured spotlight on main channel, 'Certified Legend' badge, and professional strategy kits.`,
-          platforms: ["TikTok", "Instagram Reels", "Twitter"],
-          whyItWorks: "Drives healthy competition and consistent organic visibility through UGC."
+          title: `"Which ${companyData?.industry || 'Industry'} Future Are You?" Quiz`,
+          description: `An interactive diagnostic campaign that captures deep lead data while providing immediate value to the consumer.`,
+          mechanics: `A 60-second interactive quiz that analyzes the user's current business state and gives them a "Strategy Maturity Score". To see the full 10-page custom report, users enter their professional details.`,
+          prize: `Personalized 20-Page Strategy Roadmap + 15-minute diagnostic call with an AI Specialist.`,
+          platforms: ["Instagram Reels", "Facebook", "LinkedIn"],
+          whyItWorks: "The 'Self-Discovery' hook drives massive participation, while the gated custom report ensures high-intent lead capture."
+        },
+        {
+          id: "3",
+          title: `The "${companyData?.name || 'Brand'} Innovation Co-Lab"`,
+          description: `A community-driven co-creation campaign that builds intense brand loyalty and word-of-mouth participation.`,
+          mechanics: `Consumers vote on the next major update for ${companyData?.product || 'your product'}. Every voter gets a "Beta Pioneer" badge and a unique referral code that grants their friends priority access.`,
+          prize: `Early Beta Access, Permanent Name in the "Innovation Wall", and Limited Edition "Co-Creator" Merch.`,
+          platforms: ["Twitter/X", "Discord", "TikTok"],
+          whyItWorks: "Direct participation in the product roadmap creates a 'Sense of Ownership', leading to organic viral sharing."
         }
       ];
 
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "ai",
-        content: `I've architected prime viral idea campaigns for your business. These strategies are designed to maximize consumer-friendly engagement and professional impact. Here are the top concepts:`,
+        content: `I've architected a professional suite of viral campaigns for **${companyData?.name || 'your business'}**. These concepts are engineered specifically to drive high-intensity lead generation and consumer participation through value-driven loops.`,
         campaigns,
         timestamp: new Date(),
       };
