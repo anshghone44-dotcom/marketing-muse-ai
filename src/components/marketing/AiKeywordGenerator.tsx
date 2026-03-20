@@ -227,21 +227,13 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
             <h2 className="text-sm font-bold tracking-tight">Keyword Intelligence Agent</h2>
           </div>
         </div>
-        <div className="flex gap-1.5 overflow-x-auto pb-1 max-w-[200px] md:max-w-none">
-          {KEYWORD_FACTORS.map(f => (
-            <button
-              key={f.id}
-              onClick={() => handleFactorToggle(f.id)}
-              className={cn(
-                "px-2.5 py-1 rounded-full text-[10px] font-bold border transition-all whitespace-nowrap",
-                selectedFactors.includes(f.id) 
-                  ? "bg-primary/20 border-primary/50 text-foreground" 
-                  : "bg-muted/50 border-border/50 text-muted-foreground hover:bg-muted"
-              )}
-            >
-              {f.label}
-            </button>
-          ))}
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+            <Bot className="w-4 h-4" />
+          </div>
+          <div>
+            <h2 className="text-sm font-bold tracking-tight">Keyword Intelligence Agent</h2>
+          </div>
         </div>
       </div>
 
@@ -253,21 +245,13 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
         {messages.length === 0 && !isGenerating ? (
           <div className="h-full flex flex-col items-center justify-center text-center max-w-md mx-auto space-y-6">
             <div className="w-16 h-16 rounded-3xl bg-primary/10 flex items-center justify-center animate-pulse">
-              <Sparkles className="w-8 h-8 text-primary" />
+              <Bot className="w-8 h-8 text-primary" />
             </div>
             <div>
-              <h3 className="text-xl font-bold mb-2">Hello {companyData.name}!</h3>
+              <h3 className="text-xl font-bold mb-2">Campaign Keyword Specialist</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                I'm your dedicated AI Keyword Strategist. Upload any competitor documents, marketing briefs, or images, or just type a campaign goal below to start generating high-impact keyword clusters.
+                Provide your campaign details or upload documents to generate high-precision keyword clusters tailored for your industry.
               </p>
-            </div>
-            <div className="grid grid-cols-2 gap-3 w-full">
-              <div className="p-3 rounded-xl border border-border/50 bg-muted/20 text-[10px] font-medium text-left">
-                "Find lead-generating keywords for our new ${companyData.product.toLowerCase()} launch."
-              </div>
-              <div className="p-3 rounded-xl border border-border/50 bg-muted/20 text-[10px] font-medium text-left">
-                "What are some catchy viral phrases for ${companyData.industry.toLowerCase()} target audience?"
-              </div>
             </div>
           </div>
         ) : (

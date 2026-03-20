@@ -300,37 +300,14 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
           <div className="h-full flex flex-col items-center justify-center text-center max-w-xl mx-auto space-y-8">
             <div className="relative">
               <div className="w-20 h-20 rounded-[2.5rem] bg-primary/10 flex items-center justify-center animate-pulse">
-                <Sparkles className="w-10 h-10 text-primary" />
-              </div>
-              <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-background rounded-full flex items-center justify-center shadow-xl border border-border/40">
-                <Bot className="w-4 h-4 text-primary" />
+                <Bot className="w-10 h-10 text-primary" />
               </div>
             </div>
             <div className="space-y-4">
-              <h3 className="text-2xl font-black text-foreground leading-tight">Elite Ad Intelligence for {companyData.name}</h3>
+              <h3 className="text-2xl font-black text-foreground leading-tight italic tracking-tighter">Ready to Architect Your Campaign?</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Describe your current campaign objective. I will architect high-quality, professional, and formal ad copy tailored to your industry standards.
+                Describe your high-level objective below. I will generate a comprehensive, professional ad strategy across all selected platforms.
               </p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-              {AD_GOALS.map(goal => (
-                <button
-                  key={goal}
-                  onClick={() => setSelectedGoal(goal)}
-                  className={cn(
-                    "p-4 rounded-2xl border text-[11px] font-bold text-left transition-all hover:scale-[1.02]",
-                    selectedGoal === goal 
-                      ? "bg-primary/5 border-primary/50 text-foreground ring-1 ring-primary/20" 
-                      : "bg-card/30 border-border/40 text-muted-foreground hover:bg-muted"
-                  )}
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="uppercase tracking-widest">{goal}</span>
-                    <Layout className="w-3 h-3 opacity-40" />
-                  </div>
-                  <span className="text-[9px] font-normal block opacity-60">Generate formal {goal.toLowerCase()} creatives.</span>
-                </button>
-              ))}
             </div>
           </div>
         ) : (
