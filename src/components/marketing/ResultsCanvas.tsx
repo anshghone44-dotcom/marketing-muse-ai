@@ -5,6 +5,7 @@ import AiAdGeneratorChat from "./AiAdGeneratorChat";
 import AiKeywordGenerator from "./AiKeywordGenerator";
 import AiContentGeneratorChat from "./AiContentGeneratorChat";
 import AiViralGeneratorChat from "./AiViralGeneratorChat";
+import AiCompetitorAnalysisChat from "./AiCompetitorAnalysisChat";
 import CompanyForm from "./CompanyForm";
 import { Button } from "@/components/ui/button";
 
@@ -99,6 +100,15 @@ export default function ResultsCanvas({
     return (
       <div className="max-w-6xl mx-auto">
         <AiViralGeneratorChat companyData={companyData} onCompanySubmit={onCompanySubmit} />
+      </div>
+    );
+  }
+
+  // Show AI Competitor Analysis for competitor task
+  if (activeTask === "competitor") {
+    return (
+      <div className="max-w-6xl mx-auto">
+        <AiCompetitorAnalysisChat companyData={companyData} onCompanySubmit={onCompanySubmit} />
       </div>
     );
   }
