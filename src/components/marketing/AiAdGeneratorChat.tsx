@@ -1,79 +1,45 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Download, Sparkles, Check } from "lucide-react";
+  Sparkles,
+  Download,
+  Check,
+  X,
+  SendHorizontal,
+  Bot,
+  User,
+  Loader2,
+  Megaphone,
+  Layout,
+  Instagram,
+  Facebook,
+  Linkedin,
+  Youtube,
+  Globe,
+  MessageSquare
+} from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 import type { CompanyData } from "./CompanyForm";
 import CompanyForm from "./CompanyForm";
 
 export const SOCIAL_PLATFORMS = [
-  "Instagram",
-  "YouTube",
-  "TikTok",
-  "Facebook",
-  "LinkedIn",
-  "WhatsApp",
-  "Twitter/X",
-  "Pinterest",
-  "Snapchat",
-  "Reddit",
+  { id: "Instagram", icon: Instagram },
+  { id: "Facebook", icon: Facebook },
+  { id: "LinkedIn", icon: Linkedin },
+  { id: "YouTube", icon: Youtube },
+  { id: "TikTok", icon: MessageSquare },
+  { id: "Google", icon: Globe },
 ];
 
-// Ad Goals
 export const AD_GOALS = [
-  "Increase brand awareness",
-  "Drive traffic to the website",
-  "Promote a special offer",
-  "Capture leads",
-  "Highlight success stories/testimonials",
-];
-
-// Target Audiences
-export const TARGET_AUDIENCES = [
-  "Demographics (Age, Gender, Location)",
-  "Skilled Workers",
-  "IT Professionals",
-  "Engineers",
-  "Students",
-  "Families",
-  "Immigration Consultants",
-];
-
-// Visa Services/Types
-export const VISA_SERVICES = [
-  "Canada PR Visa",
-  "Australia Work Visa",
-  "New Zealand Work Visa",
-  "Student Visas",
-  "IELTS/PTE Preparation",
-  "Visa Consultation Services",
-  "Family Sponsorship",
-];
-
-// Key Benefits
-export const KEY_BENEFITS = [
-  "Expert guidance through the entire visa process",
-  "High success rate in visa approvals",
-  "Personalized consultations",
-  "Free IELTS/PTE preparation support",
-  "Access to job opportunities",
-  "Document & application assistance",
+  "Brand Awareness",
+  "Website Traffic",
+  "Lead Generation",
+  "Direct Sales",
+  "Testimonials",
 ];
 
 interface VisualAd {
@@ -87,8 +53,14 @@ interface VisualAd {
   adCopy: string;
   mediaType: "image" | "video";
   mediaUrl: string;
-  videoScript?: string;
-  fullScriptTemplate?: string;
+}
+
+interface Message {
+  id: string;
+  role: "user" | "ai";
+  content: string;
+  ads?: VisualAd[];
+  timestamp: Date;
 }
 
 interface Props {
@@ -96,257 +68,108 @@ interface Props {
   onCompanySubmit: (data: CompanyData) => void;
 }
 
-interface AdFormData {
-  // Step 1: Goals
-  selectedGoals: string[];
-  // Step 2: Target Audience
-  targetAudiences: string[];
-  audienceDemographics: string;
-  // Step 3: Visa Services
-  visaServices: string[];
-  // Step 4: Hook/Message
-  hook: string;
-  // Step 5: Benefits
-  selectedBenefits: string[];
-  customBenefits: string;
-  // Step 6: Social Proof
-  testimonial: string;
-  successRate: string;
-  rating: string;
-  caseStudy: string;
-  // Step 7: Call to Action
-  callToAction: string;
-  // Step 8: Branding
-  websiteUrl: string;
-  phoneNumber: string;
-  // Step 9: Ad Length
-  adLength: string;
-  // Step 10: Customizations
-  brandColors: string;
-  brandFonts: string;
-  additionalVisuals: string;
-  // Platforms
-  platforms: string[];
-}
-
 export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Props) {
-  const [formData, setFormData] = useState<AdFormData>({
-    selectedGoals: [],
-    targetAudiences: [],
-    audienceDemographics: "",
-    visaServices: [],
-    hook: "",
-    selectedBenefits: [],
-    customBenefits: "",
-    testimonial: "",
-    successRate: "",
-    rating: "",
-    caseStudy: "",
-    callToAction: "Book a free consultation",
-    websiteUrl: "",
-    phoneNumber: "",
-    adLength: "30",
-    brandColors: "",
-    brandFonts: "",
-    additionalVisuals: "",
-    platforms: [],
-  });
-  const [generatedAds, setGeneratedAds] = useState<VisualAd[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(["Instagram", "Facebook"]);
+  const [selectedGoal, setSelectedGoal] = useState("Lead Generation");
   const [isGenerating, setIsGenerating] = useState(false);
+  
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const generateComprehensiveAdScript = () => {
-    const benefitsText = [
-      ...formData.selectedBenefits.slice(0, 3),
-      ...(formData.customBenefits ? [formData.customBenefits] : []),
-    ].join("\n• ");
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, isGenerating]);
 
-    const socialProofText = [
-      formData.testimonial && `"${formData.testimonial}"`,
-      formData.successRate && `Success Rate: ${formData.successRate}`,
-      formData.rating && `Rating: ${formData.rating}`,
-    ]
-      .filter(Boolean)
-      .join("\n");
+  const generateAds = async () => {
+    if (!input.trim()) {
+      toast.error("Please describe your ad campaign goal.");
+      return;
+    }
 
-    const adLength = parseInt(formData.adLength);
+    if (selectedPlatforms.length === 0) {
+      toast.error("Please select at least one platform.");
+      return;
+    }
 
-    // Generate platform-specific scripts
-    const scriptTemplate = {
-      opening: formData.hook || `Ready to ${formData.visaServices[0]?.toLowerCase() || "start your immigration journey"}?`,
-      benefits: benefitsText || "Expert support at every step",
-      socialProof: socialProofText || "Trusted by thousands",
-      cta: formData.callToAction,
-      contact: `${formData.websiteUrl || (companyData?.name ? `www.${companyData.name.toLowerCase().replace(/\s+/g, '')}.com` : "visit our website")} | ${formData.phoneNumber || "contact us"}`,
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: "user",
+      content: input,
+      timestamp: new Date(),
     };
 
-    return scriptTemplate;
-  };
-
-  const generateVisualAds = () => {
-    const colorSchemes: Record<string, { bg: string; accent: string }> = {
-      Instagram: { bg: "from-pink-50 to-purple-50", accent: "from-pink-500 to-purple-500" },
-      YouTube: { bg: "from-red-50 to-orange-50", accent: "from-red-500 to-orange-500" },
-      TikTok: { bg: "from-blue-50 to-pink-50", accent: "from-blue-500 to-pink-500" },
-      Facebook: { bg: "from-blue-50 to-indigo-50", accent: "from-blue-600 to-indigo-600" },
-      LinkedIn: { bg: "from-blue-50 to-slate-50", accent: "from-blue-700 to-slate-700" },
-      WhatsApp: { bg: "from-green-50 to-emerald-50", accent: "from-green-500 to-emerald-500" },
-      "Twitter/X": { bg: "from-slate-50 to-gray-50", accent: "from-black to-gray-800" },
-      Pinterest: { bg: "from-red-50 to-pink-50", accent: "from-red-600 to-pink-600" },
-      Snapchat: { bg: "from-yellow-50 to-amber-50", accent: "from-yellow-400 to-amber-500" },
-      Reddit: { bg: "from-orange-50 to-red-50", accent: "from-orange-600 to-red-600" },
-    };
-
-    const scriptTemplate = generateComprehensiveAdScript();
-
-    const generatePlatformScript = (platform: string) => {
-      const adLength = parseInt(formData.adLength);
-      const isVideo = ["YouTube", "TikTok"].includes(platform);
-
-      if (isVideo) {
-        const secondsPerSegment = adLength / 3;
-        return `
-🎬 ${platform} Video Script (${adLength}s)
-
-[0-${secondsPerSegment}s] 🎞️ Opening
-${scriptTemplate.opening}
-Visuals: ${formData.additionalVisuals || `Professional ${formData.visaServices[0]?.toLowerCase() || "immigration"} visuals`}
-
-[${secondsPerSegment}-${secondsPerSegment * 2}s] 💡 Key Benefits
-✓ ${formData.selectedBenefits[0] || "Expert Guidance"}
-✓ ${formData.selectedBenefits[1] || "High Success Rates"}
-✓ ${formData.selectedBenefits[2] || "Personalized Support"}
-
-[${secondsPerSegment * 2}-${adLength}s] ✨ Call to Action
-${scriptTemplate.cta}
-${scriptTemplate.contact}
-${scriptTemplate.socialProof ? `\n"${scriptTemplate.socialProof}"` : ""}
-`;
-      }
-
-      // Image ad
-      return `
-📸 ${platform} Image Ad (${formData.adLength}s)
-
-Headline: ${scriptTemplate.opening}
-
-Body Copy:
-${formData.selectedBenefits.slice(0, 2).join("\n") || "Expert support for your visa journey"}
-
-Social Proof: ${scriptTemplate.socialProof || "Trusted by thousands"}
-
-Call to Action: ${scriptTemplate.cta}
-
-Contact: ${scriptTemplate.contact}
-`;
-    };
-
-    const ads: VisualAd[] = formData.platforms.map((platform) => {
-      const colors = colorSchemes[platform] || colorSchemes.Instagram;
-      const isVideo = ["YouTube", "TikTok"].includes(platform);
-
-      return {
-        id: `${platform}-${Date.now()}`,
-        platform,
-        headline: formData.hook || formData.visaServices[0] || "Start Your Journey",
-        description: formData.selectedBenefits[0] || "Expert immigration support",
-        callToAction: formData.callToAction,
-        backgroundColor: colors.bg,
-        accentColor: colors.accent,
-        adCopy: `${formData.hook}\n\n${formData.selectedBenefits.slice(0, 2).join("\n")}`,
-        mediaType: isVideo ? "video" : "image",
-        mediaUrl: isVideo
-          ? "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
-          : `https://source.unsplash.com/600x400/?${formData.visaServices[0]?.toLowerCase().replace(" ", ",") || "business"},professional`,
-        videoScript: isVideo ? generatePlatformScript(platform) : undefined,
-        fullScriptTemplate: generatePlatformScript(platform),
-      };
-    });
-
-    return ads;
-  };
-
-  const handleGenerateAds = () => {
-    if (formData.platforms.length === 0) {
-      toast.error("Please select at least one platform");
-      return;
-    }
-    if (formData.selectedGoals.length === 0) {
-      toast.error("Please select at least one ad goal");
-      return;
-    }
-    if (!formData.hook.trim()) {
-      toast.error("Please provide an attention-grabbing hook");
-      return;
-    }
-    if (formData.visaServices.length === 0) {
-      toast.error("Please select at least one visa service");
-      return;
-    }
-
+    setMessages(prev => [...prev, userMessage]);
+    setInput("");
     setIsGenerating(true);
+
+    // Simulate AI generation logic
     setTimeout(() => {
-      const newAds = generateVisualAds();
-      setGeneratedAds(newAds);
+      const topic = userMessage.content;
+      const { name, industry, product, audience } = companyData || {};
+
+      const platformConfig: Record<string, { bg: string; accent: string }> = {
+        Instagram: { bg: "from-purple-500/20 to-pink-500/20", accent: "bg-gradient-to-r from-purple-600 to-pink-600" },
+        Facebook: { bg: "from-blue-600/20 to-indigo-600/20", accent: "bg-blue-600" },
+        LinkedIn: { bg: "from-blue-700/20 to-slate-700/20", accent: "bg-blue-700" },
+        YouTube: { bg: "from-red-600/20 to-orange-600/20", accent: "bg-red-600" },
+        TikTok: { bg: "from-slate-900/20 to-pink-500/20", accent: "bg-black" },
+        Google: { bg: "from-blue-500/20 to-green-500/20", accent: "bg-blue-500" },
+      };
+
+      const ads: VisualAd[] = selectedPlatforms.map(platform => {
+        const config = platformConfig[platform] || platformConfig.Instagram;
+        return {
+          id: `${platform}-${Date.now()}`,
+          platform,
+          headline: `Professional ${topic.split(' ').slice(0, 3).join(' ')} Strategy`,
+          description: `Unlock high-quality ${selectedGoal.toLowerCase()} with ${name || "our solutions"} specifically designed for ${audience || "industry professionals"}.`,
+          callToAction: "Book a Strategic Consultation",
+          backgroundColor: config.bg,
+          accentColor: config.accent,
+          adCopy: `### AI GENERATED AD COPY (${platform})\n\n**Headline:** Elevate your ${industry || "business"} with ${product || "expert solutions"}.\n\n**Body:** Tired of subpar results? ${name || "LeadBot"} delivers a formal, data-driven approach to ${topic.toLowerCase()}. We help ${audience || "forward-thinking leaders"} achieve measurable growth through proven ${industry || "market"} methodologies.\n\n**CTA:** ${selectedGoal === "Lead Generation" ? "Claim Your Free Strategic Assessment" : "Explore Professional Solutions"}`,
+          mediaType: ["YouTube", "TikTok"].includes(platform) ? "video" : "image",
+          mediaUrl: `https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800`
+        };
+      });
+
+      const aiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "ai",
+        content: `I've architected a professional ad campaign for "${topic}". Targeting your ${selectedGoal.toLowerCase()} goals across ${selectedPlatforms.join(', ')}. Here are the formal variations designed for ${companyData?.name || "your company"}:`,
+        ads,
+        timestamp: new Date(),
+      };
+
+      setMessages(prev => [...prev, aiMessage]);
       setIsGenerating(false);
-      toast.success("Ad campaigns generated successfully!");
-    }, 2000);
+      toast.success("Ad campaigns architected successfully!");
+    }, 3000);
   };
 
-  const downloadAdImage = (ad: VisualAd) => {
-    toast.success(`Downloading ${ad.platform} ad...`);
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      generateAds();
+    }
   };
 
-  const handleGoalToggle = (goal: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      selectedGoals: prev.selectedGoals.includes(goal)
-        ? prev.selectedGoals.filter((g) => g !== goal)
-        : [...prev.selectedGoals, goal],
-    }));
-  };
-
-  const handleAudienceToggle = (audience: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      targetAudiences: prev.targetAudiences.includes(audience)
-        ? prev.targetAudiences.filter((a) => a !== audience)
-        : [...prev.targetAudiences, audience],
-    }));
-  };
-
-  const handleVisaServiceToggle = (service: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      visaServices: prev.visaServices.includes(service)
-        ? prev.visaServices.filter((s) => s !== service)
-        : [...prev.visaServices, service],
-    }));
-  };
-
-  const handleBenefitToggle = (benefit: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      selectedBenefits: prev.selectedBenefits.includes(benefit)
-        ? prev.selectedBenefits.filter((b) => b !== benefit)
-        : [...prev.selectedBenefits, benefit],
-    }));
-  };
-
-  const handlePlatformToggle = (platform: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      platforms: prev.platforms.includes(platform)
-        ? prev.platforms.filter((p) => p !== platform)
-        : [...prev.platforms, platform],
-    }));
+  const togglePlatform = (platform: string) => {
+    setSelectedPlatforms(prev => 
+      prev.includes(platform) 
+        ? prev.filter(p => p !== platform) 
+        : [...prev, platform]
+    );
   };
 
   if (!companyData) {
     return (
-      <div className="max-w-2xl mx-auto py-8">
+      <div className="max-w-2xl mx-auto py-12">
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold mb-2">Complete Your Profile</h2>
-          <p className="text-muted-foreground">To use the AI Ad Generator, please provide your company details below.</p>
+          <h2 className="text-3xl font-bold mb-3">Initialize AI Context</h2>
+          <p className="text-muted-foreground">Complete your profile to unlock the Strategic Ad Generator Chatbot.</p>
         </div>
         <CompanyForm onSubmit={onCompanySubmit} />
       </div>
@@ -354,497 +177,236 @@ Contact: ${scriptTemplate.contact}
   }
 
   return (
-    <div className="space-y-8">
-      {/* Form Section - 11 Step Workflow */}
-      <Card className="p-6 border border-border/50 bg-card/50 backdrop-blur">
-        <div className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-semibold mb-2">🎯 Immigration Ad Generator - 11 Step Workflow</h2>
-            <p className="text-sm text-muted-foreground">Create professional visa & immigration ads with guided step-by-step process</p>
+    <div className="flex flex-col h-[80vh] max-w-5xl mx-auto relative bg-background/40 border border-border/40 rounded-[2rem] overflow-hidden shadow-2xl backdrop-blur-md">
+      {/* Header Context Bar */}
+      <div className="p-5 border-b border-border/20 bg-card/40 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+            <Megaphone className="w-5 h-5" />
           </div>
-
-          <Accordion type="single" collapsible className="w-full">
-            {/* Step 1: Goals */}
-            <AccordionItem value="step1">
-              <AccordionTrigger className="text-base font-semibold">
-                <span className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">
-                    1
-                  </span>
-                  Define Your Ad Goals
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="space-y-3">
-                <p className="text-sm text-muted-foreground mb-3">
-                  What do you want your ad to achieve? (Choose one or more)
-                </p>
-                <div className="space-y-2">
-                  {AD_GOALS.map((goal) => (
-                    <div key={goal} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={goal}
-                        checked={formData.selectedGoals.includes(goal)}
-                        onCheckedChange={() => handleGoalToggle(goal)}
-                      />
-                      <label htmlFor={goal} className="text-sm cursor-pointer">
-                        {goal}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Step 2: Target Audience */}
-            <AccordionItem value="step2">
-              <AccordionTrigger className="text-base font-semibold">
-                <span className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">
-                    2
-                  </span>
-                  Choose Target Audience
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="space-y-4">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-3">Who are you targeting with this ad?</p>
-                  <div className="space-y-2 mb-4">
-                    {TARGET_AUDIENCES.map((audience) => (
-                      <div key={audience} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={audience}
-                          checked={formData.targetAudiences.includes(audience)}
-                          onCheckedChange={() => handleAudienceToggle(audience)}
-                        />
-                        <label htmlFor={audience} className="text-sm cursor-pointer">
-                          {audience}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Additional Demographics (optional)</label>
-                  <Input
-                    placeholder="e.g., 'IT professionals aged 25-35 in India looking to migrate to Canada'"
-                    value={formData.audienceDemographics}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, audienceDemographics: e.target.value }))
-                    }
-                    className="bg-background/50 border-border/50"
-                  />
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Step 3: Visa Services */}
-            <AccordionItem value="step3">
-              <AccordionTrigger className="text-base font-semibold">
-                <span className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">
-                    3
-                  </span>
-                  Select Visa Offering/Service
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="space-y-3">
-                <p className="text-sm text-muted-foreground mb-3">Which visa type or service are you promoting?</p>
-                <div className="space-y-2">
-                  {VISA_SERVICES.map((service) => (
-                    <div key={service} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={service}
-                        checked={formData.visaServices.includes(service)}
-                        onCheckedChange={() => handleVisaServiceToggle(service)}
-                      />
-                      <label htmlFor={service} className="text-sm cursor-pointer">
-                        {service}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Step 4: Hook/Message */}
-            <AccordionItem value="step4">
-              <AccordionTrigger className="text-base font-semibold">
-                <span className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">
-                    4
-                  </span>
-                  Craft Your Attention-Grabbing Hook
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="space-y-3">
-                <p className="text-sm text-muted-foreground mb-3">What is your hook for the first 5 seconds?</p>
-                <Textarea
-                  placeholder="Examples: 'Want to live and work in Canada? Let us help you get there!' or 'Did you know? 95% of our clients get their Canadian PR approved!' or 'Ready to study in Australia? We've helped thousands of students!'"
-                  value={formData.hook}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, hook: e.target.value }))}
-                  className="min-h-20 bg-background/50 border-border/50"
-                />
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Step 5: Benefits */}
-            <AccordionItem value="step5">
-              <AccordionTrigger className="text-base font-semibold">
-                <span className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">
-                    5
-                  </span>
-                  Highlight Key Benefits
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="space-y-4">
-                <p className="text-sm text-muted-foreground mb-3">What are the main benefits to highlight?</p>
-                <div className="space-y-2 mb-4">
-                  {KEY_BENEFITS.map((benefit) => (
-                    <div key={benefit} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={benefit}
-                        checked={formData.selectedBenefits.includes(benefit)}
-                        onCheckedChange={() => handleBenefitToggle(benefit)}
-                      />
-                      <label htmlFor={benefit} className="text-sm cursor-pointer">
-                        {benefit}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Custom Benefit (optional)</label>
-                  <Input
-                    placeholder="Add your own unique benefit..."
-                    value={formData.customBenefits}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, customBenefits: e.target.value }))}
-                    className="bg-background/50 border-border/50"
-                  />
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Step 6: Social Proof */}
-            <AccordionItem value="step6">
-              <AccordionTrigger className="text-base font-semibold">
-                <span className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">
-                    6
-                  </span>
-                  Add Social Proof & Testimonials
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Client Testimonial (optional)</label>
-                  <Textarea
-                    placeholder="e.g., 'Thanks to Nexus Migration, I received my Canada PR in just 6 months!'"
-                    value={formData.testimonial}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, testimonial: e.target.value }))}
-                    className="min-h-12 bg-background/50 border-border/50"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Success Rate (optional)</label>
-                  <Input
-                    placeholder="e.g., '4000+ ITA filed with 95% success rate'"
-                    value={formData.successRate}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, successRate: e.target.value }))}
-                    className="bg-background/50 border-border/50"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Rating (optional)</label>
-                  <Input
-                    placeholder="e.g., 'Rated 4.5/5 on Trustpilot'"
-                    value={formData.rating}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, rating: e.target.value }))}
-                    className="bg-background/50 border-border/50"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Case Study/Story (optional)</label>
-                  <Textarea
-                    placeholder="Share a real-life success story..."
-                    value={formData.caseStudy}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, caseStudy: e.target.value }))}
-                    className="min-h-12 bg-background/50 border-border/50"
-                  />
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Step 7: Call to Action */}
-            <AccordionItem value="step7">
-              <AccordionTrigger className="text-base font-semibold">
-                <span className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">
-                    7
-                  </span>
-                  Create Your Call to Action
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="space-y-3">
-                <p className="text-sm text-muted-foreground mb-3">What action do you want viewers to take?</p>
-                <Input
-                  placeholder="e.g., 'Book a free consultation', 'Get your free visa assessment', 'Start your journey now'"
-                  value={formData.callToAction}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, callToAction: e.target.value }))}
-                  className="bg-background/50 border-border/50"
-                />
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Step 8: Branding */}
-            <AccordionItem value="step8">
-              <AccordionTrigger className="text-base font-semibold">
-                <span className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">
-                    8
-                  </span>
-                  Add Branding & Contact Info
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Website URL</label>
-                  <Input
-                    placeholder="e.g., https://www.nexusmigration.com"
-                    value={formData.websiteUrl}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, websiteUrl: e.target.value }))}
-                    className="bg-background/50 border-border/50"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Phone Number</label>
-                  <Input
-                    placeholder="e.g., +971 4 295 0122"
-                    value={formData.phoneNumber}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, phoneNumber: e.target.value }))}
-                    className="bg-background/50 border-border/50"
-                  />
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Step 9: Ad Length */}
-            <AccordionItem value="step9">
-              <AccordionTrigger className="text-base font-semibold">
-                <span className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">
-                    9
-                  </span>
-                  Choose Ad Length
-                </span>
-              </AccordionTrigger>
-              <AccordionContent>
-                <Select value={formData.adLength} onValueChange={(value) => setFormData((prev) => ({ ...prev, adLength: value }))}>
-                  <SelectTrigger className="w-full bg-background/50 border-border/50">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="15">15 seconds</SelectItem>
-                    <SelectItem value="30">30 seconds</SelectItem>
-                    <SelectItem value="60">60 seconds</SelectItem>
-                  </SelectContent>
-                </Select>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Step 10: Customizations */}
-            <AccordionItem value="step10">
-              <AccordionTrigger className="text-base font-semibold">
-                <span className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">
-                    10
-                  </span>
-                  Final Customization
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Brand Colors (optional)</label>
-                  <Input
-                    placeholder="e.g., 'Blue (#0066CC) and White (#FFFFFF)'"
-                    value={formData.brandColors}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, brandColors: e.target.value }))}
-                    className="bg-background/50 border-border/50"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Brand Fonts (optional)</label>
-                  <Input
-                    placeholder="e.g., 'Arial Bold for headlines, Roboto for body'"
-                    value={formData.brandFonts}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, brandFonts: e.target.value }))}
-                    className="bg-background/50 border-border/50"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Visuals & Media (optional)</label>
-                  <Textarea
-                    placeholder="Describe any specific visuals or customizations. e.g., 'Images of Canadian landmarks, happy families, professionals at work, etc.'"
-                    value={formData.additionalVisuals}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, additionalVisuals: e.target.value }))}
-                    className="min-h-12 bg-background/50 border-border/50"
-                  />
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Step 11: Platform Selection */}
-            <AccordionItem value="step11">
-              <AccordionTrigger className="text-base font-semibold">
-                <span className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">
-                    11
-                  </span>
-                  Preview & Select Platforms
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="space-y-4">
-                <p className="text-sm text-muted-foreground mb-3">Which platforms do you want to generate ads for?</p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                  {SOCIAL_PLATFORMS.map((platform) => (
-                    <Button
-                      key={platform}
-                      variant={formData.platforms.includes(platform) ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => handlePlatformToggle(platform)}
-                      className="text-xs"
-                    >
-                      {formData.platforms.includes(platform) && <Check className="w-3 h-3 mr-1" />}
-                      {platform}
-                    </Button>
-                  ))}
-                </div>
-
-                {/* Generate Button */}
-                <Button
-                  onClick={handleGenerateAds}
-                  disabled={
-                    isGenerating ||
-                    formData.platforms.length === 0 ||
-                    formData.selectedGoals.length === 0 ||
-                    !formData.hook.trim() ||
-                    formData.visaServices.length === 0
-                  }
-                  size="lg"
-                  className="w-full gap-2 mt-4"
-                >
-                  <Sparkles className="w-5 h-5" />
-                  {isGenerating ? "Generating Ad Campaigns..." : "🎬 Generate Ad Campaigns"}
-                </Button>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+          <div>
+            <h2 className="text-base font-black tracking-tight flex items-center gap-2">
+              Strategic Ad Architect
+              <span className="px-1.5 py-0.5 rounded-md bg-primary/10 text-[9px] text-primary uppercase">v2.0</span>
+            </h2>
+            <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-widest">Formal & Professional Tone Enabled</p>
+          </div>
         </div>
-      </Card>
 
-      {/* Generated Ads Grid */}
-      {generatedAds.length > 0 && (
-        <div className="space-y-4">
-          <h3 className="text-xl font-semibold">✨ Generated Ad Campaigns for {formData.visaServices[0]}</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {generatedAds.map((ad) => (
-              <div key={ad.id} className="group">
-                <Card className="overflow-hidden border border-border/50 hover:shadow-lg transition-all">
-                  {/* Visual Preview */}
-                  <div className={`bg-gradient-to-br ${ad.backgroundColor} aspect-video flex items-center justify-center p-6 relative overflow-hidden`}>
-                    {/* Decorative elements */}
-                    <div className={`absolute inset-0 bg-gradient-to-r ${ad.accentColor} opacity-10`}></div>
+        <div className="flex flex-wrap items-center gap-2">
+          {SOCIAL_PLATFORMS.map(platform => {
+            const Icon = platform.icon;
+            const isSelected = selectedPlatforms.includes(platform.id);
+            return (
+              <button
+                key={platform.id}
+                onClick={() => togglePlatform(platform.id)}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold border transition-all duration-300",
+                  isSelected 
+                    ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20 scale-105" 
+                    : "bg-background/50 border-border/50 text-muted-foreground hover:bg-muted"
+                )}
+              >
+                <Icon className="w-3 h-3" />
+                {platform.id}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
-                    {ad.mediaType === "video" ? (
-                      <video
-                        className="absolute inset-0 w-full h-full object-cover"
-                        src={ad.mediaUrl}
-                        muted
-                        loop
-                        playsInline
-                        controls
-                      />
-                    ) : (
-                      <img
-                        className="absolute inset-0 w-full h-full object-cover"
-                        src={ad.mediaUrl}
-                        alt={`${ad.platform} ad preview`}
-                      />
-                    )}
-
-                    <div className="relative z-10 text-center space-y-3 max-w-full">
-                      <div className="inline-flex items-center justify-center gap-2 px-3 py-1 rounded-full bg-black/40 text-xs text-white">
-                        {ad.mediaType === "video" ? "Video Ad" : "Image Ad"}
-                        <span className="opacity-70">•</span>
-                        {ad.platform}
-                      </div>
-
-                      <h4 className="text-xl md:text-2xl font-bold text-foreground leading-tight">{ad.headline}</h4>
-                      <p className="text-sm text-muted-foreground">{ad.description}</p>
-                      <div className={`inline-block px-6 py-2 bg-gradient-to-r ${ad.accentColor} text-white rounded-lg font-semibold text-sm`}>
-                        {ad.callToAction}
-                      </div>
-                    </div>
+      {/* Chat Conversation Stream */}
+      <div 
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto p-6 md:p-10 space-y-10 scroll-smooth"
+      >
+        {messages.length === 0 && !isGenerating ? (
+          <div className="h-full flex flex-col items-center justify-center text-center max-w-xl mx-auto space-y-8">
+            <div className="relative">
+              <div className="w-20 h-20 rounded-[2.5rem] bg-primary/10 flex items-center justify-center animate-pulse">
+                <Sparkles className="w-10 h-10 text-primary" />
+              </div>
+              <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-background rounded-full flex items-center justify-center shadow-xl border border-border/40">
+                <Bot className="w-4 h-4 text-primary" />
+              </div>
+            </div>
+            <div className="space-y-4">
+              <h3 className="text-2xl font-black text-foreground leading-tight">Elite Ad Intelligence for {companyData.name}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Describe your current campaign objective. I will architect high-quality, professional, and formal ad copy tailored to your industry standards.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+              {AD_GOALS.map(goal => (
+                <button
+                  key={goal}
+                  onClick={() => setSelectedGoal(goal)}
+                  className={cn(
+                    "p-4 rounded-2xl border text-[11px] font-bold text-left transition-all hover:scale-[1.02]",
+                    selectedGoal === goal 
+                      ? "bg-primary/5 border-primary/50 text-foreground ring-1 ring-primary/20" 
+                      : "bg-card/30 border-border/40 text-muted-foreground hover:bg-muted"
+                  )}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="uppercase tracking-widest">{goal}</span>
+                    <Layout className="w-3 h-3 opacity-40" />
+                  </div>
+                  <span className="text-[9px] font-normal block opacity-60">Generate formal {goal.toLowerCase()} creatives.</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <>
+            {messages.map((m) => (
+              <div 
+                key={m.id} 
+                className={cn(
+                  "flex animate-in fade-in slide-in-from-bottom-6 duration-500",
+                  m.role === "user" ? "justify-end" : "justify-start"
+                )}
+              >
+                <div className={cn(
+                  "max-w-[90%] space-y-3",
+                  m.role === "user" ? "items-end flex flex-col text-right" : "items-start flex flex-col text-left"
+                )}>
+                  <div className="flex items-center gap-2 mb-1 px-2">
+                    {m.role === "ai" && <Bot className="w-4 h-4 text-primary" />}
+                    <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-80">
+                      {m.role === "user" ? "Your Directive" : "Strategic Response"}
+                    </span>
+                    {m.role === "user" && <User className="w-4 h-4 text-muted-foreground/60" />}
                   </div>
 
-                  {/* Ad Details */}
-                  <div className="p-4 space-y-3">
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">Platform</p>
-                      <p className="font-semibold text-sm">{ad.platform}</p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">Headline Hook</p>
-                      <p className="text-sm text-foreground line-clamp-2">{ad.headline}</p>
-                    </div>
-
-                    {ad.fullScriptTemplate && (
-                      <div>
-                        <p className="text-xs text-muted-foreground mb-1">{formData.adLength}s Ad Script</p>
-                        <pre className="text-xs text-foreground whitespace-pre-wrap line-clamp-6 bg-muted p-2 rounded border">
-                          {ad.fullScriptTemplate}
-                        </pre>
+                  <div className={cn(
+                    "p-5 rounded-3xl text-sm leading-relaxed shadow-xl border border-white/5",
+                    m.role === "user" 
+                      ? "bg-primary text-primary-foreground rounded-tr-none" 
+                      : "bg-card/90 border-border/50 rounded-tl-none backdrop-blur-xl"
+                  )}>
+                    {m.content}
+                    
+                    {m.ads && (
+                      <div className="mt-8 grid grid-cols-1 gap-8 pt-8 border-t border-border/20">
+                        {m.ads.map((ad, aIdx) => (
+                          <Card key={aIdx} className="overflow-hidden border border-border/40 bg-background/50 backdrop-blur shadow-2xl group transition-all hover:border-primary/30">
+                            <div className={cn(
+                              "relative aspect-video flex flex-col items-center justify-center p-8 bg-gradient-to-br transition-all duration-700",
+                              ad.backgroundColor
+                            )}>
+                              <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                              <img src={ad.mediaUrl} className="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-30 px-0" alt="Ad Visualization" />
+                              
+                              <div className="relative z-10 text-center space-y-4 max-w-sm">
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/30 backdrop-blur-md text-[10px] font-bold text-white uppercase tracking-tighter">
+                                  {ad.platform} PREVIEW
+                                </div>
+                                <h4 className="text-xl md:text-3xl font-black text-white leading-[1.1] drop-shadow-2xl">
+                                  {ad.headline.toUpperCase()}
+                                </h4>
+                                <div className={cn("inline-block px-8 py-3 rounded-full text-[12px] font-black text-white shadow-2xl tracking-tight transition-transform group-hover:scale-105", ad.accentColor)}>
+                                  {ad.callToAction.toUpperCase()}
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="p-6 space-y-4 bg-card/60">
+                              <div className="flex items-center justify-between pb-4 border-b border-border/20">
+                                <span className="text-[10px] font-black text-primary uppercase tracking-widest">High-End Ad Copy (Formal)</span>
+                                <Button variant="ghost" size="sm" className="h-8 text-[10px] gap-2 font-black uppercase text-muted-foreground hover:text-primary transition-all">
+                                  <Download className="w-3.5 h-3.5" />
+                                  Export Brand Asset
+                                </Button>
+                              </div>
+                              <div className="text-[13px] text-foreground/90 font-serif leading-loose italic whitespace-pre-wrap">
+                                {ad.adCopy}
+                              </div>
+                              <div className="flex gap-2 pt-2">
+                                <span className="px-2 py-0.5 rounded-md bg-muted text-[9px] font-bold text-muted-foreground uppercase">2048x1080</span>
+                                <span className="px-2 py-0.5 rounded-md bg-muted text-[9px] font-bold text-muted-foreground uppercase">Professional Tone</span>
+                                <span className="px-2 py-0.5 rounded-md bg-muted text-[9px] font-bold text-muted-foreground uppercase">Verified Context</span>
+                              </div>
+                            </div>
+                          </Card>
+                        ))}
                       </div>
                     )}
-
-                    <div className="flex gap-2 pt-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex-1 gap-2"
-                        onClick={() => downloadAdImage(ad)}
-                      >
-                        <Download className="w-4 h-4" />
-                        Download
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                          const scriptText = ad.fullScriptTemplate || `${ad.headline}\n${ad.description}\n${ad.callToAction}`;
-                          navigator.clipboard.writeText(scriptText);
-                          toast.success("Script copied!");
-                        }}
-                      >
-                        Copy Script
-                      </Button>
-                    </div>
                   </div>
-                </Card>
+                  <span className="text-[9px] text-muted-foreground px-2 font-mono">
+                    {m.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
               </div>
             ))}
-          </div>
-        </div>
-      )}
+            
+            {isGenerating && (
+              <div className="flex justify-start animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="max-w-[90%] space-y-3 flex flex-col items-start">
+                  <div className="flex items-center gap-2 mb-1 px-2">
+                    <Bot className="w-4 h-4 text-primary" />
+                    <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-80">Strategic Response</span>
+                  </div>
+                  <div className="bg-card/90 border border-border/50 p-6 rounded-3xl rounded-tl-none flex items-center gap-4 shadow-2xl backdrop-blur-xl">
+                    <div className="relative">
+                      <div className="w-10 h-10 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-black text-foreground">Analyzing Strategy...</p>
+                      <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-tight">Designing professional formal ad variations for {companyData.name}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
 
-      {/* Empty State */}
-      {generatedAds.length === 0 && !isGenerating && (
-        <Card className="p-12 text-center border border-border/50 bg-card/30">
-          <Sparkles className="w-12 h-12 text-muted-foreground/50 mx-auto mb-4" />
-          <p className="text-muted-foreground">Follow the 11-step workflow above to create professional immigration/visa ads. Fill out each section and click "Generate Ad Campaigns" when ready!</p>
-        </Card>
-      )}
+      {/* Input Action Console */}
+      <div className="p-6 bg-card/60 border-t border-border/20 shadow-[-10px_0_30px_rgba(0,0,0,0.05)] backdrop-blur-2xl">
+        <div className="max-w-4xl mx-auto flex items-end gap-4 relative">
+          <div className="flex-1 relative bg-background/80 border border-border/40 rounded-3xl focus-within:border-primary/50 focus-within:ring-[6px] focus-within:ring-primary/5 transition-all duration-300 shadow-sm overflow-hidden">
+            <Textarea
+              placeholder={`Describe the goal for your ${companyData.industry.toLowerCase()} ad campaign...`}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="min-h-[100px] max-h-[250px] border-0 focus-visible:ring-0 bg-transparent resize-none p-5 text-sm leading-relaxed font-medium"
+            />
+            
+            <div className="absolute top-3 right-3 flex flex-col gap-1.5 opacity-40 group-focus-within:opacity-100 transition-opacity">
+               <div className="px-2 py-0.5 rounded-lg bg-muted text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Formal</div>
+            </div>
+          </div>
+
+          <Button
+            onClick={generateAds}
+            disabled={isGenerating || !input.trim()}
+            size="icon"
+            className={cn(
+              "h-14 w-14 rounded-[1.5rem] transition-all duration-500 shadow-2xl",
+              input.trim() 
+                ? "bg-primary text-primary-foreground hover:scale-105 hover:rotate-2 shadow-primary/25" 
+                : "bg-muted text-muted-foreground opacity-50 grayscale"
+            )}
+          >
+            {isGenerating ? <Loader2 className="w-6 h-6 animate-spin" /> : <SendHorizontal className="w-6 h-6 ml-0.5" />}
+          </Button>
+        </div>
+        <div className="mt-4 flex items-center justify-center gap-6 opacity-40">
+           <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
+            <Check className="w-3 h-3 text-primary" /> Verified Strategy
+           </p>
+           <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
+            <Check className="w-3 h-3 text-primary" /> Multi-Platform Ready
+           </p>
+           <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
+            <Check className="w-3 h-3 text-primary" /> Enterprise Content
+           </p>
+        </div>
+      </div>
     </div>
   );
 }
