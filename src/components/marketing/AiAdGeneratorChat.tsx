@@ -18,7 +18,10 @@ import {
   Linkedin,
   Youtube,
   Globe,
-  MessageSquare
+  MessageSquare,
+  Paperclip,
+  File as FileIcon,
+  Image as ImageIcon
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -55,10 +58,19 @@ interface VisualAd {
   mediaUrl: string;
 }
 
+interface UploadedFile {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+  url?: string;
+}
+
 interface Message {
   id: string;
   role: "user" | "ai";
   content: string;
+  files?: UploadedFile[];
   ads?: VisualAd[];
   timestamp: Date;
 }
@@ -73,8 +85,10 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
   const [input, setInput] = useState("");
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(["Instagram", "Facebook"]);
   const [selectedGoal, setSelectedGoal] = useState("Lead Generation");
+  const [files, setFiles] = useState<UploadedFile[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -83,9 +97,37 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
     }
   }, [messages, isGenerating]);
 
+  const processFiles = (newFiles: FileList | File[]) => {
+    const fileArray = Array.from(newFiles).map(f => ({
+      id: Math.random().toString(36).substring(7),
+      name: f.name,
+      size: f.size,
+      type: f.type,
+      url: f.type.startsWith('image/') ? URL.createObjectURL(f) : undefined
+    }));
+    
+    if (files.length + fileArray.length > 5) {
+      toast.error("Maximum 5 files allowed.");
+      return;
+    }
+    
+    setFiles(prev => [...prev, ...fileArray]);
+    toast.success(`${fileArray.length} file(s) attached.`);
+  };
+
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      processFiles(e.target.files);
+    }
+  };
+
+  const removeFile = (id: string) => {
+    setFiles(prev => prev.filter(f => f.id !== id));
+  };
+
   const generateAds = async () => {
-    if (!input.trim()) {
-      toast.error("Please describe your ad campaign goal.");
+    if (!input.trim() && files.length === 0) {
+      toast.error("Please describe your ad campaign goal or upload files.");
       return;
     }
 
@@ -98,11 +140,13 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
       id: Date.now().toString(),
       role: "user",
       content: input,
+      files: [...files],
       timestamp: new Date(),
     };
 
     setMessages(prev => [...prev, userMessage]);
     setInput("");
+    setFiles([]);
     setIsGenerating(true);
 
     // Simulate AI generation logic
@@ -189,7 +233,6 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
               Strategic Ad Architect
               <span className="px-1.5 py-0.5 rounded-md bg-primary/10 text-[9px] text-primary uppercase">v2.0</span>
             </h2>
-            <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-widest">Formal & Professional Tone Enabled</p>
           </div>
         </div>
 
@@ -286,6 +329,16 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
                       ? "bg-primary text-primary-foreground rounded-tr-none" 
                       : "bg-card/90 border-border/50 rounded-tl-none backdrop-blur-xl"
                   )}>
+                    {m.files && m.files.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {m.files.map(f => (
+                          <div key={f.id} className="flex items-center gap-1.5 bg-black/10 rounded-lg px-2 py-1 text-[10px] font-bold">
+                            {f.type.startsWith('image/') ? <ImageIcon className="w-3 h-3" /> : <FileIcon className="w-3 h-3" />}
+                            <span className="max-w-[80px] truncate">{f.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                     {m.content}
                     
                     {m.ads && (
@@ -364,30 +417,63 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
         )}
       </div>
 
-      {/* Input Action Console */}
+  {/* Input Action Console */}
       <div className="p-6 bg-card/60 border-t border-border/20 shadow-[-10px_0_30px_rgba(0,0,0,0.05)] backdrop-blur-2xl">
         <div className="max-w-4xl mx-auto flex items-end gap-4 relative">
           <div className="flex-1 relative bg-background/80 border border-border/40 rounded-3xl focus-within:border-primary/50 focus-within:ring-[6px] focus-within:ring-primary/5 transition-all duration-300 shadow-sm overflow-hidden">
+            {files.length > 0 && (
+              <div className="flex flex-wrap gap-2 p-3 pb-0">
+                {files.map(file => (
+                  <div key={file.id} className="flex items-center gap-1.5 bg-muted border border-border rounded-full px-3 py-1 text-[10px] font-bold animate-in fade-in zoom-in group">
+                    {file.type.startsWith('image/') ? <ImageIcon className="w-3.5 h-3.5 text-blue-500" /> : <FileIcon className="w-3.5 h-3.5 text-orange-500" />}
+                    <span className="max-w-[120px] truncate">{file.name}</span>
+                    <button onClick={() => removeFile(file.id)} className="text-muted-foreground hover:text-destructive ml-1">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            
             <Textarea
               placeholder={`Describe the goal for your ${companyData.industry.toLowerCase()} ad campaign...`}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="min-h-[100px] max-h-[250px] border-0 focus-visible:ring-0 bg-transparent resize-none p-5 text-sm leading-relaxed font-medium"
+              className="min-h-[100px] max-h-[250px] border-0 focus-visible:ring-0 bg-transparent resize-none p-5 pb-12 text-sm leading-relaxed font-medium"
             />
             
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleFileInput} 
+              multiple 
+              className="hidden" 
+            />
+
+            <div className="absolute bottom-3 left-3 flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => fileInputRef.current?.click()}
+                className="h-8 w-8 rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
+              >
+                <Paperclip className="w-4 h-4" />
+              </Button>
+            </div>
+
             <div className="absolute top-3 right-3 flex flex-col gap-1.5 opacity-40 group-focus-within:opacity-100 transition-opacity">
-               <div className="px-2 py-0.5 rounded-lg bg-muted text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Formal</div>
+               <div className="px-2 py-0.5 rounded-lg bg-muted text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Professional</div>
             </div>
           </div>
 
           <Button
             onClick={generateAds}
-            disabled={isGenerating || !input.trim()}
+            disabled={isGenerating || (!input.trim() && files.length === 0)}
             size="icon"
             className={cn(
               "h-14 w-14 rounded-[1.5rem] transition-all duration-500 shadow-2xl",
-              input.trim() 
+              input.trim() || files.length > 0
                 ? "bg-primary text-primary-foreground hover:scale-105 hover:rotate-2 shadow-primary/25" 
                 : "bg-muted text-muted-foreground opacity-50 grayscale"
             )}
