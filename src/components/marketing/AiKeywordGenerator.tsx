@@ -224,7 +224,7 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
             <Bot className="w-4 h-4" />
           </div>
           <div>
-            <h2 className="text-sm font-bold tracking-tight">Keyword Intelligence Agent</h2>
+            <h2 className="text-sm font-bold tracking-tight">AI Keyword Agent</h2>
           </div>
         </div>
         <div className="flex items-center gap-3">

@@ -4,6 +4,7 @@ import ResultCard from "./ResultCard";
 import AiAdGeneratorChat from "./AiAdGeneratorChat";
 import AiKeywordGenerator from "./AiKeywordGenerator";
 import AiContentGeneratorChat from "./AiContentGeneratorChat";
+import AiViralGeneratorChat from "./AiViralGeneratorChat";
 import CompanyForm from "./CompanyForm";
 import { Button } from "@/components/ui/button";
 
@@ -89,6 +90,15 @@ export default function ResultsCanvas({
     return (
       <div className="max-w-6xl mx-auto">
         <AiContentGeneratorChat companyData={companyData} onCompanySubmit={onCompanySubmit} />
+      </div>
+    );
+  }
+
+  // Show AI Viral Idea Generator for viral task
+  if (activeTask === "viral") {
+    return (
+      <div className="max-w-6xl mx-auto">
+        <AiViralGeneratorChat companyData={companyData} onCompanySubmit={onCompanySubmit} />
       </div>
     );
   }
