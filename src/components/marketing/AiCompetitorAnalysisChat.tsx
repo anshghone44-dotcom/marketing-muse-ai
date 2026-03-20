@@ -248,30 +248,65 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
                         {/* Engagement Graph */}
                         <div className="space-y-4">
                           <div className="flex items-center gap-2 group">
-                            <PieChartIcon className="w-4 h-4 text-primary transition-transform group-hover:rotate-12" />
-                            <span className="text-[11px] font-black uppercase tracking-widest">Platform Engagement</span>
+                            <BarChart3 className="w-4 h-4 text-primary transition-transform group-hover:rotate-12" />
+                            <span className="text-[11px] font-black uppercase tracking-widest">Social Engagement (Avg.)</span>
                           </div>
                           <div className="h-[250px] w-full bg-background/40 rounded-3xl p-4 border border-border/20">
                             <ResponsiveContainer width="100%" height="100%">
-                              <BarChart data={m.competitorData.engagement}>
+                              <BarChart data={[
+                                { type: 'Likes', count: 1200 },
+                                { type: 'Shares', count: 450 },
+                                { type: 'Comments', count: 320 }
+                              ]}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(128,128,128,0.1)" />
-                                <XAxis dataKey="platform" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 700}} />
+                                <XAxis dataKey="type" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 700}} />
                                 <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 700}} />
                                 <Tooltip 
                                   contentStyle={{borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.8)'}}
                                   cursor={{fill: 'rgba(255,255,255,0.05)'}}
                                 />
-                                <Bar dataKey="score" fill="#8884d8" radius={[8, 8, 0, 0]} />
+                                <Bar dataKey="count" fill="#8884d8" radius={[8, 8, 0, 0]} />
                               </BarChart>
                             </ResponsiveContainer>
                           </div>
                         </div>
 
-                        {/* Growth Graph */}
+                        {/* Lead Gen Pie Chart */}
                         <div className="space-y-4">
                           <div className="flex items-center gap-2 group">
+                            <PieChartIcon className="w-4 h-4 text-primary transition-transform group-hover:scale-110" />
+                            <span className="text-[11px] font-black uppercase tracking-widest">Lead Generation Breakdown</span>
+                          </div>
+                          <div className="h-[250px] w-full bg-background/40 rounded-3xl p-4 border border-border/20">
+                            <ResponsiveContainer width="100%" height="100%">
+                              <PieChart>
+                                <Pie
+                                  data={m.competitorData.leadGen}
+                                  cx="50%"
+                                  cy="50%"
+                                  innerRadius={60}
+                                  outerRadius={80}
+                                  paddingAngle={5}
+                                  dataKey="value"
+                                >
+                                  {m.competitorData.leadGen.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                  ))}
+                                </Pie>
+                                <Tooltip 
+                                  contentStyle={{borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.8)'}}
+                                />
+                                <Legend verticalAlign="bottom" height={36}/>
+                              </PieChart>
+                            </ResponsiveContainer>
+                          </div>
+                        </div>
+
+                        {/* Growth Graph */}
+                        <div className="space-y-4 md:col-span-2">
+                          <div className="flex items-center gap-2 group">
                             <LineChartIcon className="w-4 h-4 text-primary transition-transform group-hover:scale-110" />
-                            <span className="text-[11px] font-black uppercase tracking-widest">Follower Trajectory</span>
+                            <span className="text-[11px] font-black uppercase tracking-widest">Follower Trajectory (Market Expansion)</span>
                           </div>
                           <div className="h-[250px] w-full bg-background/40 rounded-3xl p-4 border border-border/20">
                             <ResponsiveContainer width="100%" height="100%">
