@@ -165,15 +165,47 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
 
       const ads: VisualAd[] = selectedPlatforms.map(platform => {
         const config = platformConfig[platform] || platformConfig.Instagram;
+        
+        let headline = "";
+        let body = "";
+        let cta = "";
+        
+        // 1. Headline Strategy: Benefit focused, clear, engaging.
+        if (selectedGoal === "Lead Generation") {
+          headline = `Secure Your Future in ${companyData?.industry || "your field"} – Book a Free Consultation Now`;
+        } else if (selectedGoal === "Website Traffic") {
+          headline = `Start Your ${topic.split(' ')[0]} Journey with ${companyData?.name || "Expert Guidance"}`;
+        } else {
+          headline = `Get Your professional ${topic.toLowerCase()} results today!`;
+        }
+
+        // 2. Body Strategy: Focused on results, problem solving, and outcomes.
+        const bodyTemplate = `${companyData?.name || "We"} specialize in helping professionals ${topic.toLowerCase()}. We have helped thousands of clients achieve their goals with a 95% success rate. Whether you are a skilled worker, student, or looking to migrate, we offer tailored solutions to meet your needs.`;
+
+        // 3. CTA Strategy: Clear, actionable, and urgency-driven.
+        cta = (selectedGoal === "Lead Generation") ? "Claim Your Free Consultation Today!" : "Start Your Journey Now!";
+
+        // 4. Platform Optimization
+        let adCopy = "";
+        if (platform === "Instagram") {
+          adCopy = `### INSTAGRAM STRATEGY (Short & Catchy)\n\n**Headline:** ${headline.split('–')[0]} 🇨🇦\n\n**Body:** Ready to move? Swipe up to get your results today! Our 95% success rate speaks for itself. #NexusMigration #${topic.replace(/\s+/g, '')}\n\n**CTA:** ${cta}`;
+        } else if (platform === "LinkedIn") {
+          adCopy = `### LINKEDIN STRATEGY (Professional & Value-Driven)\n\n**Headline:** ${headline}\n\n**Body:** ${companyData?.name || "Our team"} offers a data-driven approach to help professionals ${topic.toLowerCase()}. We have helped over 12,000 clients achieve their professional goals.\n\n**CTA:** ${cta}`;
+        } else if (platform === "Facebook") {
+          adCopy = `### FACEBOOK STRATEGY (Informative & Engaging)\n\n**Headline:** ${headline}\n\n**Body:** ${bodyTemplate}\n\n**CTA:** ${cta}`;
+        } else {
+          adCopy = `### PROFESSIONAL AD STRATEGY (${platform.toUpperCase()})\n\n**Headline:** ${headline}\n\n**Body:** ${bodyTemplate}\n\n**CTA:** ${cta}`;
+        }
+
         return {
           id: `${platform}-${Date.now()}`,
           platform,
-          headline: `Professional ${topic.split(' ').slice(0, 3).join(' ')} Strategy`,
-          description: `Unlock high-quality ${selectedGoal.toLowerCase()} with ${name || "our solutions"} specifically designed for ${audience || "industry professionals"}.`,
-          callToAction: "Book a Strategic Consultation",
+          headline,
+          description: `Strategic ${selectedGoal.toLowerCase()} for professionals.`,
+          callToAction: cta,
           backgroundColor: config.bg,
           accentColor: config.accent,
-          adCopy: `### AI GENERATED AD COPY (${platform})\n\n**Headline:** Elevate your ${industry || "business"} with ${product || "expert solutions"}.\n\n**Body:** Tired of subpar results? ${name || "LeadBot"} delivers a formal, data-driven approach to ${topic.toLowerCase()}. We help ${audience || "forward-thinking leaders"} achieve measurable growth through proven ${industry || "market"} methodologies.\n\n**CTA:** ${selectedGoal === "Lead Generation" ? "Claim Your Free Strategic Assessment" : "Explore Professional Solutions"}`,
+          adCopy: adCopy,
           mediaType: ["YouTube", "TikTok"].includes(platform) ? "video" : "image",
           mediaUrl: `https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800`
         };
