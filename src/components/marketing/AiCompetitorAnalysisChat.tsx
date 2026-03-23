@@ -21,6 +21,8 @@ import {
   Search,
   Bot,
   User,
+  Paperclip,
+  Check,
   Loader2,
   TrendingUp,
   Target,
@@ -168,15 +170,28 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
     }
   };
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      toast.success(`File "${file.name}" uploaded successfully.`, {
+        description: "Analyzing competitor documents for insights..."
+      });
+      // Simulate analysis start based on file
+      startAnalysis(file.name.split('.')[0]);
+    }
+  };
+
   return (
     <div className="flex flex-col h-[85vh] max-w-6xl mx-auto relative bg-transparent overflow-hidden">
-      {/* Centered Logo/Icon for Empty State */}
+      {/* Centered LeadBot Logo for Empty State */}
       {messages.length === 0 && !isAnalyzing && (
         <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-24 pointer-events-none">
           <div className="w-20 h-20 rounded-full bg-foreground flex items-center justify-center mb-6">
-            <Zap className="w-10 h-10 text-background fill-current" />
+            <Bot className="w-10 h-10 text-background" />
           </div>
-          <h1 className="text-4xl font-bold tracking-tight text-foreground">Grok</h1>
+          <h1 className="text-4xl font-bold tracking-tight text-foreground">LeadBot</h1>
         </div>
       )}
 
@@ -189,7 +204,7 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
           messages.map((m) => (
             <div key={m.id} className={cn("flex w-full animate-in fade-in slide-in-from-bottom-8 duration-700", m.role === "user" ? "justify-end" : "justify-start")}>
               <div className={cn("max-w-[85%] space-y-4", m.role === "user" ? "items-end" : "items-start")}>
-                {/* Simplified Content Bubble (Grok Style) */}
+                {/* Simplified Content Bubble (LeadBot Style) */}
                 <div className={cn(
                   "p-6 md:p-8 rounded-3xl text-base leading-relaxed overflow-hidden",
                   m.role === "user" 
@@ -371,13 +386,23 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
         )}
       </div>
 
-      {/* Grok-Style Input Console */}
+      {/* LeadBot-Style Input Console */}
       <div className="pb-10 px-6">
         <div className="max-w-3xl mx-auto flex flex-col items-center">
           <div className="w-full relative flex items-center">
-            {/* Paperclip (Grok Style) */}
-            <button className="absolute left-6 z-10 p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground">
-              <RefreshCcw className="w-5 h-5 rotate-45" /> {/* Using refresh as a placeholder for attachment icon style or similar */}
+            {/* Paperclip (Upload Style) */}
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleFileUpload} 
+              className="hidden" 
+              accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+            />
+            <button 
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute left-6 z-10 p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground group"
+            >
+              <Paperclip className="w-5 h-5 transition-transform group-hover:rotate-12" />
             </button>
 
             <Textarea
@@ -388,7 +413,7 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
               className="min-h-[64px] max-h-[200px] w-full bg-muted/40 border-border/40 focus:border-border/60 hover:border-border/60 rounded-[2rem] pl-16 pr-24 py-5 text-base font-medium resize-none shadow-sm transition-all"
             />
 
-            {/* Submit Actions (Grok Style) */}
+            {/* Submit Actions */}
             <div className="absolute right-3 flex items-center gap-2">
               <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-muted/60 text-[11px] font-bold text-muted-foreground mr-1">
                 Auto <ArrowRight className="w-3 h-3 ml-1" />
@@ -408,27 +433,6 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
               </Button>
             </div>
           </div>
-
-          <div className="mt-4 flex items-center gap-3 text-xs font-bold text-muted-foreground">
-             <span className="flex items-center gap-1.5 opacity-60">
-                <Zap className="w-3.5 h-3.5" /> New
-             </span>
-             <span className="opacity-40">Hold Ctrl+D to dictate</span>
-          </div>
-
-          {messages.length === 0 && (
-            <div className="mt-8 flex flex-wrap justify-center gap-2">
-               {['Nexus Migration', 'WWICS', 'VFS Global'].map(name => (
-                  <button 
-                    key={name}
-                    onClick={() => startAnalysis(name)}
-                    className="px-5 py-2 rounded-full bg-muted/30 border border-border/20 text-xs font-bold hover:bg-muted/50 transition-all"
-                  >
-                    {name}
-                  </button>
-                ))}
-            </div>
-          )}
         </div>
       </div>
     </div>
