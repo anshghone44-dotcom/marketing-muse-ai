@@ -21,7 +21,7 @@ import {
   Search,
   Bot,
   User,
-  Paperclip,
+  Plus,
   Check,
   Loader2,
   TrendingUp,
@@ -185,13 +185,13 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
 
   return (
     <div className="flex flex-col h-[85vh] max-w-6xl mx-auto relative bg-transparent overflow-hidden">
-      {/* Centered LeadBot Logo for Empty State */}
+      {/* Centered LeadBot Title for Empty State */}
       {messages.length === 0 && !isAnalyzing && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-24 pointer-events-none">
-          <div className="w-20 h-20 rounded-full bg-foreground flex items-center justify-center mb-6">
-            <Bot className="w-10 h-10 text-background" />
-          </div>
-          <h1 className="text-4xl font-bold tracking-tight text-foreground">LeadBot</h1>
+        <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-24 pointer-events-none px-4 text-center">
+          <h1 className="text-4xl md:text-5xl font-sans font-semibold tracking-tight text-foreground flex flex-col md:flex-row items-center gap-2 md:gap-3">
+            <span className="opacity-90">LeadBot</span>
+            <span className="text-muted-foreground/60 font-light">Competitor Analyzer</span>
+          </h1>
         </div>
       )}
 
@@ -390,19 +390,21 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
       <div className="pb-10 px-6">
         <div className="max-w-3xl mx-auto flex flex-col items-center">
           <div className="w-full relative flex items-center">
-            {/* Paperclip (Upload Style) */}
+            {/* Plus Icon (Source/Context Upload) */}
             <input 
               type="file" 
               ref={fileInputRef} 
               onChange={handleFileUpload} 
               className="hidden" 
+              multiple
               accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
             />
             <button 
               onClick={() => fileInputRef.current?.click()}
               className="absolute left-6 z-10 p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground group"
+              title="Add sources, contexts, or files"
             >
-              <Paperclip className="w-5 h-5 transition-transform group-hover:rotate-12" />
+              <Plus className="w-6 h-6 transition-transform group-hover:rotate-90 duration-300" />
             </button>
 
             <Textarea
