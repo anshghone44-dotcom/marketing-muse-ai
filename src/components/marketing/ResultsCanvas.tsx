@@ -107,7 +107,7 @@ export default function ResultsCanvas({
   // Show AI Competitor Analysis for competitor task
   if (activeTask === "competitor") {
     return (
-      <div className="max-w-6xl mx-auto">
+      <div className="w-full">
         <AiCompetitorAnalysisChat companyData={companyData} onCompanySubmit={onCompanySubmit} />
       </div>
     );
@@ -115,16 +115,14 @@ export default function ResultsCanvas({
 
   return (
     <div className="max-w-5xl mx-auto">
-      {activeTask !== "competitor" && (
-        <div className="mb-10 text-center">
-          <h1 className="font-display text-4xl font-bold mb-3 bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent">
-            {config.title}
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            {config.description}
-          </p>
-        </div>
-      )}
+      <div className="mb-10 text-center">
+        <h1 className="font-display text-4xl font-bold mb-3 bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent">
+          {config.title}
+        </h1>
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          {config.description}
+        </p>
+      </div>
 
       {!companyData && (
         <div className="max-w-2xl mx-auto py-8">

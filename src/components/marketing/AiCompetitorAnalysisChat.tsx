@@ -169,79 +169,47 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
   };
 
   return (
-    <div className="flex flex-col h-[85vh] max-w-6xl mx-auto relative bg-background/40 border border-border/40 rounded-[2.5rem] overflow-hidden shadow-3xl backdrop-blur-xl">
-      {/* Header */}
-      <div className="p-6 border-b border-white/5 bg-card/50 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
-            <BarChart3 className="w-6 h-6" />
+    <div className="flex flex-col h-[85vh] max-w-6xl mx-auto relative bg-transparent overflow-hidden">
+      {/* Centered Logo/Icon for Empty State */}
+      {messages.length === 0 && !isAnalyzing && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-24 pointer-events-none">
+          <div className="w-20 h-20 rounded-full bg-foreground flex items-center justify-center mb-6">
+            <Zap className="w-10 h-10 text-background fill-current" />
           </div>
-          <div>
-            <h2 className="text-lg font-black tracking-tighter">AI Competitor Analyzer</h2>
-          </div>
+          <h1 className="text-4xl font-bold tracking-tight text-foreground">Grok</h1>
         </div>
-      </div>
+      )}
 
       {/* Chat Area */}
       <div 
         ref={scrollRef}
         className="flex-1 overflow-y-auto p-6 md:p-10 space-y-12 scroll-smooth"
       >
-        {messages.length === 0 && !isAnalyzing ? (
-          <div className="h-full flex flex-col items-center justify-center text-center max-w-xl mx-auto space-y-8">
-            <div className="w-24 h-24 rounded-[3rem] bg-primary/5 flex items-center justify-center border border-primary/10 shadow-2xl">
-              <Bot className="w-12 h-12 text-primary" />
-            </div>
-            <div className="flex flex-wrap justify-center gap-3 pt-4">
-              {['Nexus Migration', 'WWICS', 'VFS Global'].map(name => (
-                <button 
-                  key={name}
-                  onClick={() => startAnalysis(name)}
-                  className="px-6 py-2 rounded-full bg-muted/40 border border-border/50 text-[11px] font-black uppercase tracking-widest hover:bg-primary/10 transition-all"
-                >
-                  {name}
-                </button>
-              ))}
-            </div>
-          </div>
-        ) : (
+        {messages.length > 0 && (
           messages.map((m) => (
             <div key={m.id} className={cn("flex w-full animate-in fade-in slide-in-from-bottom-8 duration-700", m.role === "user" ? "justify-end" : "justify-start")}>
-              <div className={cn("max-w-[95%] space-y-4", m.role === "user" ? "items-end" : "items-start")}>
-                {/* Meta Labels */}
-                <div className="flex items-center gap-3 px-3">
-                  {m.role === "ai" && <Bot className="w-5 h-5 text-primary" />}
-                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-70">
-                    {m.role === "user" ? "Target Identification" : "Intelligence Report"}
-                  </span>
-                </div>
-
-                {/* Content Bubble */}
+              <div className={cn("max-w-[85%] space-y-4", m.role === "user" ? "items-end" : "items-start")}>
+                {/* Simplified Content Bubble (Grok Style) */}
                 <div className={cn(
-                  "p-6 md:p-8 rounded-[2rem] text-sm leading-relaxed border shadow-2xl overflow-hidden",
+                  "p-6 md:p-8 rounded-3xl text-base leading-relaxed overflow-hidden",
                   m.role === "user" 
-                    ? "bg-primary text-primary-foreground border-primary/20 rounded-tr-none" 
-                    : "bg-card/90 border-border/40 rounded-tl-none backdrop-blur-3xl"
+                    ? "bg-muted/50 text-foreground border border-border/40" 
+                    : "bg-transparent text-foreground"
                 )}>
-                  <div className="prose prose-sm dark:prose-invert font-medium">
+                  <div className="prose prose-base dark:prose-invert font-medium">
                     {m.content}
                   </div>
 
                   {m.type === "results" && m.competitorData && (
-                    <div className="mt-8 space-y-10 border-t border-border/20 pt-10">
-                      <div className="flex items-center justify-between mb-4">
-                        <h4 className="text-2xl font-black tracking-tighter text-primary italic uppercase">{m.competitorData.name}</h4>
-                        <div className="h-0.5 flex-1 mx-6 bg-gradient-to-r from-primary/40 to-transparent" />
-                      </div>
-
+                    <div className="mt-8 space-y-10 border-t border-border/10 pt-10">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {/* Engagement Graph */}
                         <div className="space-y-4">
-                          <div className="flex items-center gap-2 group">
-                            <BarChart3 className="w-4 h-4 text-primary transition-transform group-hover:rotate-12" />
-                            <span className="text-[11px] font-black uppercase tracking-widest">Social Engagement (Avg.)</span>
+                          <div className="flex items-center gap-2">
+                            <BarChart3 className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Social Engagement</span>
                           </div>
-                          <div className="h-[250px] w-full bg-background/40 rounded-3xl p-4 border border-border/20">
+                          <div className="h-[250px] w-full bg-muted/20 rounded-3xl p-4 border border-border/10">
                             <ResponsiveContainer width="100%" height="100%">
                               <BarChart data={[
                                 { type: 'Likes', count: 1200 },
@@ -249,13 +217,13 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
                                 { type: 'Comments', count: 320 }
                               ]}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(128,128,128,0.1)" />
-                                <XAxis dataKey="type" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 700}} />
-                                <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 700}} />
+                                <XAxis dataKey="type" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: 'currentColor', opacity: 0.5}} />
+                                <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fill: 'currentColor', opacity: 0.5}} />
                                 <Tooltip 
                                   contentStyle={{borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.8)'}}
                                   cursor={{fill: 'rgba(255,255,255,0.05)'}}
                                 />
-                                <Bar dataKey="count" fill="#8884d8" radius={[8, 8, 0, 0]} />
+                                <Bar dataKey="count" fill="currentColor" opacity={0.8} radius={[4, 4, 0, 0]} />
                               </BarChart>
                             </ResponsiveContainer>
                           </div>
@@ -263,11 +231,11 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
 
                         {/* Lead Gen Pie Chart */}
                         <div className="space-y-4">
-                          <div className="flex items-center gap-2 group">
-                            <PieChartIcon className="w-4 h-4 text-primary transition-transform group-hover:scale-110" />
-                            <span className="text-[11px] font-black uppercase tracking-widest">Lead Generation Breakdown</span>
+                          <div className="flex items-center gap-2">
+                            <PieChartIcon className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Lead Sources</span>
                           </div>
-                          <div className="h-[250px] w-full bg-background/40 rounded-3xl p-4 border border-border/20">
+                          <div className="h-[250px] w-full bg-muted/20 rounded-3xl p-4 border border-border/10">
                             <ResponsiveContainer width="100%" height="100%">
                               <PieChart>
                                 <Pie
@@ -294,20 +262,20 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
 
                         {/* Growth Graph */}
                         <div className="space-y-4 md:col-span-2">
-                          <div className="flex items-center gap-2 group">
-                            <LineChartIcon className="w-4 h-4 text-primary transition-transform group-hover:scale-110" />
-                            <span className="text-[11px] font-black uppercase tracking-widest">Follower Trajectory (Market Expansion)</span>
+                          <div className="flex items-center gap-2">
+                            <LineChartIcon className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Growth Trajectory</span>
                           </div>
-                          <div className="h-[250px] w-full bg-background/40 rounded-3xl p-4 border border-border/20">
+                          <div className="h-[250px] w-full bg-muted/20 rounded-3xl p-4 border border-border/10">
                             <ResponsiveContainer width="100%" height="100%">
                               <LineChart data={m.competitorData.growth}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(128,128,128,0.1)" />
-                                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 700}} />
-                                <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 700}} />
+                                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: 'currentColor', opacity: 0.5}} />
+                                <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fill: 'currentColor', opacity: 0.5}} />
                                 <Tooltip 
                                   contentStyle={{borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.8)'}}
                                 />
-                                <Line type="monotone" dataKey="followers" stroke="#82ca9d" strokeWidth={3} dot={{r: 4, strokeWidth: 2}} />
+                                <Line type="monotone" dataKey="followers" stroke="currentColor" strokeWidth={2} dot={{r: 3, fill: 'currentColor'}} />
                               </LineChart>
                             </ResponsiveContainer>
                           </div>
@@ -317,12 +285,12 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
                       {/* Goal Insights */}
                       <div className="space-y-4">
                         <div className="flex items-center gap-2">
-                          <Target className="w-4 h-4 text-primary" />
-                          <span className="text-[11px] font-black uppercase tracking-widest">Target Goal Insights</span>
+                          <Target className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Strategic Goals</span>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {m.competitorData.goals.map((goal, i) => (
-                            <div key={i} className="p-5 rounded-2xl bg-primary/5 border border-primary/10 text-sm font-bold italic leading-relaxed">
+                            <div key={i} className="p-5 rounded-2xl bg-muted/30 border border-border/10 text-sm leading-relaxed">
                               {goal}
                             </div>
                           ))}
@@ -332,19 +300,19 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
                       {/* Interaction Prompts */}
                       <div className="pt-6 flex flex-wrap gap-4">
                          <Button 
-                          variant="ai" 
+                          variant="secondary" 
                           onClick={() => showRecommendations(m.competitorData!)}
-                          className="px-8 h-12 rounded-full font-black uppercase tracking-widest gap-2 shadow-xl shadow-primary/20"
+                          className="px-8 h-12 rounded-full font-bold gap-2"
                          >
                             <Lightbulb className="w-4 h-4" />
-                            Show Recommendations
+                            Recommendations
                          </Button>
                          <Button 
-                          variant="outline" 
+                          variant="ghost" 
                           onClick={() => setMessages([])}
-                          className="px-8 h-12 rounded-full font-black uppercase tracking-widest border-border/40"
+                          className="px-8 h-12 rounded-full font-bold"
                          >
-                            Analyze Another
+                            New Analysis
                          </Button>
                       </div>
                     </div>
@@ -353,47 +321,38 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
                   {m.type === "recommendations" && m.competitorData && (
                     <div className="mt-6 space-y-4 animate-in fade-in zoom-in duration-500">
                       {m.competitorData.recommendations.map((rec, i) => (
-                        <div key={i} className="flex gap-4 p-4 rounded-3xl bg-green-500/5 border border-green-500/10 group hover:border-green-500/30 transition-colors">
-                          <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center shrink-0 border border-green-500/20">
-                            <span className="text-[10px] font-black text-green-600">{i + 1}</span>
-                          </div>
-                          <p className="text-[13px] font-bold leading-relaxed">{rec}</p>
+                        <div key={i} className="p-5 rounded-3xl bg-muted/20 border border-border/10">
+                          <p className="text-sm font-medium leading-relaxed">{rec}</p>
                         </div>
                       ))}
-                      <div className="pt-8 flex flex-wrap gap-4 border-t border-border/10 mt-8">
+                      <div className="pt-8 flex flex-wrap gap-3 border-t border-border/10 mt-8">
                          <Button 
-                          variant="ai" 
+                          variant="secondary" 
                           onClick={handleExport}
-                          className="px-8 h-12 rounded-full font-black uppercase tracking-widest gap-2 shadow-2xl"
+                          className="px-8 h-12 rounded-full font-bold gap-2"
                          >
                             <Download className="w-4 h-4" />
-                            Export Data Report
+                            Export
                          </Button>
                          <Button 
-                          variant="outline" 
-                          className="px-8 h-12 rounded-full font-black uppercase tracking-widest border-border/40 gap-2"
+                          variant="ghost" 
+                          className="px-8 h-12 rounded-full font-bold gap-2"
                          >
                             <Mail className="w-4 h-4" />
-                            Share via Email
+                            Email
                          </Button>
                       </div>
                     </div>
                   )}
 
                   {m.type === "export" && (
-                    <div className="mt-6 flex flex-col gap-4">
-                      <div className="flex items-center gap-4 text-primary font-black uppercase tracking-widest text-[11px] mb-2">
-                         <Zap className="w-4 h-4 fill-primary" />
-                         Next Move Recommendation
-                      </div>
-                      <div className="flex flex-wrap gap-3">
-                        <Button variant="outline" className="rounded-full px-6 font-bold gap-2">
-                           Analyze Another <RefreshCcw className="w-3.5 h-3.5" />
-                        </Button>
-                        <Button variant="ai" className="rounded-full px-6 font-bold gap-2 shadow-lg shadow-primary/20">
-                           Optimize My Strategy <ArrowRight className="w-3.5 h-3.5" />
-                        </Button>
-                      </div>
+                    <div className="mt-6 flex flex-wrap gap-3">
+                      <Button variant="ghost" className="rounded-full px-6 font-bold" onClick={() => setMessages([])}>
+                         Analyze Another
+                      </Button>
+                      <Button variant="secondary" className="rounded-full px-6 font-bold">
+                         Optimize Strategy
+                      </Button>
                     </div>
                   )}
                 </div>
@@ -403,58 +362,73 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
         )}
 
         {isAnalyzing && (
-          <div className="flex justify-start animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="max-w-[90%] space-y-3">
-              <div className="flex items-center gap-2 px-3">
-                <Bot className="w-4 h-4 text-primary" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Competitor Engine</span>
-              </div>
-              <div className="bg-card/90 border border-border/50 p-6 rounded-3xl rounded-tl-none shadow-3xl backdrop-blur-2xl flex items-center gap-6">
-                <div className="relative">
-                   <div className="w-10 h-10 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
-                   <Search className="absolute inset-0 m-auto w-4 h-4 text-primary animate-pulse" />
-                </div>
-                <div className="space-y-1">
-                   <p className="text-sm font-black text-foreground">Scraping Competitive Intelligence...</p>
-                   <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-tighter">Aggregating social signals and ad history for {companyData?.name || 'market context'}</p>
-                </div>
-              </div>
+          <div className="flex justify-start">
+            <div className="max-w-[90%] p-6 rounded-3xl bg-muted/20 animate-pulse flex items-center gap-4">
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span className="text-sm font-medium">Analyzing market data...</span>
             </div>
           </div>
         )}
       </div>
 
-      {/* Input Console */}
-      <div className="p-8 bg-card/60 border-t border-white/5 backdrop-blur-3xl shadow-[0_-20px_50px_rgba(0,0,0,0.1)]">
-        <div className="max-w-4xl mx-auto">
-          <div className="relative flex items-end gap-4">
-            <div className="flex-1 relative bg-background/50 border border-border/40 rounded-[2rem] focus-within:border-primary/50 focus-within:ring-[8px] focus-within:ring-primary/5 transition-all duration-500 shadow-inner group">
-              <Textarea
-                placeholder="Type the competitor's name or choose from the list..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="min-h-[90px] max-h-[200px] border-0 focus-visible:ring-0 bg-transparent resize-none p-6 text-base font-bold leading-relaxed placeholder:opacity-50"
-              />
-              <div className="absolute top-4 right-4 opacity-30 group-focus-within:opacity-100 transition-opacity">
-                 <Search className="w-5 h-5 text-muted-foreground" />
-              </div>
-            </div>
+      {/* Grok-Style Input Console */}
+      <div className="pb-10 px-6">
+        <div className="max-w-3xl mx-auto flex flex-col items-center">
+          <div className="w-full relative flex items-center">
+            {/* Paperclip (Grok Style) */}
+            <button className="absolute left-6 z-10 p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground">
+              <RefreshCcw className="w-5 h-5 rotate-45" /> {/* Using refresh as a placeholder for attachment icon style or similar */}
+            </button>
 
-            <Button
-              onClick={() => startAnalysis(input)}
-              disabled={isAnalyzing || !input.trim()}
-              size="icon"
-              className={cn(
-                "h-16 w-16 rounded-3xl transition-all duration-500 shadow-3xl",
-                input.trim()
-                  ? "bg-primary text-primary-foreground hover:scale-105 hover:rotate-2 shadow-primary/30" 
-                  : "bg-muted text-muted-foreground opacity-50 grayscale"
-              )}
-            >
-              {isAnalyzing ? <Loader2 className="w-7 h-7 animate-spin" /> : <TrendingUp className="w-7 h-7" />}
-            </Button>
+            <Textarea
+              placeholder="What do you want to know?"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="min-h-[64px] max-h-[200px] w-full bg-muted/40 border-border/40 focus:border-border/60 hover:border-border/60 rounded-[2rem] pl-16 pr-24 py-5 text-base font-medium resize-none shadow-sm transition-all"
+            />
+
+            {/* Submit Actions (Grok Style) */}
+            <div className="absolute right-3 flex items-center gap-2">
+              <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-muted/60 text-[11px] font-bold text-muted-foreground mr-1">
+                Auto <ArrowRight className="w-3 h-3 ml-1" />
+              </div>
+              <Button
+                onClick={() => startAnalysis(input)}
+                disabled={isAnalyzing || !input.trim()}
+                size="icon"
+                className={cn(
+                  "h-10 w-10 rounded-full transition-all duration-300",
+                  input.trim()
+                    ? "bg-foreground text-background hover:scale-105" 
+                    : "bg-muted text-muted-foreground opacity-50 grayscale"
+                )}
+              >
+                {isAnalyzing ? <Loader2 className="w-5 h-5 animate-spin" /> : <ArrowRight className="w-5 h-5" />}
+              </Button>
+            </div>
           </div>
+
+          <div className="mt-4 flex items-center gap-3 text-xs font-bold text-muted-foreground">
+             <span className="flex items-center gap-1.5 opacity-60">
+                <Zap className="w-3.5 h-3.5" /> New
+             </span>
+             <span className="opacity-40">Hold Ctrl+D to dictate</span>
+          </div>
+
+          {messages.length === 0 && (
+            <div className="mt-8 flex flex-wrap justify-center gap-2">
+               {['Nexus Migration', 'WWICS', 'VFS Global'].map(name => (
+                  <button 
+                    key={name}
+                    onClick={() => startAnalysis(name)}
+                    className="px-5 py-2 rounded-full bg-muted/30 border border-border/20 text-xs font-bold hover:bg-muted/50 transition-all"
+                  >
+                    {name}
+                  </button>
+                ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
