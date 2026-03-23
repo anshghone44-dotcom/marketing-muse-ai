@@ -50,6 +50,7 @@ import {
   Activity,
   DollarSign
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { CompanyData } from "./CompanyForm";
@@ -148,14 +149,34 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
             { name: 'Others', value: 20 }
           ] : [],
           detailedReport: mode === 'auto' ? `
-            ### Company Formation and Evolution
-            Founded in 2015, **${competitorName}** began as a specialized niche provider before aggressively expanding into mid-market enterprise solutions. Their initial formation was backed by series-A funding which focused on architectural scalability—a decision that has allowed them to maintain high operational efficiency during rapid growth periods.
+### ${competitorName} - Company Overview
+**${competitorName}** is a leading global consultancy firm specializing in comprehensive market solutions. Founded in 2015, the firm has established a dominant presence in over **20 countries**, with a primary focus on scaling high-growth enterprises in the **UAE, India, and North America**.
 
-            ### Financial Performance & Net Profits
-            Over the last three financial years, the company has demonstrated an impressive CAGR of 18%. In the most recent fiscal year (FY2023), they reported a record net profit of $145M, up from $110M the previous year. This growth is largely attributed to their high-margin subscription models and a significant reduction in customer acquisition costs through organic channel optimization.
+### Main Services
+- **Strategic Market Entry**: Comprehensive eligibility assessments and post-entry settlement support.
+- **Financial Architecture**: Specialized support for revenue optimization and fiscal scaling.
+- **Operational Transformation**: End-to-end process re-engineering for enterprise efficiency.
+- **Risk Mitigation**: Rigorous compliance and audit frameworks for global operations.
 
-            ### Accounting & Fiscal Health
-            From an accounting perspective, **${competitorName}** maintains a robust balance sheet with a current ratio of 2.4, indicating strong liquidity. Their financial reports show a disciplined approach to capital expenditure, with 25% of gross profit being reinvested directly into R&D. Recent audits confirm a transparent fiscal policy, with no significant long-term debt liabilities impacting their short-term operational agility.
+### Claimed Achievements & Statistics
+- **Over 10,000+** successful project completions globally.
+- **98.8%** client satisfaction and retention rate.
+- **Top 10** ranking in global industry efficiency benchmarks.
+- More than **10 years** of cumulative leadership experience in the sector.
+
+### Certifications & Team Claims
+- Team includes **ISO-certified** professionals and world-class domain experts.
+- **Industry-registered** consultants with verified track records in top-tier markets.
+- Government-approved consultancy status in major economic hubs.
+
+### Office Locations
+- **Dubai (HQ)**: Level 42, Business Bay, Dubai, UAE.
+- **Mumbai**: Executive Suite, BKC, Mumbai, India.
+- **London**: Tech Hub, Canary Wharf, London, UK.
+- **Singapore**: Marina One East Tower, Singapore.
+
+### Important Note
+While ${competitorName} maintains a strong reputation, it is always recommended to verify specific consultant licenses and performance history on official regulatory portals before engagement.
           ` : "",
           recommendations: [
             "Monitor their upcoming Q3 expansion into the European market",
@@ -217,8 +238,8 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
                            <FileText className="w-5 h-5 text-primary" />
                            <h2 className="text-lg font-bold tracking-tight">Executive Summary & Financial Analysis</h2>
                         </div>
-                        <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                          {m.competitorData.detailedReport}
+                        <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none text-muted-foreground leading-relaxed">
+                          <ReactMarkdown>{m.competitorData.detailedReport}</ReactMarkdown>
                         </div>
                       </div>
                     )}
