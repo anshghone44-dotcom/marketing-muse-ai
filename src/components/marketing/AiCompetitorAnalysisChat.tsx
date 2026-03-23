@@ -177,11 +177,7 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
             <BarChart3 className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-lg font-black tracking-tighter">AI Competitor Architect</h2>
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest leading-none">Intelligence Active</span>
-            </div>
+            <h2 className="text-lg font-black tracking-tighter">AI Competitor Analyzer</h2>
           </div>
         </div>
       </div>
@@ -195,12 +191,6 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
           <div className="h-full flex flex-col items-center justify-center text-center max-w-xl mx-auto space-y-8">
             <div className="w-24 h-24 rounded-[3rem] bg-primary/5 flex items-center justify-center border border-primary/10 shadow-2xl">
               <Bot className="w-12 h-12 text-primary" />
-            </div>
-            <div className="space-y-4">
-              <h3 className="text-3xl font-black text-foreground tracking-tighter italic">Know Thy Competitor.</h3>
-              <p className="text-base text-muted-foreground leading-relaxed">
-                Type a competitor's name below. I will analyze their social engagement, lead generation strategies, and growth patterns to give you actionable insights.
-              </p>
             </div>
             <div className="flex flex-wrap justify-center gap-3 pt-4">
               {['Nexus Migration', 'WWICS', 'VFS Global'].map(name => (
@@ -464,12 +454,6 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
             >
               {isAnalyzing ? <Loader2 className="w-7 h-7 animate-spin" /> : <TrendingUp className="w-7 h-7" />}
             </Button>
-          </div>
-          
-          <div className="mt-6 flex flex-wrap justify-center gap-10 opacity-40 grayscale group-hover:grayscale-0 transition-all duration-1000 font-black text-[9px] uppercase tracking-[0.3em] text-muted-foreground">
-             <span className="flex items-center gap-2">Performance Tracking</span>
-             <span className="flex items-center gap-2">Goal Extraction</span>
-             <span className="flex items-center gap-2">Export Ready</span>
           </div>
         </div>
       </div>
