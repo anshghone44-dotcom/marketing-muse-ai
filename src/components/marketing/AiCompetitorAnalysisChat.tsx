@@ -97,6 +97,21 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
     }
   }, [messages, isAnalyzing]);
 
+  const getCompanyNameFromUrl = (url: string) => {
+    try {
+      // Basic URL cleanup
+      let name = url.replace(/^(https?:\/\/)?(www\.)?/, '').split(/[/?#]/)[0];
+      // Remove TLDs
+      name = name.split('.')[0];
+      // Replace hyphens and underscores with spaces
+      name = name.replace(/[-_]/g, ' ');
+      // Capitalize first letters
+      return name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    } catch (e) {
+      return url;
+    }
+  };
+
   const startAnalysis = (query: string, mode: 'auto' | 'analyze' = 'auto') => {
     if (!query.trim() && !selectedSource) return;
     
@@ -110,7 +125,12 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
     
     // Simulate AI response delay
     setTimeout(() => {
-      const competitorName = query || (selectedSource === 'competitor' ? 'Selected Competitor' : 'Target Entity');
+      let competitorName = query || (selectedSource === 'competitor' ? 'Selected Competitor' : 'Target Entity');
+      
+      // If it looks like a URL, extract the name
+      if (competitorName.toLowerCase().includes('.') || competitorName.toLowerCase().startsWith('http')) {
+        competitorName = getCompanyNameFromUrl(competitorName);
+      }
       
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
