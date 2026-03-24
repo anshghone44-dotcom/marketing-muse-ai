@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import {
   DropdownMenu,
@@ -19,59 +18,41 @@ import {
   PieChart,
   Pie,
   Cell,
-  LineChart,
-  Line,
-  Legend,
   AreaChart,
-  Area
+  Area,
+  Legend,
 } from "recharts";
 import {
   ArrowRight,
   Plus,
-  Bot,
-  User,
-  Check,
   Loader2,
-  TrendingUp,
-  Target,
-  Lightbulb,
-  Download,
-  Mail,
-  RefreshCcw,
-  Zap,
   BarChart3,
   PieChart as PieChartIcon,
-  LineChart as LineChartIcon,
   FileText,
-  Image as ImageIcon,
   Link,
-  Type,
-  TrendingDown,
   Activity,
-  DollarSign
+  Building2,
+  MapPin,
+  Users,
+  Package,
+  TrendingUp,
+  ShieldAlert,
+  Lightbulb,
+  Target,
+  AlertTriangle,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { CompanyData } from "./CompanyForm";
-
-interface CompetitorData {
-  name: string;
-  engagement: { type: string; count: number }[];
-  leadGen: { name: string; value: number }[];
-  growth: { month: string; followers: number }[];
-  financials: { year: string; revenue: number; profit: number }[];
-  marketShare: { name: string; value: number }[];
-  detailedReport: string;
-  recommendations: string[];
-}
+import { analyzeCompetitor, type CompetitorAnalysis } from "@/lib/geminiCompetitorService";
 
 interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
-  type?: "intro" | "analyzing" | "results" | "recommendations" | "export";
-  competitorData?: CompetitorData;
+  type?: "results";
+  analysis?: CompetitorAnalysis;
 }
 
 interface Props {
@@ -79,16 +60,87 @@ interface Props {
   onCompanySubmit: (data: CompanyData) => void;
 }
 
-const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#00C49F', '#FFBB28'];
+const PIE_COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff7300", "#00C49F", "#FFBB28"];
+
+// Build illustrative chart data from the analysis
+function buildCharts(analysis: CompetitorAnalysis) {
+  const competitors = [analysis.companyName, ...analysis.mainCompetitors.slice(0, 3)];
+  const baseShare = Math.floor(Math.random() * 15) + 30;
+  const marketShare = competitors.map((name, i) => ({
+    name,
+    value: i === 0 ? baseShare : Math.floor((100 - baseShare) / (competitors.length - 1)),
+  }));
+
+  const growth = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"].map((month, i) => ({
+    month,
+    trend: 70 + i * 5 + Math.floor(Math.random() * 8),
+  }));
+
+  const strengthCount = analysis.strengths.length;
+  const weaknessCount = analysis.weaknesses.length;
+  const opportunityCount = analysis.opportunities.length;
+  const threatCount = analysis.threats.length;
+  const swot = [
+    { category: "Strengths", count: strengthCount },
+    { category: "Weaknesses", count: weaknessCount },
+    { category: "Opportunities", count: opportunityCount },
+    { category: "Threats", count: threatCount },
+  ];
+
+  return { marketShare, growth, swot };
+}
+
+function buildDetailedReport(a: CompetitorAnalysis): string {
+  return `
+### ${a.companyName} — Executive Overview
+
+**${a.companyName}** operates in the **${a.industry}** sector and is headquartered in **${a.headquarters}**${a.founded !== "Unknown" ? `, founded in **${a.founded}**` : ""}.
+
+${a.overallSummary}
+
+---
+
+### Business Model & Revenue
+- **Model:** ${a.businessModel}
+- **Estimated Revenue:** ${a.revenueRange}
+- **Workforce:** ${a.employeeCount}
+
+---
+
+### Target Audience
+${a.targetAudience}
+
+---
+
+### Key Products & Services
+${a.keyProducts.map((p) => `- ${p}`).join("\n")}
+
+---
+
+### Market Positioning
+${a.marketPositioning}
+
+---
+
+### Main Competitors
+${a.mainCompetitors.map((c) => `- **${c}**`).join("\n")}
+
+---
+
+### Recent Highlights
+${a.recentHighlights.map((h) => `- ${h}`).join("\n")}
+  `.trim();
+}
 
 export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analyzingLabel, setAnalyzingLabel] = useState("Analyzing…");
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  type SourceType = 'files' | 'screenshot' | 'competitor' | 'prompt';
+  type SourceType = "files" | "competitor";
   const [selectedSource, setSelectedSource] = useState<SourceType | null>(null);
 
   useEffect(() => {
@@ -97,127 +149,48 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
     }
   }, [messages, isAnalyzing]);
 
-  const getCompanyNameFromUrl = (url: string) => {
-    try {
-      // Basic URL cleanup
-      let name = url.replace(/^(https?:\/\/)?(www\.)?/, '').split(/[/?#]/)[0];
-      // Remove TLDs
-      name = name.split('.')[0];
-      // Replace hyphens and underscores with spaces
-      name = name.replace(/[-_]/g, ' ');
-      // Capitalize first letters
-      return name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-    } catch (e) {
-      return url;
-    }
-  };
+  const startAnalysis = async (query: string) => {
+    const trimmed = query.trim();
+    if (!trimmed) return;
 
-  const startAnalysis = (query: string, mode: 'auto' | 'analyze' = 'auto') => {
-    if (!query.trim() && !selectedSource) return;
-    
     setIsAnalyzing(true);
-    const userMessage: Message = { 
-      id: Date.now().toString(), 
-      role: "user", 
-      content: query || `Source: ${selectedSource}` 
+    setAnalyzingLabel(`Researching ${trimmed}…`);
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: "user",
+      content: trimmed,
     };
-    setMessages(prev => [...prev, userMessage]);
-    
-    // Simulate AI response delay
-    setTimeout(() => {
-      let competitorName = query || (selectedSource === 'competitor' ? 'Selected Competitor' : 'Target Entity');
-      
-      // If it looks like a URL, extract the name
-      if (competitorName.toLowerCase().includes('.') || competitorName.toLowerCase().startsWith('http')) {
-        competitorName = getCompanyNameFromUrl(competitorName);
-      }
-      
+    setMessages((prev) => [...prev, userMessage]);
+
+    try {
+      const analysis = await analyzeCompetitor(trimmed);
+
+      const detailedReport = buildDetailedReport(analysis);
+
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: mode === 'auto' 
-          ? `Comprehensive financial and strategic report for **${competitorName}**. Our analysis covers their technical formation, historical net profits, and current accounting standing.` 
-          : `Financial position and performance visualization for **${competitorName}**. The following charts detail their revenue trajectory and market dominance.`,
+        content: `Here is a comprehensive competitive intelligence report for **${analysis.companyName}**.`,
         type: "results",
-        competitorData: {
-          name: competitorName,
-          engagement: mode === 'analyze' ? [
-            { type: 'Likes', count: 1200 },
-            { type: 'Shares', count: 450 },
-            { type: 'Comments', count: 320 }
-          ] : [],
-          leadGen: mode === 'analyze' ? [
-            { name: 'Organic', value: 45 },
-            { name: 'Paid Ads', value: 30 },
-            { name: 'Social', value: 25 }
-          ] : [],
-          growth: mode === 'analyze' ? [
-            { month: 'Jan', followers: 10000 },
-            { month: 'Feb', followers: 12500 },
-            { month: 'Mar', followers: 15000 }
-          ] : [],
-          financials: mode === 'analyze' ? [
-            { year: '2021', revenue: 450, profit: 85 },
-            { year: '2022', revenue: 520, profit: 110 },
-            { year: '2023', revenue: 610, profit: 145 },
-            { year: '2024', revenue: 780, profit: 195 }
-          ] : [],
-          marketShare: mode === 'analyze' ? [
-            { name: competitorName, value: 35 },
-            { name: 'Competitor A', value: 25 },
-            { name: 'Competitor B', value: 20 },
-            { name: 'Others', value: 20 }
-          ] : [],
-          detailedReport: mode === 'auto' ? `
-### ${competitorName} - Company Overview
-**${competitorName}** is a leading global consultancy firm specializing in comprehensive market solutions. Founded in 2015, the firm has established a dominant presence in over **20 countries**, with a primary focus on scaling high-growth enterprises in the **UAE, India, and North America**.
-
-### Main Services
-- **Strategic Market Entry**: Comprehensive eligibility assessments and post-entry settlement support.
-- **Financial Architecture**: Specialized support for revenue optimization and fiscal scaling.
-- **Operational Transformation**: End-to-end process re-engineering for enterprise efficiency.
-- **Risk Mitigation**: Rigorous compliance and audit frameworks for global operations.
-
-### Claimed Achievements & Statistics
-- **Over 10,000+** successful project completions globally.
-- **98.8%** client satisfaction and retention rate.
-- **Top 10** ranking in global industry efficiency benchmarks.
-- More than **10 years** of cumulative leadership experience in the sector.
-
-### Certifications & Team Claims
-- Team includes **ISO-certified** professionals and world-class domain experts.
-- **Industry-registered** consultants with verified track records in top-tier markets.
-- Government-approved consultancy status in major economic hubs.
-
-### Office Locations
-- **Dubai (HQ)**: Level 42, Business Bay, Dubai, UAE.
-- **Mumbai**: Executive Suite, BKC, Mumbai, India.
-- **London**: Tech Hub, Canary Wharf, London, UK.
-- **Singapore**: Marina One East Tower, Singapore.
-
-### Important Note
-While ${competitorName} maintains a strong reputation, it is always recommended to verify specific consultant licenses and performance history on official regulatory portals before engagement.
-          ` : "",
-          recommendations: [
-            "Monitor their upcoming Q3 expansion into the European market",
-            "Consider a more aggressive pricing strategy to challenge their high-margin segments",
-            "Leverage their current R&D focus areas to identify your own innovation gaps"
-          ]
-        }
+        analysis,
       };
-      
-      setMessages(prev => [...prev, aiResponse]);
+
+      setMessages((prev) => [...prev, aiResponse]);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to analyze the company. Please check your API key and try again.");
+    } finally {
       setIsAnalyzing(false);
       setInput("");
       setSelectedSource(null);
-    }, 2000);
+    }
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      toast.success(`File "${file.name}" uploaded successfully.`);
-      startAnalysis("", 'auto');
+      toast.success(`File "${file.name}" uploaded. For best results, type the company name directly.`);
     }
   };
 
@@ -230,129 +203,216 @@ While ${competitorName} maintains a strong reputation, it is always recommended 
             <span className="opacity-90">LeadBot</span>
             <span className="text-muted-foreground/60 font-light">Competitor Analyzer</span>
           </h1>
+          <p className="mt-4 text-sm text-muted-foreground max-w-md">
+            Enter any company name or website URL to get a detailed AI-powered competitive intelligence report.
+          </p>
         </div>
       )}
 
       {/* Chat Messages */}
-      <div 
+      <div
         ref={scrollRef}
         className="flex-1 overflow-y-auto p-6 md:p-10 space-y-12 scroll-smooth"
       >
         {messages.map((m) => (
-          <div key={m.id} className={cn("flex w-full animate-in fade-in slide-in-from-bottom-8 duration-700", m.role === "user" ? "justify-end" : "justify-start")}>
-            <div className={cn("max-w-[85%] space-y-4", m.role === "user" ? "items-end" : "items-start")}>
-              <div className={cn(
-                "p-6 md:p-8 rounded-3xl text-base leading-relaxed overflow-hidden shadow-sm",
-                m.role === "user" ? "bg-muted/50 text-foreground border border-border/40" : "bg-card/40 backdrop-blur-xl border border-border/10 text-foreground"
-              )}>
+          <div
+            key={m.id}
+            className={cn(
+              "flex w-full animate-in fade-in slide-in-from-bottom-8 duration-700",
+              m.role === "user" ? "justify-end" : "justify-start"
+            )}
+          >
+            <div className={cn("max-w-[90%] space-y-4", m.role === "user" ? "items-end" : "items-start")}>
+              <div
+                className={cn(
+                  "p-6 md:p-8 rounded-3xl text-base leading-relaxed overflow-hidden shadow-sm",
+                  m.role === "user"
+                    ? "bg-muted/50 text-foreground border border-border/40"
+                    : "bg-card/40 backdrop-blur-xl border border-border/10 text-foreground"
+                )}
+              >
                 <div className="prose prose-base dark:prose-invert font-medium">
-                  {m.content}
+                  <ReactMarkdown>{m.content}</ReactMarkdown>
                 </div>
 
-                {m.type === "results" && m.competitorData && (
-                  <div className="mt-8 space-y-12 border-t border-border/10 pt-10">
-                    {/* Detailed Professional Text Report */}
-                    {m.competitorData.detailedReport && (
-                      <div className="space-y-6 animate-in fade-in duration-700">
-                        <div className="flex items-center gap-2 mb-4">
-                           <FileText className="w-5 h-5 text-primary" />
-                           <h2 className="text-lg font-bold tracking-tight">Executive Summary & Financial Analysis</h2>
+                {m.type === "results" && m.analysis && (() => {
+                  const { marketShare, growth, swot } = buildCharts(m.analysis);
+                  const a = m.analysis;
+                  return (
+                    <div className="mt-8 space-y-10 border-t border-border/10 pt-10">
+
+                      {/* ── Company Quick Stats ── */}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-in fade-in duration-700">
+                        {[
+                          { icon: Building2, label: "Industry", value: a.industry },
+                          { icon: MapPin, label: "Headquarters", value: a.headquarters },
+                          { icon: Users, label: "Employees", value: a.employeeCount },
+                          { icon: TrendingUp, label: "Revenue", value: a.revenueRange },
+                        ].map(({ icon: Icon, label, value }) => (
+                          <div key={label} className="bg-muted/30 border border-border/20 rounded-2xl p-4 space-y-1">
+                            <div className="flex items-center gap-1.5 text-muted-foreground">
+                              <Icon className="w-3.5 h-3.5" />
+                              <span className="text-[10px] font-bold uppercase tracking-widest">{label}</span>
+                            </div>
+                            <p className="text-sm font-semibold leading-tight">{value || "—"}</p>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* ── Detailed Text Report ── */}
+                      <div className="space-y-4 animate-in fade-in duration-700">
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-5 h-5 text-primary" />
+                          <h2 className="text-lg font-bold tracking-tight">Executive Intelligence Report</h2>
                         </div>
                         <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none text-muted-foreground leading-relaxed">
-                          <ReactMarkdown>{m.competitorData.detailedReport}</ReactMarkdown>
+                          <ReactMarkdown>{buildDetailedReport(a)}</ReactMarkdown>
                         </div>
                       </div>
-                    )}
 
-                    {/* Financial Position & Performance Graphs */}
-                    {m.competitorData.financials.length > 0 && (
-                      <div className="space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-1000">
-                        
-                        {/* Financial Growth (Revenue vs Profit) */}
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <BarChart3 className="w-4 h-4 text-primary" />
-                              <span className="text-xs font-bold text-foreground uppercase tracking-widest">Financial Position (Revenue vs Net Profit)</span>
-                            </div>
-                            <div className="flex items-center gap-4 text-[10px] uppercase tracking-tighter font-bold">
-                              <div className="flex items-center gap-1"><div className="w-2 h-2 bg-primary rounded-full"></div> Revenue ($M)</div>
-                              <div className="flex items-center gap-1"><div className="w-2 h-2 bg-emerald-500 rounded-full"></div> Net Profit ($M)</div>
-                            </div>
+                      {/* ── Target Audience & Products ── */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in duration-700">
+                        <div className="bg-muted/20 border border-border/10 rounded-2xl p-5 space-y-3">
+                          <div className="flex items-center gap-2 text-primary">
+                            <Target className="w-4 h-4" />
+                            <span className="text-xs font-bold uppercase tracking-widest">Target Audience</span>
                           </div>
-                          <div className="h-[300px] bg-muted/20 rounded-3xl p-6 border border-border/10 shadow-inner">
-                            <ResponsiveContainer width="100%" height="100%">
-                              <BarChart data={m.competitorData.financials}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(128,128,128,0.1)" />
-                                <XAxis dataKey="year" tick={{fontSize: 10, fill: 'currentColor', opacity: 0.5}} axisLine={false} tickLine={false} />
-                                <YAxis tick={{fontSize: 10, fill: 'currentColor', opacity: 0.5}} axisLine={false} tickLine={false} />
-                                <Tooltip 
-                                  contentStyle={{borderRadius: '16px', background: 'rgba(0,0,0,0.9)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff'}} 
-                                  cursor={{fill: 'rgba(255,255,255,0.05)'}}
-                                />
-                                <Bar dataKey="revenue" fill="currentColor" className="text-primary" radius={[4, 4, 0, 0]} />
-                                <Bar dataKey="profit" fill="#10b981" radius={[4, 4, 0, 0]} />
-                              </BarChart>
-                            </ResponsiveContainer>
-                          </div>
+                          <p className="text-sm leading-relaxed text-muted-foreground">{a.targetAudience}</p>
                         </div>
+                        <div className="bg-muted/20 border border-border/10 rounded-2xl p-5 space-y-3">
+                          <div className="flex items-center gap-2 text-primary">
+                            <Package className="w-4 h-4" />
+                            <span className="text-xs font-bold uppercase tracking-widest">Key Products & Services</span>
+                          </div>
+                          <ul className="space-y-1">
+                            {a.keyProducts.map((p, i) => (
+                              <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
+                                <span className="text-primary mt-0.5">•</span> {p}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+
+                      {/* ── SWOT Analysis ── */}
+                      <div className="animate-in fade-in duration-700">
+                        <div className="flex items-center gap-2 mb-4">
+                          <ShieldAlert className="w-5 h-5 text-primary" />
+                          <h2 className="text-lg font-bold tracking-tight">SWOT Analysis</h2>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {[
+                            { label: "Strengths", items: a.strengths, color: "text-emerald-500", bg: "bg-emerald-500/5 border-emerald-500/20", Icon: TrendingUp },
+                            { label: "Weaknesses", items: a.weaknesses, color: "text-red-400", bg: "bg-red-400/5 border-red-400/20", Icon: AlertTriangle },
+                            { label: "Opportunities", items: a.opportunities, color: "text-blue-400", bg: "bg-blue-400/5 border-blue-400/20", Icon: Lightbulb },
+                            { label: "Threats", items: a.threats, color: "text-orange-400", bg: "bg-orange-400/5 border-orange-400/20", Icon: ShieldAlert },
+                          ].map(({ label, items, color, bg, Icon }) => (
+                            <div key={label} className={cn("border rounded-2xl p-4 space-y-2", bg)}>
+                              <div className={cn("flex items-center gap-2", color)}>
+                                <Icon className="w-4 h-4" />
+                                <span className="text-xs font-bold uppercase tracking-widest">{label}</span>
+                              </div>
+                              <ul className="space-y-1">
+                                {items.map((item, i) => (
+                                  <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
+                                    <span className={cn("mt-0.5", color)}>•</span> {item}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* ── Charts ── */}
+                      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-1000">
+                        <p className="text-[10px] text-muted-foreground/50 uppercase tracking-widest font-bold text-center">
+                          Charts below are illustrative estimates for visual reference
+                        </p>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                          {/* Market Share Positioning */}
-                          <div className="space-y-4">
+                          {/* Market Share Pie */}
+                          <div className="space-y-3">
                             <div className="flex items-center gap-2">
                               <PieChartIcon className="w-4 h-4 text-primary" />
-                              <span className="text-xs font-bold text-foreground uppercase tracking-widest">Market Dominance</span>
+                              <span className="text-xs font-bold text-foreground uppercase tracking-widest">Market Share Estimate</span>
                             </div>
-                            <div className="h-[250px] bg-muted/20 rounded-3xl p-4 border border-border/10">
+                            <div className="h-[240px] bg-muted/20 rounded-3xl p-4 border border-border/10">
                               <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
-                                  <Pie data={m.competitorData.marketShare} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
-                                    {m.competitorData.marketShare.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                                  <Pie data={marketShare} innerRadius={55} outerRadius={80} paddingAngle={4} dataKey="value">
+                                    {marketShare.map((_, index) => (
+                                      <Cell key={index} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                                    ))}
                                   </Pie>
-                                  <Tooltip contentStyle={{borderRadius: '12px', background: '#000', border: 'none'}} />
+                                  <Tooltip contentStyle={{ borderRadius: "12px", background: "#000", border: "none" }} />
                                   <Legend verticalAlign="bottom" height={36} iconType="circle" />
                                 </PieChart>
                               </ResponsiveContainer>
                             </div>
                           </div>
 
-                          {/* Efficiency & Growth Trajectory */}
-                          <div className="space-y-4">
+                          {/* Growth Trend Area */}
+                          <div className="space-y-3">
                             <div className="flex items-center gap-2">
                               <Activity className="w-4 h-4 text-primary" />
-                              <span className="text-xs font-bold text-foreground uppercase tracking-widest">Performance Reports</span>
+                              <span className="text-xs font-bold text-foreground uppercase tracking-widest">Growth Trajectory</span>
                             </div>
-                            <div className="h-[250px] bg-muted/20 rounded-3xl p-4 border border-border/10">
+                            <div className="h-[240px] bg-muted/20 rounded-3xl p-4 border border-border/10">
                               <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={m.competitorData.growth}>
+                                <AreaChart data={growth}>
                                   <defs>
-                                    <linearGradient id="colorFollowers" x1="0" y1="0" x2="0" y2="1">
-                                      <stop offset="5%" stopColor="currentColor" stopOpacity={0.3}/>
-                                      <stop offset="95%" stopColor="currentColor" stopOpacity={0}/>
+                                    <linearGradient id="colorTrend" x1="0" y1="0" x2="0" y2="1">
+                                      <stop offset="5%" stopColor="#8884d8" stopOpacity={0.3} />
+                                      <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
                                     </linearGradient>
                                   </defs>
                                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(128,128,128,0.1)" />
-                                  <XAxis dataKey="month" tick={{fontSize: 10, fill: 'currentColor', opacity: 0.5}} axisLine={false} tickLine={false} />
+                                  <XAxis dataKey="month" tick={{ fontSize: 10, fill: "currentColor", opacity: 0.5 }} axisLine={false} tickLine={false} />
                                   <Tooltip />
-                                  <Area type="monotone" dataKey="followers" stroke="currentColor" fillOpacity={1} fill="url(#colorFollowers)" strokeWidth={2} />
+                                  <Area type="monotone" dataKey="trend" stroke="#8884d8" fillOpacity={1} fill="url(#colorTrend)" strokeWidth={2} />
                                 </AreaChart>
                               </ResponsiveContainer>
                             </div>
                           </div>
                         </div>
+
+                        {/* SWOT Bar Chart */}
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2">
+                            <BarChart3 className="w-4 h-4 text-primary" />
+                            <span className="text-xs font-bold text-foreground uppercase tracking-widest">SWOT Factor Count</span>
+                          </div>
+                          <div className="h-[220px] bg-muted/20 rounded-3xl p-6 border border-border/10">
+                            <ResponsiveContainer width="100%" height="100%">
+                              <BarChart data={swot}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(128,128,128,0.1)" />
+                                <XAxis dataKey="category" tick={{ fontSize: 10, fill: "currentColor", opacity: 0.5 }} axisLine={false} tickLine={false} />
+                                <YAxis tick={{ fontSize: 10, fill: "currentColor", opacity: 0.5 }} axisLine={false} tickLine={false} />
+                                <Tooltip contentStyle={{ borderRadius: "16px", background: "rgba(0,0,0,0.9)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff" }} cursor={{ fill: "rgba(255,255,255,0.05)" }} />
+                                <Bar dataKey="count" radius={[6, 6, 0, 0]}>
+                                  {swot.map((_, index) => (
+                                    <Cell key={index} fill={["#10b981", "#ef4444", "#3b82f6", "#f97316"][index]} />
+                                  ))}
+                                </Bar>
+                              </BarChart>
+                            </ResponsiveContainer>
+                          </div>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                )}
+
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           </div>
         ))}
+
         {isAnalyzing && (
           <div className="flex items-center gap-4 p-6 bg-muted/20 rounded-3xl max-w-fit animate-pulse">
             <Loader2 className="w-5 h-5 animate-spin text-primary" />
-            <span className="text-sm font-semibold tracking-tight">Aggregating Financial Intelligence...</span>
+            <span className="text-sm font-semibold tracking-tight">{analyzingLabel}</span>
           </div>
         )}
       </div>
@@ -362,7 +422,7 @@ While ${competitorName} maintains a strong reputation, it is always recommended 
         <div className="max-w-3xl mx-auto relative flex items-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button 
+              <button
                 className={cn(
                   "absolute left-6 z-10 p-2 hover:bg-muted rounded-full transition-all text-muted-foreground",
                   selectedSource && "bg-primary/10 text-primary"
@@ -372,21 +432,23 @@ While ${competitorName} maintains a strong reputation, it is always recommended 
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-64 p-2 bg-background/95 backdrop-blur-xl border border-border/40 shadow-2xl rounded-2xl">
-              <DropdownMenuItem onClick={() => { setSelectedSource('competitor'); }} className="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-muted">
+              <DropdownMenuItem onClick={() => setSelectedSource("competitor")} className="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-muted">
                 <Link className="w-4 h-4 text-orange-500" />
                 <div className="flex flex-col">
                   <span className="text-sm font-semibold">Competitor Analysis</span>
                   <span className="text-[10px] text-muted-foreground">URL or Company Name</span>
                 </div>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => { setSelectedSource('files'); fileInputRef.current?.click(); }} className="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-muted">
+              <DropdownMenuItem
+                onClick={() => { setSelectedSource("files"); fileInputRef.current?.click(); }}
+                className="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-muted"
+              >
                 <FileText className="w-4 h-4 text-blue-500" />
                 <div className="flex flex-col">
-                  <span className="text-sm font-semibold">Financial Reports</span>
+                  <span className="text-sm font-semibold">Upload File</span>
                   <span className="text-[10px] text-muted-foreground">PDF or DOC Files</span>
                 </div>
               </DropdownMenuItem>
-              {/* Other options simplified for focus */}
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -395,17 +457,22 @@ While ${competitorName} maintains a strong reputation, it is always recommended 
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), startAnalysis(input))}
-            placeholder={selectedSource === 'competitor' ? "Enter competitor name for deep analysis..." : "Ask about competitor formation, profits, or accounting..."}
+            onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), startAnalysis(input))}
+            placeholder={
+              selectedSource === "competitor"
+                ? "Enter competitor URL or company name (e.g. apple.com, Zomato)..."
+                : "Enter a company name or URL to analyze (e.g. tesla.com, OpenAI)..."
+            }
             className="w-full min-h-[64px] bg-muted/40 border-border/40 rounded-[2rem] pl-16 pr-44 py-5 resize-none focus:border-primary/40 shadow-sm transition-shadow hover:shadow-md"
           />
 
           <div className="absolute right-3 flex items-center gap-2">
-            <Button variant="ghost" onClick={() => startAnalysis(input, 'auto')} disabled={isAnalyzing || !input.trim() && !selectedSource} className="h-10 px-4 rounded-full text-xs font-bold gap-1.5 hover:bg-primary/10 transition-all">
-              Auto <ArrowRight className="w-3.5 h-3.5" />
-            </Button>
-            <Button onClick={() => startAnalysis(input, 'analyze')} disabled={isAnalyzing || !input.trim() && !selectedSource} className="h-11 px-6 rounded-full font-bold bg-foreground text-background hover:scale-105 transition-all shadow-lg active:scale-95">
-              {isAnalyzing ? <Loader2 className="w-4 h-4 animate-spin" /> : "Analyze"}
+            <Button
+              onClick={() => startAnalysis(input)}
+              disabled={isAnalyzing || !input.trim()}
+              className="h-11 px-6 rounded-full font-bold bg-foreground text-background hover:scale-105 transition-all shadow-lg active:scale-95"
+            >
+              {isAnalyzing ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Analyze <ArrowRight className="w-3.5 h-3.5 ml-1" /></>}
             </Button>
           </div>
         </div>
