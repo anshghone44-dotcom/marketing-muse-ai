@@ -30,21 +30,20 @@ export async function generateAdCampaigns(
   audience?: string
 ): Promise<AdCampaignResult> {
   const { data, error } = await supabase.functions.invoke('generate-ads', {
-    body: { 
-      brief, 
-      platforms, 
-      goal, 
-      companyName, 
-      industry, 
-      product, 
-      audience 
+    body: {
+      brief,
+      platforms,
+      goal,
+      companyName,
+      industry,
+      product,
+      audience,
     },
   });
 
   if (error) {
-    console.error('Edge function error details:', error);
-    const details = (error as any).status || error.message || 'Unknown error';
-    throw new Error(`Edge Function error (${details}): Failed to generate ad campaigns`);
+    console.error('Edge function error:', error);
+    throw new Error(error.message || 'Failed to generate ad campaigns');
   }
 
   if (data?.error) {

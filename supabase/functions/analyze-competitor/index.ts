@@ -60,7 +60,7 @@ Be accurate, factual and specific. Do NOT make up data. If unknown, write 'Undis
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "google/gemini-flash-1.5",
         messages: [
           { role: "system", content: "You are a business intelligence analyst. Return only valid JSON, no markdown." },
           { role: "user", content: prompt },
