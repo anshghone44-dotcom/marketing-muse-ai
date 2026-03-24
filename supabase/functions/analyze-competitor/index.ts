@@ -19,9 +19,9 @@ serve(async (req) => {
       });
     }
 
-    const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
-    if (!GEMINI_API_KEY) {
-      throw new Error('GEMINI_API_KEY is not configured');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY is not configured');
     }
 
     const prompt = `You are a world-class business intelligence analyst. Analyze the following company and provide detailed, accurate, factual information about it in JSON format only (no markdown, no code blocks, just raw JSON).
@@ -36,7 +36,7 @@ Return a JSON object with exactly these fields:
   "industry": "Primary industry / sector",
   "headquarters": "City, Country or State, Country",
   "founded": "Year founded (e.g. '1994')",
-  "businessModel": "Short description of how the company makes money (B2B, B2C, SaaS, marketplace, etc.)",
+  "businessModel": "Short description of how the company makes money",
   "targetAudience": "Detailed description of their primary customer segments",
   "keyProducts": ["Product or service 1", "Product or service 2", "Product or service 3"],
   "revenueRange": "Approximate annual revenue or range",
@@ -51,36 +51,46 @@ Return a JSON object with exactly these fields:
   "overallSummary": "A 3-4 sentence executive summary of the company."
 }
 
-Be accurate, factual and specific. Do NOT make up data. If some data is truly unknown or private, use reasonable ranges or write 'Undisclosed'.`;
+Be accurate, factual and specific. Do NOT make up data. If unknown, write 'Undisclosed'.`;
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 4096,
-          },
-        }),
-      }
-    );
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-3-flash-preview",
+        messages: [
+          { role: "system", content: "You are a business intelligence analyst. Return only valid JSON, no markdown." },
+          { role: "user", content: prompt },
+        ],
+      }),
+    });
 
+    if (response.status === 429) {
+      return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again later." }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    if (response.status === 402) {
+      return new Response(JSON.stringify({ error: "AI credits exhausted. Please add funds in Settings > Workspace > Usage." }), {
+        status: 402,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Gemini API error:', response.status, errorText);
-      return new Response(JSON.stringify({ error: 'Failed to call Gemini API', details: errorText }), {
+      console.error('AI gateway error:', response.status, errorText);
+      return new Response(JSON.stringify({ error: 'AI gateway error' }), {
         status: 502,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
     const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-    // Strip markdown fences if present
+    const text = data.choices?.[0]?.message?.content || '';
     const cleaned = text.replace(/```json\n?/gi, '').replace(/```\n?/g, '').trim();
 
     try {
@@ -90,12 +100,11 @@ Be accurate, factual and specific. Do NOT make up data. If some data is truly un
       });
     } catch {
       return new Response(JSON.stringify({
-        companyName: query,
-        industry: "Unknown", headquarters: "Unknown", founded: "Unknown",
-        businessModel: "Unknown", targetAudience: "Unknown", keyProducts: [],
-        revenueRange: "Unknown", employeeCount: "Unknown", mainCompetitors: [],
-        marketPositioning: "Unknown", recentHighlights: [], strengths: [],
-        weaknesses: [], opportunities: [], threats: [],
+        companyName: query, industry: "Unknown", headquarters: "Unknown",
+        founded: "Unknown", businessModel: "Unknown", targetAudience: "Unknown",
+        keyProducts: [], revenueRange: "Unknown", employeeCount: "Unknown",
+        mainCompetitors: [], marketPositioning: "Unknown", recentHighlights: [],
+        strengths: [], weaknesses: [], opportunities: [], threats: [],
         overallSummary: text,
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
