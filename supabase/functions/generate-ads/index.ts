@@ -65,7 +65,7 @@ Generate one campaign object per platform. Be specific, professional, and tailor
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.0-flash-exp",
+        model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: "You are a marketing strategist. Return only valid JSON, no markdown." },
           { role: "user", content: prompt },

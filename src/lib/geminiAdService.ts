@@ -42,12 +42,9 @@ export async function generateAdCampaigns(
   });
 
   if (error) {
-    console.error('Edge function error:', error);
-    // Handle specific error codes from the gateway
-    if (error.message?.includes("402")) {
-      throw new Error("AI credits exhausted. Please add funds in Settings > Workspace > Usage.");
-    }
-    throw new Error('Failed to generate ad campaigns via Edge Function');
+    console.error('Edge function error details:', error);
+    const details = (error as any).status || error.message || 'Unknown error';
+    throw new Error(`Edge Function error (${details}): Failed to generate ad campaigns`);
   }
 
   if (data?.error) {
