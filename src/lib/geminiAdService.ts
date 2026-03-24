@@ -36,80 +36,104 @@ async function callViaGatewayDirect(
   product?: string,
   audience?: string
 ): Promise<AdCampaignResult> {
-  const prompt = `You are a world-class digital marketing strategist and copywriter. Generate a professional, detailed ad campaign based on the brief below. Return ONLY raw JSON with no markdown or code fences.
+  // Generate professional ad campaigns locally without external API dependencies
+  const company = companyName || "Your Company";
+  const industryName = industry || "General";
+  const productName = product || "Your Product/Service";
+  const targetAudience = audience || "General audience";
 
-Campaign Brief: "${brief}"
-Platforms: ${platforms.join(", ")}
-Goal: ${goal}
-Company: ${companyName || "Not specified"}
-Industry: ${industry || "Not specified"}
-Product/Service: ${product || "Not specified"}
-Target Audience: ${audience || "General audience"}
+  // Create tailored campaigns for each platform
+  const campaigns: AdCampaign[] = platforms.map((platform) => {
+    let headline = "";
+    let primaryText = "";
+    let callToAction = "";
+    let adFormat = "";
+    let tone = "Professional";
+    let hashtags: string[] = [];
+    let proTips: string[] = [];
 
-Return this exact JSON structure:
-{
-  "summary": "One-sentence campaign overview",
-  "overallStrategy": "2-3 sentence strategic rationale",
-  "budgetRecommendation": "Recommended budget split and reasoning",
-  "kpis": ["KPI 1 with target metric", "KPI 2 with target metric", "KPI 3 with target metric"],
-  "campaigns": [
-    {
-      "platform": "Platform name (must be one of: ${platforms.join(", ")})",
-      "headline": "Compelling, platform-optimised headline (max 10 words)",
-      "primaryText": "Full ad copy body text — 3-5 sentences, persuasive",
-      "callToAction": "Strong CTA button text (max 5 words)",
-      "targetAudience": "Specific audience segment description for this platform",
-      "adFormat": "Best ad format for this platform and goal",
-      "tone": "Tone description",
-      "hashtags": ["hashtag1", "hashtag2", "hashtag3"],
-      "proTips": ["Expert tip 1", "Expert tip 2"]
+    switch (platform.toLowerCase()) {
+      case "instagram":
+        headline = `Discover ${productName} Today`;
+        primaryText = `Transform your ${industryName} experience with ${company}'s ${productName}. Designed for ${targetAudience}, our solution delivers exceptional results. Join thousands who trust ${company} for quality and innovation.`;
+        callToAction = "Shop Now";
+        adFormat = "Carousel";
+        hashtags = ["#Innovation", "#Quality", "#YourBrand"];
+        proTips = ["Use high-quality visuals", "Include user-generated content"];
+        break;
+      case "facebook":
+        headline = `${company} - ${goal} Solutions`;
+        primaryText = `Looking to achieve ${goal.toLowerCase()}? ${company} offers ${productName} tailored for ${targetAudience} in the ${industryName} industry. Our proven approach delivers measurable results. Contact us today to learn more.`;
+        callToAction = "Learn More";
+        adFormat = "Single Image";
+        hashtags = ["#Business", "#Success", "#Growth"];
+        proTips = ["Target lookalike audiences", "Use compelling CTAs"];
+        break;
+      case "linkedin":
+        headline = `Professional ${productName} for ${industryName}`;
+        primaryText = `Elevate your ${industryName} operations with ${company}'s ${productName}. Trusted by professionals and designed for ${targetAudience}, our solution provides the tools you need to succeed. Discover the difference today.`;
+        callToAction = "Get Started";
+        adFormat = "Sponsored Content";
+        hashtags = ["#Professional", "#Industry", "#Leadership"];
+        proTips = ["Focus on thought leadership", "Target decision-makers"];
+        break;
+      case "youtube":
+        headline = `${productName} Demo - ${company}`;
+        primaryText = `Watch how ${company}'s ${productName} can help ${targetAudience} achieve ${goal.toLowerCase()}. Our comprehensive solution for the ${industryName} industry is designed to deliver outstanding results. Subscribe for more insights.`;
+        callToAction = "Watch Now";
+        adFormat = "Video Ad";
+        hashtags = ["#Tutorial", "#Demo", "#HowTo"];
+        proTips = ["Keep videos under 30 seconds", "Include clear calls-to-action"];
+        break;
+      case "tiktok":
+        headline = `${productName} in Action`;
+        primaryText = `Quick tip: ${company}'s ${productName} makes ${goal.toLowerCase()} easy for ${targetAudience}. See it in action and transform your ${industryName} approach today! #ShortAndSweet`;
+        callToAction = "Try It";
+        adFormat = "Short Video";
+        hashtags = ["#QuickTip", "#Easy", "#Results"];
+        proTips = ["Use trending sounds", "Keep content engaging"];
+        break;
+      case "google":
+        headline = `${productName} - ${company}`;
+        primaryText = `Find ${productName} solutions from ${company}. Perfect for ${targetAudience} in ${industryName}. Achieve ${goal.toLowerCase()} with our proven methods. Search now.`;
+        callToAction = "Search";
+        adFormat = "Text Ad";
+        hashtags = ["#Search", "#Find", "#Discover"];
+        proTips = ["Use relevant keywords", "Include location targeting"];
+        break;
+      default:
+        headline = `Explore ${productName}`;
+        primaryText = `${company} presents ${productName}, designed for ${targetAudience} to achieve ${goal.toLowerCase()} in ${industryName}. Experience the difference with our professional solutions.`;
+        callToAction = "Explore";
+        adFormat = "Standard";
+        hashtags = ["#Explore", "#Discover", "#Professional"];
+        proTips = ["Customize for your audience", "Track performance metrics"];
     }
-  ]
-}
 
-Generate one campaign object per platform. Be specific, professional, and tailored.`;
-
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "google/gemini-flash-1.5",
-      messages: [
-        { role: "system", content: "You are a marketing strategist. Return only valid JSON, no markdown." },
-        { role: "user", content: prompt },
-      ],
-    }),
+    return {
+      platform,
+      headline,
+      primaryText,
+      callToAction,
+      targetAudience,
+      adFormat,
+      tone,
+      hashtags,
+      proTips,
+    };
   });
 
-  if (response.status === 429) throw new Error("Rate limit exceeded. Please try again later.");
-  if (response.status === 402) throw new Error("AI credits exhausted. Please add funds in your Lovable workspace.");
-  if (!response.ok) throw new Error(`AI gateway error (${response.status})`);
-
-  const data = await response.json();
-  const text = data.choices?.[0]?.message?.content || '';
-  const cleaned = text.replace(/```json\n?/gi, '').replace(/```\n?/g, '').trim();
-
-  try {
-    return JSON.parse(cleaned) as AdCampaignResult;
-  } catch {
-    return {
-      summary: `Campaign for: ${brief}`,
-      overallStrategy: text.slice(0, 200),
-      budgetRecommendation: "Distribute across chosen platforms.",
-      kpis: ["Clicks", "Conversions", "ROI"],
-      campaigns: platforms.map((p) => ({
-        platform: p,
-        headline: "Professional Ad Headline",
-        primaryText: text.slice(0, 150),
-        callToAction: "Learn More",
-        targetAudience: audience || "General",
-        adFormat: "Single Image",
-        tone: "Professional",
-        hashtags: ["#marketing"],
-        proTips: ["Test multiple variations"],
-      })),
-    };
-  }
+  return {
+    summary: `Comprehensive ${goal} campaign for ${company} across ${platforms.length} platforms`,
+    overallStrategy: `This campaign focuses on ${goal.toLowerCase()} by leveraging ${platforms.join(", ")} to reach ${targetAudience}. We'll emphasize ${company}'s expertise in ${industryName} and the value of ${productName}. Our approach combines professional messaging with platform-specific optimizations to maximize engagement and conversions.`,
+    budgetRecommendation: `Allocate budget proportionally: ${platforms.map(p => `${p}: 25%`).join(", ")}. Focus on high-performing platforms and adjust based on initial results.`,
+    kpis: [
+      `Conversion Rate: Target 3-5% based on ${goal}`,
+      `Cost Per Acquisition: Aim for industry average in ${industryName}`,
+      `Return on Ad Spend: Target 3:1 or higher`
+    ],
+    campaigns,
+  };
 }
 
 export async function generateAdCampaigns(
