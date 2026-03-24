@@ -129,10 +129,7 @@ export async function generateAdCampaigns(
   product?: string,
   audience?: string
 ): Promise<AdCampaignResult> {
-  try {
-    return await callViaEdgeFunction({ brief, platforms, goal, companyName, industry, product, audience });
-  } catch (edgeErr) {
-    console.warn('Edge function unavailable, falling back to direct gateway:', edgeErr);
-    return await callViaGatewayDirect(brief, platforms, goal, companyName, industry, product, audience);
-  }
+  // Revert to direct campaign generation path that works reliably
+  // (without the new in-progress Lovable API gateway fallback logic)
+  return await callViaGatewayDirect(brief, platforms, goal, companyName, industry, product, audience);
 }
