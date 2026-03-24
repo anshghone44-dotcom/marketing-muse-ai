@@ -242,7 +242,7 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
-      content: `${trimmed} · Goal: ${selectedGoal} · Platforms: ${selectedPlatforms.join(", ")}`,
+      content: trimmed,
     };
     setMessages((prev) => [...prev, userMessage]);
     setIsGenerating(true);
@@ -267,9 +267,12 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
       };
       setMessages((prev) => [...prev, aiResponse]);
       toast.success("Ad campaigns generated successfully!");
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      toast.error("Failed to generate campaigns. Please try again.");
+      const errorMessage = err.message || "Failed to generate campaigns. Please try again.";
+      toast.error(errorMessage, {
+        duration: 5000,
+      });
     } finally {
       setIsGenerating(false);
       setInput("");
