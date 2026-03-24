@@ -248,15 +248,20 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
     setIsGenerating(true);
     setGeneratingLabel(`Crafting ${selectedPlatforms.length} campaign(s) with Gemini…`);
 
+    const companyName = companyData?.name?.trim() ?? "";
+    const companyIndustry = companyData?.industry?.trim() ?? "";
+    const companyProduct = companyData?.product?.trim() ?? "";
+    const companyAudience = companyData?.audience?.trim() ?? "";
+
     try {
       const result = await generateAdCampaigns(
         trimmed,
         selectedPlatforms,
         selectedGoal,
-        companyData?.name,
-        companyData?.industry,
-        companyData?.product,
-        companyData?.audience
+        companyName,
+        companyIndustry,
+        companyProduct,
+        companyAudience
       );
 
       const aiResponse: Message = {
@@ -267,9 +272,12 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
       };
       setMessages((prev) => [...prev, aiResponse]);
       toast.success("Ad campaigns generated successfully!");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      const errorMessage = err.message || "Failed to generate campaigns. Please try again.";
+      const errorMessage =
+        err && typeof err === 'object' && 'message' in err && typeof (err as { message?: string }).message === 'string'
+          ? (err as { message: string }).message
+          : "Failed to generate campaigns. Please try again.";
       toast.error(errorMessage, {
         duration: 5000,
       });

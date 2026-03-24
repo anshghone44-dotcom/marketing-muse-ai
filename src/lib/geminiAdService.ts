@@ -69,17 +69,25 @@ Return this exact JSON structure:
 
 Generate one campaign object per platform. Be specific, professional, and tailored.`;
 
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "google/gemini-flash-1.5",
-      messages: [
-        { role: "system", content: "You are a marketing strategist. Return only valid JSON, no markdown." },
-        { role: "user", content: prompt },
-      ],
-    }),
-  });
+  let response: Response;
+  try {
+    response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "google/gemini-flash-1.5",
+        messages: [
+          { role: "system", content: "You are a marketing strategist. Return only valid JSON, no markdown." },
+          { role: "user", content: prompt },
+        ],
+      }),
+    });
+  } catch (networkError) {
+    console.error('Network error while calling AI gateway:', networkError);
+    throw new Error(
+      'Network error: unable to reach AI gateway. Please check your internet connection and CORS configuration.'
+    );
+  }
 
   if (response.status === 429) throw new Error("Rate limit exceeded. Please try again later.");
   if (response.status === 402) throw new Error("AI credits exhausted. Please add funds in your Lovable workspace.");
