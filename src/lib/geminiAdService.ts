@@ -29,27 +29,49 @@ export async function generateAdCampaigns(
   product?: string,
   audience?: string
 ): Promise<AdCampaignResult> {
-  const { data, error } = await supabase.functions.invoke('generate-ads', {
-    body: { 
-      brief, 
-      platforms, 
-      goal, 
-      companyName, 
-      industry, 
-      product, 
-      audience 
-    },
-  });
+  let invocationResult;
+  try {
+    invocationResult = await supabase.functions.invoke('generate-ads', {
+      body: {
+        brief,
+        platforms,
+        goal,
+        companyName: companyName?.trim() ?? "",
+        industry: industry?.trim() ?? "",
+        product: product?.trim() ?? "",
+        audience: audience?.trim() ?? "",
+      },
+    });
+  } catch (invokeError) {
+    console.error('Supabase edge function invocation failed:', invokeError);
+    throw new Error(
+      invokeError instanceof Error
+        ? `Failed to call Edge Function: ${invokeError.message}`
+        : 'Failed to call Edge Function: unknown error'
+    );
+  }
+
+  const { data, error } = invocationResult;
 
   if (error) {
     console.error('Edge function error details:', error);
-    const details = (error as any).status || error.message || 'Unknown error';
-    throw new Error(`Edge Function error (${details}): Failed to generate ad campaigns`);
+
+    const details =
+      typeof error === 'object' && error !== null && 'status' in error && 'message' in error
+        ? `${(error as { status?: number; message?: string }).status ?? ''} ${(error as { status?: number; message?: string }).message ?? ''}`.trim()
+        : (error as Error).message ?? 'Unknown error';
+
+    throw new Error(`Edge Function error (${details || 'Unknown'}): Failed to generate ad campaigns`);
   }
 
-  if (data?.error) {
-    console.error('Generation error:', data.error);
-    throw new Error(data.error);
+  if (!data) {
+    throw new Error('Edge Function returned no data. Please check the backend route and deployment.');
+  }
+
+  if (typeof data === 'object' && data !== null && 'error' in data && (data as { error: unknown }).error) {
+    const dataError = (data as { error: string }).error;
+    console.error('Generation error:', dataError);
+    throw new Error(typeof dataError === 'string' ? dataError : 'Unknown generation error');
   }
 
   return data as AdCampaignResult;
