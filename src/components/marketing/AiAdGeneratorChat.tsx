@@ -1,78 +1,82 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Sparkles,
-  Download,
-  Check,
-  X,
-  SendHorizontal,
-  Bot,
-  User,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  ArrowRight,
+  Plus,
   Loader2,
   Megaphone,
-  Layout,
   Instagram,
   Facebook,
   Linkedin,
   Youtube,
   Globe,
   MessageSquare,
-  Paperclip,
-  File as FileIcon,
-  Image as ImageIcon
+  FileText,
+  Target,
+  TrendingUp,
+  Lightbulb,
+  BarChart3,
+  Check,
+  Zap,
+  ChevronDown,
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { CompanyData } from "./CompanyForm";
-import CompanyForm from "./CompanyForm";
+import {
+  generateAdCampaigns,
+  type AdCampaignResult,
+  type AdCampaign,
+} from "@/lib/geminiAdService";
 
 export const SOCIAL_PLATFORMS = [
-  { id: "Instagram", icon: Instagram },
-  { id: "Facebook", icon: Facebook },
-  { id: "LinkedIn", icon: Linkedin },
-  { id: "YouTube", icon: Youtube },
-  { id: "TikTok", icon: MessageSquare },
-  { id: "Google", icon: Globe },
+  { id: "Instagram", icon: Instagram, color: "text-pink-500" },
+  { id: "Facebook", icon: Facebook, color: "text-blue-500" },
+  { id: "LinkedIn", icon: Linkedin, color: "text-blue-700" },
+  { id: "YouTube", icon: Youtube, color: "text-red-500" },
+  { id: "TikTok", icon: MessageSquare, color: "text-slate-400" },
+  { id: "Google", icon: Globe, color: "text-green-500" },
 ];
 
 export const AD_GOALS = [
+  "Lead Generation",
   "Brand Awareness",
   "Website Traffic",
-  "Lead Generation",
   "Direct Sales",
-  "Testimonials",
+  "App Downloads",
 ];
 
-interface VisualAd {
-  id: string;
-  platform: string;
-  headline: string;
-  description: string;
-  callToAction: string;
-  backgroundColor: string;
-  accentColor: string;
-  adCopy: string;
-  mediaType: "image" | "video";
-  mediaUrl: string;
-}
+const PLATFORM_ACCENT: Record<string, string> = {
+  Instagram: "bg-gradient-to-r from-purple-500 to-pink-500",
+  Facebook: "bg-blue-600",
+  LinkedIn: "bg-blue-700",
+  YouTube: "bg-red-600",
+  TikTok: "bg-slate-900",
+  Google: "bg-blue-500",
+};
 
-interface UploadedFile {
-  id: string;
-  name: string;
-  size: number;
-  type: string;
-  url?: string;
-}
+const PLATFORM_BG: Record<string, string> = {
+  Instagram: "from-purple-500/15 to-pink-500/15",
+  Facebook: "from-blue-600/15 to-indigo-600/15",
+  LinkedIn: "from-blue-700/15 to-slate-700/15",
+  YouTube: "from-red-600/15 to-orange-600/15",
+  TikTok: "from-slate-800/15 to-pink-500/15",
+  Google: "from-blue-500/15 to-green-500/15",
+};
 
 interface Message {
   id: string;
-  role: "user" | "ai";
+  role: "user" | "assistant";
   content: string;
-  files?: UploadedFile[];
-  ads?: VisualAd[];
-  timestamp: Date;
+  result?: AdCampaignResult;
 }
 
 interface Props {
@@ -80,16 +84,140 @@ interface Props {
   onCompanySubmit: (data: CompanyData) => void;
 }
 
+function CampaignCard({ campaign }: { campaign: AdCampaign }) {
+  const accent = PLATFORM_ACCENT[campaign.platform] || "bg-primary";
+  const bg = PLATFORM_BG[campaign.platform] || "from-primary/10 to-primary/5";
+  const PlatformIcon =
+    SOCIAL_PLATFORMS.find((p) => p.id === campaign.platform)?.icon || Megaphone;
+
+  return (
+    <div className="bg-card/40 backdrop-blur-xl border border-border/20 rounded-3xl overflow-hidden shadow-sm">
+      {/* Platform header banner */}
+      <div
+        className={cn(
+          "bg-gradient-to-br p-6 flex items-center justify-between",
+          bg
+        )}
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center">
+            <PlatformIcon className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-white/70">
+              Platform
+            </p>
+            <h4 className="text-base font-black text-white">{campaign.platform}</h4>
+          </div>
+        </div>
+        <div className="flex flex-col items-end gap-1">
+          <span className="px-2 py-0.5 rounded-full bg-white/10 text-[9px] font-bold text-white uppercase tracking-wider">
+            {campaign.adFormat}
+          </span>
+          <span className="px-2 py-0.5 rounded-full bg-white/10 text-[9px] font-bold text-white/70 uppercase tracking-wider">
+            {campaign.tone}
+          </span>
+        </div>
+      </div>
+
+      {/* Ad preview */}
+      <div className="p-6 space-y-5">
+        {/* Headline */}
+        <div className="space-y-1">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+            Headline
+          </p>
+          <p className="text-xl font-black text-foreground leading-tight">
+            {campaign.headline}
+          </p>
+        </div>
+
+        {/* Primary text */}
+        <div className="space-y-1">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+            Ad Copy
+          </p>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {campaign.primaryText}
+          </p>
+        </div>
+
+        {/* CTA pill */}
+        <div
+          className={cn(
+            "inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-black text-white shadow-lg",
+            accent
+          )}
+        >
+          <Zap className="w-3.5 h-3.5" />
+          {campaign.callToAction}
+        </div>
+
+        {/* Target audience & hashtags row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-border/10">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <Target className="w-3.5 h-3.5" />
+              <span className="text-[10px] font-bold uppercase tracking-widest">
+                Target Audience
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground">{campaign.targetAudience}</p>
+          </div>
+          <div className="space-y-1.5">
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+              Hashtags
+            </p>
+            <div className="flex flex-wrap gap-1">
+              {campaign.hashtags.map((tag, i) => (
+                <span
+                  key={i}
+                  className="px-2 py-0.5 rounded-full bg-muted/60 text-[10px] font-semibold text-muted-foreground"
+                >
+                  {tag.startsWith("#") ? tag : `#${tag}`}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Pro tips */}
+        {campaign.proTips.length > 0 && (
+          <div className="space-y-2 pt-2 border-t border-border/10">
+            <div className="flex items-center gap-1.5 text-primary">
+              <Lightbulb className="w-3.5 h-3.5" />
+              <span className="text-[10px] font-bold uppercase tracking-widest">
+                Expert Tips
+              </span>
+            </div>
+            {campaign.proTips.map((tip, i) => (
+              <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+                <Check className="w-3.5 h-3.5 text-primary mt-0.5 shrink-0" />
+                {tip}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(["Instagram", "Facebook"]);
-  const [selectedGoal, setSelectedGoal] = useState("Lead Generation");
-  const [files, setFiles] = useState<UploadedFile[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [generatingLabel, setGeneratingLabel] = useState("Crafting campaigns…");
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([
+    "Instagram",
+    "Facebook",
+  ]);
+  const [selectedGoal, setSelectedGoal] = useState("Lead Generation");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  type SourceType = "platforms" | "files";
+  const [selectedSource, setSelectedSource] = useState<SourceType | null>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -97,40 +225,15 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
     }
   }, [messages, isGenerating]);
 
-  const processFiles = (newFiles: FileList | File[]) => {
-    const fileArray = Array.from(newFiles).map(f => ({
-      id: Math.random().toString(36).substring(7),
-      name: f.name,
-      size: f.size,
-      type: f.type,
-      url: f.type.startsWith('image/') ? URL.createObjectURL(f) : undefined
-    }));
-    
-    if (files.length + fileArray.length > 5) {
-      toast.error("Maximum 5 files allowed.");
-      return;
-    }
-    
-    setFiles(prev => [...prev, ...fileArray]);
-    toast.success(`${fileArray.length} file(s) attached.`);
+  const togglePlatform = (platform: string) => {
+    setSelectedPlatforms((prev) =>
+      prev.includes(platform) ? prev.filter((p) => p !== platform) : [...prev, platform]
+    );
   };
 
-  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      processFiles(e.target.files);
-    }
-  };
-
-  const removeFile = (id: string) => {
-    setFiles(prev => prev.filter(f => f.id !== id));
-  };
-
-  const generateAds = async () => {
-    if (!input.trim() && files.length === 0) {
-      toast.error("Please describe your ad campaign goal or upload files.");
-      return;
-    }
-
+  const generateAds = async (query: string) => {
+    const trimmed = query.trim();
+    if (!trimmed) return;
     if (selectedPlatforms.length === 0) {
       toast.error("Please select at least one platform.");
       return;
@@ -139,367 +242,284 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
-      content: input,
-      files: [...files],
-      timestamp: new Date(),
+      content: `${trimmed} · Goal: ${selectedGoal} · Platforms: ${selectedPlatforms.join(", ")}`,
     };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInput("");
-    setFiles([]);
+    setMessages((prev) => [...prev, userMessage]);
     setIsGenerating(true);
+    setGeneratingLabel(`Crafting ${selectedPlatforms.length} campaign(s) with Gemini…`);
 
-    // Simulate AI generation logic
-    setTimeout(() => {
-      const topic = userMessage.content;
-      const { name, industry, product, audience } = companyData || {};
+    try {
+      const result = await generateAdCampaigns(
+        trimmed,
+        selectedPlatforms,
+        selectedGoal,
+        companyData?.name,
+        companyData?.industry,
+        companyData?.product,
+        companyData?.audience
+      );
 
-      const platformConfig: Record<string, { bg: string; accent: string }> = {
-        Instagram: { bg: "from-purple-500/20 to-pink-500/20", accent: "bg-gradient-to-r from-purple-600 to-pink-600" },
-        Facebook: { bg: "from-blue-600/20 to-indigo-600/20", accent: "bg-blue-600" },
-        LinkedIn: { bg: "from-blue-700/20 to-slate-700/20", accent: "bg-blue-700" },
-        YouTube: { bg: "from-red-600/20 to-orange-600/20", accent: "bg-red-600" },
-        TikTok: { bg: "from-slate-900/20 to-pink-500/20", accent: "bg-black" },
-        Google: { bg: "from-blue-500/20 to-green-500/20", accent: "bg-blue-500" },
-      };
-
-      const ads: VisualAd[] = selectedPlatforms.map(platform => {
-        const config = platformConfig[platform] || platformConfig.Instagram;
-        
-        let headline = "";
-        let body = "";
-        let cta = "";
-        
-        // 1. Headline Strategy: Benefit focused, clear, engaging.
-        if (selectedGoal === "Lead Generation") {
-          headline = `Secure Your Future in ${companyData?.industry || "your field"} – Book a Free Consultation Now`;
-        } else if (selectedGoal === "Website Traffic") {
-          headline = `Start Your ${topic.split(' ')[0]} Journey with ${companyData?.name || "Expert Guidance"}`;
-        } else {
-          headline = `Get Your professional ${topic.toLowerCase()} results today!`;
-        }
-
-        // 2. Body Strategy: Focused on results, problem solving, and outcomes.
-        const bodyTemplate = `${companyData?.name || "We"} specialize in helping professionals ${topic.toLowerCase()}. We have helped thousands of clients achieve their goals with a 95% success rate. Whether you are a skilled worker, student, or looking to migrate, we offer tailored solutions to meet your needs.`;
-
-        // 3. CTA Strategy: Clear, actionable, and urgency-driven.
-        cta = (selectedGoal === "Lead Generation") ? "Claim Your Free Consultation Today!" : "Start Your Journey Now!";
-
-        // 4. Platform Optimization
-        let adCopy = "";
-        if (platform === "Instagram") {
-          adCopy = `### INSTAGRAM STRATEGY (Short & Catchy)\n\n**Headline:** ${headline.split('–')[0]} 🇨🇦\n\n**Body:** Ready to move? Swipe up to get your results today! Our 95% success rate speaks for itself. #NexusMigration #${topic.replace(/\s+/g, '')}\n\n**CTA:** ${cta}`;
-        } else if (platform === "LinkedIn") {
-          adCopy = `### LINKEDIN STRATEGY (Professional & Value-Driven)\n\n**Headline:** ${headline}\n\n**Body:** ${companyData?.name || "Our team"} offers a data-driven approach to help professionals ${topic.toLowerCase()}. We have helped over 12,000 clients achieve their professional goals.\n\n**CTA:** ${cta}`;
-        } else if (platform === "Facebook") {
-          adCopy = `### FACEBOOK STRATEGY (Informative & Engaging)\n\n**Headline:** ${headline}\n\n**Body:** ${bodyTemplate}\n\n**CTA:** ${cta}`;
-        } else {
-          adCopy = `### PROFESSIONAL AD STRATEGY (${platform.toUpperCase()})\n\n**Headline:** ${headline}\n\n**Body:** ${bodyTemplate}\n\n**CTA:** ${cta}`;
-        }
-
-        return {
-          id: `${platform}-${Date.now()}`,
-          platform,
-          headline,
-          description: `Strategic ${selectedGoal.toLowerCase()} for professionals.`,
-          callToAction: cta,
-          backgroundColor: config.bg,
-          accentColor: config.accent,
-          adCopy: adCopy,
-          mediaType: ["YouTube", "TikTok"].includes(platform) ? "video" : "image",
-          mediaUrl: `https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800`
-        };
-      });
-
-      const aiMessage: Message = {
+      const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
-        role: "ai",
-        content: `I've architected a professional ad campaign for "${topic}". Targeting your ${selectedGoal.toLowerCase()} goals across ${selectedPlatforms.join(', ')}. Here are the formal variations designed for ${companyData?.name || "your company"}:`,
-        ads,
-        timestamp: new Date(),
+        role: "assistant",
+        content: `Here are your **${selectedPlatforms.length} professional ad campaigns** targeting **${selectedGoal}**. Each is tailored to the platform's unique audience and best practices.`,
+        result,
       };
-
-      setMessages(prev => [...prev, aiMessage]);
+      setMessages((prev) => [...prev, aiResponse]);
+      toast.success("Ad campaigns generated successfully!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to generate campaigns. Please try again.");
+    } finally {
       setIsGenerating(false);
-      toast.success("Ad campaigns architected successfully!");
-    }, 3000);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      generateAds();
+      setInput("");
+      setSelectedSource(null);
     }
   };
 
-  const togglePlatform = (platform: string) => {
-    setSelectedPlatforms(prev => 
-      prev.includes(platform) 
-        ? prev.filter(p => p !== platform) 
-        : [...prev, platform]
-    );
-  };
-
-  if (!companyData) {
-    return (
-      <div className="max-w-2xl mx-auto py-12">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold mb-3">Initialize AI Context</h2>
-          <p className="text-muted-foreground">Complete your profile to unlock the Strategic Ad Generator Chatbot.</p>
-        </div>
-        <CompanyForm onSubmit={onCompanySubmit} />
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col h-[80vh] max-w-5xl mx-auto relative bg-background/40 border border-border/40 rounded-[2rem] overflow-hidden shadow-2xl backdrop-blur-md">
-      {/* Header Context Bar */}
-      <div className="p-5 border-b border-border/20 bg-card/40 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
-            <Megaphone className="w-5 h-5" />
-          </div>
-          <div>
-            <h2 className="text-base font-black tracking-tight flex items-center gap-2">
-              Strategic Ad Architect
-              <span className="px-1.5 py-0.5 rounded-md bg-primary/10 text-[9px] text-primary uppercase">v2.0</span>
-            </h2>
-          </div>
+    <div className="flex flex-col h-[85vh] max-w-6xl mx-auto relative bg-transparent overflow-hidden">
+      {/* ── Empty State ── */}
+      {messages.length === 0 && !isGenerating && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-24 pointer-events-none px-4 text-center">
+          <h1 className="text-4xl md:text-5xl font-sans font-semibold tracking-tight text-foreground flex flex-col md:flex-row items-center gap-2 md:gap-3">
+            <span className="opacity-90">LeadBot</span>
+            <span className="text-muted-foreground/60 font-light">Ad Creator</span>
+          </h1>
+          <p className="mt-4 text-sm text-muted-foreground max-w-md">
+            Describe your campaign goal and let Gemini AI craft professional ad copy for every platform you choose.
+          </p>
         </div>
+      )}
 
-        <div className="flex flex-wrap items-center gap-2">
-          {SOCIAL_PLATFORMS.map(platform => {
-            const Icon = platform.icon;
-            const isSelected = selectedPlatforms.includes(platform.id);
-            return (
-              <button
-                key={platform.id}
-                onClick={() => togglePlatform(platform.id)}
+      {/* ── Platform selector bar (always visible) ── */}
+      <div className="flex-shrink-0 px-6 pt-4 flex flex-wrap items-center gap-2 justify-center">
+        {SOCIAL_PLATFORMS.map(({ id, icon: Icon, color }) => {
+          const selected = selectedPlatforms.includes(id);
+          return (
+            <button
+              key={id}
+              onClick={() => togglePlatform(id)}
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all duration-200",
+                selected
+                  ? "bg-primary text-primary-foreground border-primary shadow-md scale-105"
+                  : "bg-muted/40 border-border/40 text-muted-foreground hover:bg-muted"
+              )}
+            >
+              <Icon className={cn("w-3.5 h-3.5", selected ? "text-primary-foreground" : color)} />
+              {id}
+            </button>
+          );
+        })}
+
+        {/* Goal selector */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border border-border/40 bg-muted/40 text-muted-foreground hover:bg-muted transition-all">
+              <BarChart3 className="w-3.5 h-3.5 text-primary" />
+              Goal: {selectedGoal}
+              <ChevronDown className="w-3 h-3" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="center" className="w-48 bg-background/95 backdrop-blur-xl border border-border/40 rounded-2xl p-1">
+            {AD_GOALS.map((goal) => (
+              <DropdownMenuItem
+                key={goal}
+                onClick={() => setSelectedGoal(goal)}
                 className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold border transition-all duration-300",
-                  isSelected 
-                    ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20 scale-105" 
-                    : "bg-background/50 border-border/50 text-muted-foreground hover:bg-muted"
+                  "rounded-xl px-3 py-2 text-sm cursor-pointer",
+                  selectedGoal === goal && "text-primary font-bold bg-primary/5"
                 )}
               >
-                <Icon className="w-3 h-3" />
-                {platform.id}
-              </button>
-            );
-          })}
-        </div>
+                {selectedGoal === goal && <Check className="w-3.5 h-3.5 mr-2 text-primary" />}
+                {goal}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
-      {/* Chat Conversation Stream */}
-      <div 
+      {/* ── Chat Messages ── */}
+      <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto p-6 md:p-10 space-y-10 scroll-smooth"
+        className="flex-1 overflow-y-auto p-6 md:p-10 space-y-12 scroll-smooth"
       >
-        {messages.length === 0 && !isGenerating ? (
-          <div className="h-full flex flex-col items-center justify-center text-center max-w-xl mx-auto space-y-8">
-            <div className="relative">
-              <div className="w-20 h-20 rounded-[2.5rem] bg-primary/10 flex items-center justify-center animate-pulse">
-                <Bot className="w-10 h-10 text-primary" />
-              </div>
-            </div>
-            <div className="space-y-4">
-              <h3 className="text-2xl font-black text-foreground leading-tight italic tracking-tighter">Ready to Architect Your Campaign?</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Describe your high-level objective below. I will generate a comprehensive, professional ad strategy across all selected platforms.
-              </p>
-            </div>
-          </div>
-        ) : (
-          <>
-            {messages.map((m) => (
-              <div 
-                key={m.id} 
+        {messages.map((m) => (
+          <div
+            key={m.id}
+            className={cn(
+              "flex w-full animate-in fade-in slide-in-from-bottom-8 duration-700",
+              m.role === "user" ? "justify-end" : "justify-start"
+            )}
+          >
+            <div className={cn("max-w-[90%] space-y-4", m.role === "user" ? "items-end" : "items-start")}>
+              <div
                 className={cn(
-                  "flex animate-in fade-in slide-in-from-bottom-6 duration-500",
-                  m.role === "user" ? "justify-end" : "justify-start"
+                  "p-6 md:p-8 rounded-3xl text-base leading-relaxed overflow-hidden shadow-sm",
+                  m.role === "user"
+                    ? "bg-muted/50 text-foreground border border-border/40"
+                    : "bg-card/40 backdrop-blur-xl border border-border/10 text-foreground"
                 )}
               >
-                <div className={cn(
-                  "max-w-[90%] space-y-3",
-                  m.role === "user" ? "items-end flex flex-col text-right" : "items-start flex flex-col text-left"
-                )}>
-                  <div className="flex items-center gap-2 mb-1 px-2">
-                    {m.role === "ai" && <Bot className="w-4 h-4 text-primary" />}
-                    <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-80">
-                      {m.role === "user" ? "Your Directive" : "Strategic Response"}
-                    </span>
-                    {m.role === "user" && <User className="w-4 h-4 text-muted-foreground/60" />}
-                  </div>
+                <div className="prose prose-base dark:prose-invert font-medium">
+                  <ReactMarkdown>{m.content}</ReactMarkdown>
+                </div>
 
-                  <div className={cn(
-                    "p-5 rounded-3xl text-sm leading-relaxed shadow-xl border border-white/5",
-                    m.role === "user" 
-                      ? "bg-primary text-primary-foreground rounded-tr-none" 
-                      : "bg-card/90 border-border/50 rounded-tl-none backdrop-blur-xl"
-                  )}>
-                    {m.files && m.files.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {m.files.map(f => (
-                          <div key={f.id} className="flex items-center gap-1.5 bg-black/10 rounded-lg px-2 py-1 text-[10px] font-bold">
-                            {f.type.startsWith('image/') ? <ImageIcon className="w-3 h-3" /> : <FileIcon className="w-3 h-3" />}
-                            <span className="max-w-[80px] truncate">{f.name}</span>
-                          </div>
+                {/* ── Campaign Results ── */}
+                {m.result && (
+                  <div className="mt-8 space-y-10 border-t border-border/10 pt-10">
+
+                    {/* Overall strategy + KPIs */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="bg-muted/20 border border-border/10 rounded-2xl p-5 space-y-2">
+                        <div className="flex items-center gap-2 text-primary">
+                          <TrendingUp className="w-4 h-4" />
+                          <span className="text-[10px] font-bold uppercase tracking-widest">Overall Strategy</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{m.result.overallStrategy}</p>
+                      </div>
+                      <div className="bg-muted/20 border border-border/10 rounded-2xl p-5 space-y-2">
+                        <div className="flex items-center gap-2 text-primary">
+                          <BarChart3 className="w-4 h-4" />
+                          <span className="text-[10px] font-bold uppercase tracking-widest">KPIs to Track</span>
+                        </div>
+                        <ul className="space-y-1">
+                          {m.result.kpis.map((kpi, i) => (
+                            <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
+                              <Check className="w-3.5 h-3.5 text-primary mt-0.5 shrink-0" />
+                              {kpi}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    {/* Budget */}
+                    <div className="bg-primary/5 border border-primary/15 rounded-2xl p-4 flex items-start gap-3">
+                      <Lightbulb className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1">Budget Recommendation</p>
+                        <p className="text-sm text-muted-foreground">{m.result.budgetRecommendation}</p>
+                      </div>
+                    </div>
+
+                    {/* Per-platform campaign cards */}
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-2">
+                        <Megaphone className="w-5 h-5 text-primary" />
+                        <h2 className="text-lg font-bold tracking-tight">Platform Campaigns</h2>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {m.result.campaigns.map((camp, i) => (
+                          <CampaignCard key={i} campaign={camp} />
                         ))}
                       </div>
-                    )}
-                    {m.content}
-                    
-                    {m.ads && (
-                      <div className="mt-8 grid grid-cols-1 gap-8 pt-8 border-t border-border/20">
-                        {m.ads.map((ad, aIdx) => (
-                          <Card key={aIdx} className="overflow-hidden border border-border/40 bg-background/50 backdrop-blur shadow-2xl group transition-all hover:border-primary/30">
-                            <div className={cn(
-                              "relative aspect-video flex flex-col items-center justify-center p-8 bg-gradient-to-br transition-all duration-700",
-                              ad.backgroundColor
-                            )}>
-                              <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                              <img src={ad.mediaUrl} className="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-30 px-0" alt="Ad Visualization" />
-                              
-                              <div className="relative z-10 text-center space-y-4 max-w-sm">
-                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/30 backdrop-blur-md text-[10px] font-bold text-white uppercase tracking-tighter">
-                                  {ad.platform} PREVIEW
-                                </div>
-                                <h4 className="text-xl md:text-3xl font-black text-white leading-[1.1] drop-shadow-2xl">
-                                  {ad.headline.toUpperCase()}
-                                </h4>
-                                <div className={cn("inline-block px-8 py-3 rounded-full text-[12px] font-black text-white shadow-2xl tracking-tight transition-transform group-hover:scale-105", ad.accentColor)}>
-                                  {ad.callToAction.toUpperCase()}
-                                </div>
-                              </div>
-                            </div>
-                            
-                            <div className="p-6 space-y-4 bg-card/60">
-                              <div className="flex items-center justify-between pb-4 border-b border-border/20">
-                                <span className="text-[10px] font-black text-primary uppercase tracking-widest">High-End Ad Copy (Formal)</span>
-                                <Button variant="ghost" size="sm" className="h-8 text-[10px] gap-2 font-black uppercase text-muted-foreground hover:text-primary transition-all">
-                                  <Download className="w-3.5 h-3.5" />
-                                  Export Brand Asset
-                                </Button>
-                              </div>
-                              <div className="text-[13px] text-foreground/90 font-serif leading-loose italic whitespace-pre-wrap">
-                                {ad.adCopy}
-                              </div>
-                              <div className="flex gap-2 pt-2">
-                                <span className="px-2 py-0.5 rounded-md bg-muted text-[9px] font-bold text-muted-foreground uppercase">2048x1080</span>
-                                <span className="px-2 py-0.5 rounded-md bg-muted text-[9px] font-bold text-muted-foreground uppercase">Professional Tone</span>
-                                <span className="px-2 py-0.5 rounded-md bg-muted text-[9px] font-bold text-muted-foreground uppercase">Verified Context</span>
-                              </div>
-                            </div>
-                          </Card>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <span className="text-[9px] text-muted-foreground px-2 font-mono">
-                    {m.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                </div>
-              </div>
-            ))}
-            
-            {isGenerating && (
-              <div className="flex justify-start animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="max-w-[90%] space-y-3 flex flex-col items-start">
-                  <div className="flex items-center gap-2 mb-1 px-2">
-                    <Bot className="w-4 h-4 text-primary" />
-                    <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-80">Strategic Response</span>
-                  </div>
-                  <div className="bg-card/90 border border-border/50 p-6 rounded-3xl rounded-tl-none flex items-center gap-4 shadow-2xl backdrop-blur-xl">
-                    <div className="relative">
-                      <div className="w-10 h-10 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
                     </div>
-                    <div className="space-y-1">
-                      <p className="text-sm font-black text-foreground">Analyzing Strategy...</p>
-                      <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-tight">Designing professional formal ad variations for {companyData.name}</p>
-                    </div>
+
                   </div>
-                </div>
+                )}
               </div>
-            )}
-          </>
+            </div>
+          </div>
+        ))}
+
+        {isGenerating && (
+          <div className="flex items-center gap-4 p-6 bg-muted/20 rounded-3xl max-w-fit animate-pulse">
+            <Loader2 className="w-5 h-5 animate-spin text-primary" />
+            <span className="text-sm font-semibold tracking-tight">{generatingLabel}</span>
+          </div>
         )}
       </div>
 
-  {/* Input Action Console */}
-      <div className="p-6 bg-card/60 border-t border-border/20 shadow-[-10px_0_30px_rgba(0,0,0,0.05)] backdrop-blur-2xl">
-        <div className="max-w-4xl mx-auto flex items-end gap-4 relative">
-          <div className="flex-1 relative bg-background/80 border border-border/40 rounded-3xl focus-within:border-primary/50 focus-within:ring-[6px] focus-within:ring-primary/5 transition-all duration-300 shadow-sm overflow-hidden">
-            {files.length > 0 && (
-              <div className="flex flex-wrap gap-2 p-3 pb-0">
-                {files.map(file => (
-                  <div key={file.id} className="flex items-center gap-1.5 bg-muted border border-border rounded-full px-3 py-1 text-[10px] font-bold animate-in fade-in zoom-in group">
-                    {file.type.startsWith('image/') ? <ImageIcon className="w-3.5 h-3.5 text-blue-500" /> : <FileIcon className="w-3.5 h-3.5 text-orange-500" />}
-                    <span className="max-w-[120px] truncate">{file.name}</span>
-                    <button onClick={() => removeFile(file.id)} className="text-muted-foreground hover:text-destructive ml-1">
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-            
-            <Textarea
-              placeholder="Generate any ad campaign for your business"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="min-h-[100px] max-h-[250px] border-0 focus-visible:ring-0 bg-transparent resize-none p-5 pb-12 text-sm leading-relaxed font-medium"
-            />
-            
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              onChange={handleFileInput} 
-              multiple 
-              className="hidden" 
-            />
-
-            <div className="absolute bottom-3 left-3 flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => fileInputRef.current?.click()}
-                className="h-8 w-8 rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
+      {/* ── Input Console (mirrors Competitor Analyzer) ── */}
+      <div className="pb-10 px-6">
+        <div className="max-w-3xl mx-auto relative flex items-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className={cn(
+                  "absolute left-6 z-10 p-2 hover:bg-muted rounded-full transition-all text-muted-foreground",
+                  selectedSource && "bg-primary/10 text-primary"
+                )}
               >
-                <Paperclip className="w-4 h-4" />
-              </Button>
-            </div>
+                <Plus
+                  className={cn(
+                    "w-6 h-6 transition-transform",
+                    selectedSource ? "rotate-45" : ""
+                  )}
+                />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="start"
+              className="w-64 p-2 bg-background/95 backdrop-blur-xl border border-border/40 shadow-2xl rounded-2xl"
+            >
+              <DropdownMenuItem
+                onClick={() => setSelectedSource("platforms")}
+                className="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-muted"
+              >
+                <Megaphone className="w-4 h-4 text-orange-500" />
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold">Ad Campaign</span>
+                  <span className="text-[10px] text-muted-foreground">
+                    Describe your campaign goal
+                  </span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setSelectedSource("files");
+                  fileInputRef.current?.click();
+                }}
+                className="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-muted"
+              >
+                <FileText className="w-4 h-4 text-blue-500" />
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold">Upload Brief</span>
+                  <span className="text-[10px] text-muted-foreground">PDF or DOC Files</span>
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-            <div className="absolute top-3 right-3 flex flex-col gap-1.5 opacity-40 group-focus-within:opacity-100 transition-opacity">
-               <div className="px-2 py-0.5 rounded-lg bg-muted text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Professional</div>
-            </div>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={() =>
+              toast.info("For best results, describe your campaign goal in the text box.")
+            }
+            className="hidden"
+            accept=".pdf,.doc,.docx"
+          />
+
+          <Textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) =>
+              e.key === "Enter" &&
+              !e.shiftKey &&
+              (e.preventDefault(), generateAds(input))
+            }
+            placeholder="Describe your campaign goal (e.g. 'Generate leads for our new fitness app targeting women 25–40')..."
+            className="w-full min-h-[64px] bg-muted/40 border-border/40 rounded-[2rem] pl-16 pr-44 py-5 resize-none focus:border-primary/40 shadow-sm transition-shadow hover:shadow-md"
+          />
+
+          <div className="absolute right-3 flex items-center gap-2">
+            <Button
+              onClick={() => generateAds(input)}
+              disabled={isGenerating || !input.trim()}
+              className="h-11 px-6 rounded-full font-bold bg-foreground text-background hover:scale-105 transition-all shadow-lg active:scale-95"
+            >
+              {isGenerating ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <>
+                  Generate <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                </>
+              )}
+            </Button>
           </div>
-
-          <Button
-            onClick={generateAds}
-            disabled={isGenerating || (!input.trim() && files.length === 0)}
-            size="icon"
-            className={cn(
-              "h-14 w-14 rounded-[1.5rem] transition-all duration-500 shadow-2xl",
-              input.trim() || files.length > 0
-                ? "bg-primary text-primary-foreground hover:scale-105 hover:rotate-2 shadow-primary/25" 
-                : "bg-muted text-muted-foreground opacity-50 grayscale"
-            )}
-          >
-            {isGenerating ? <Loader2 className="w-6 h-6 animate-spin" /> : <SendHorizontal className="w-6 h-6 ml-0.5" />}
-          </Button>
-        </div>
-        <div className="mt-4 flex items-center justify-center gap-6 opacity-40">
-           <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
-            <Check className="w-3 h-3 text-primary" /> Verified Strategy
-           </p>
-           <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
-            <Check className="w-3 h-3 text-primary" /> Multi-Platform Ready
-           </p>
-           <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
-            <Check className="w-3 h-3 text-primary" /> Enterprise Content
-           </p>
         </div>
       </div>
     </div>
