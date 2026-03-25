@@ -19,8 +19,8 @@ interface Props {
 
 const TASK_CONFIG: Record<TaskId, { title: string; description: string }> = {
   ads: {
-    title: "Ad Campaign Ideas",
-    description: "Headlines, ad copy, CTAs, visual concepts, and emotional hooks",
+    title: "LeadBot Ad Creator",
+    description: "Describe your campaign goal and let Isaac AI craft professional ad copy for every platform.",
   },
   keywords: {
     title: "Campaign Keyword Specialist",
@@ -60,17 +60,18 @@ export default function ResultsCanvas({
   const config = TASK_CONFIG[activeTask];
   const content = generatedContent[activeTask] || [];
   const hasContent = content.length > 0;
+  const isAdCreator = activeTask === "ads";
 
   return (
-    <div className="max-w-5xl mx-auto">
-      <div className="mb-10 text-center">
+    <div className={cn("max-w-5xl mx-auto", isAdCreator ? "bg-white/70 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-border" : "")}>
+      <div className={cn("mb-10 text-center", isAdCreator && "bg-white/90 p-8 rounded-2xl shadow-lg border border-border") }>
         <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl ai-gradient mb-6 glow animate-pulse-glow">
           <Sparkles className="h-10 w-10 text-primary-foreground" />
         </div>
-        <h1 className="font-display text-4xl font-bold mb-3 bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent">
+        <h1 className={cn("font-display text-4xl font-bold mb-3", isAdCreator ? "text-slate-900" : "bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent") }>
           {config.title}
         </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+        <p className={cn("text-lg max-w-2xl mx-auto leading-relaxed", isAdCreator ? "text-slate-600" : "text-muted-foreground") }>
           {config.description}
         </p>
       </div>
