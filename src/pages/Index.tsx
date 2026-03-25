@@ -67,24 +67,9 @@ function generateMockContent(task: TaskId, data: CompanyData): string[] {
 **Platform Adaptation Notes:** Use urgency and pain-point framing on conversion-focused placements, then adapt the supporting line into shorter hooks for Instagram and YouTube formats.`,
     ],
     keywords: [
-      `### High-Intent Keywords
-- best ${product.toLowerCase()} for ${audience.toLowerCase()}
-- ${industry.toLowerCase()} ${product.toLowerCase()} pricing
-- buy ${product.toLowerCase()} online
-- ${name.toLowerCase()} reviews
-- ${product.toLowerCase()} comparison ${new Date().getFullYear()}`,
-      `### Long-Tail Keywords
-- how to choose ${product.toLowerCase()} for ${audience.toLowerCase()}
-- best ${industry.toLowerCase()} tools for small business
-- ${product.toLowerCase()} vs ${competitors || "competitors"}
-- affordable ${product.toLowerCase()} for startups
-- ${industry.toLowerCase()} marketing automation tools`,
-      `### Trending & Competitor Gap Keywords
-- AI-powered ${product.toLowerCase()}
-- ${industry.toLowerCase()} trends ${new Date().getFullYear()}
-- ${competitors ? competitors.split(",")[0].trim() : "competitor"} alternatives
-- ${product.toLowerCase()} for remote teams
-- sustainable ${industry.toLowerCase()} solutions`,
+      `### Keyword Strategy Summary\n\n**Objective:** Position ${name} as the market-leading ${industry} solution for ${audience} with high-intent, conversion-driven search traffic.\n\n**Recommended Focus:**\n- Core intent: ${goal.toLowerCase()} and efficiency in ${product.toLowerCase()}.\n- Brand anchors: ${name}, ${product}, ${industry}.\n- Content themes: implementation guides, use cases, ROI comparisons, trust signals.\n\n### Priority Keyword Cluster\n- ${name.toLowerCase()} ${product.toLowerCase()} for ${audience.toLowerCase()}\n- ${industry.toLowerCase()} ${product.toLowerCase()} ROI\n- ${product.toLowerCase()} best practices for ${audience.toLowerCase()}\n- ${name.toLowerCase()} vs ${competitors || "competitors"}\n- ${product.toLowerCase()} adoption ${new Date().getFullYear()}\n\n**Next step:** Develop one pillar blog targeting this cluster, then internal linking to supporting long-tail posts.`,
+      `### Long-Tail & Intent-Based Keywords\n\n**Commercial intent:**\n- ${industry.toLowerCase()} ${product.toLowerCase()} comparison for ${audience.toLowerCase()}\n- buy ${product.toLowerCase()} with ${goal.toLowerCase()} guarantee\n\n**Informational intent:**\n- how to select ${product.toLowerCase()} for ${audience.toLowerCase()}\n- ${product.toLowerCase()} implementation checklist\n\n**Navigational intent:**\n- ${name.toLowerCase()} customer success stories\n- ${product.toLowerCase()} support ${industry.toLowerCase()} case study`,
+      `### Trending + Competitive Gap Keywords\n\n- AI-enhanced ${industry.toLowerCase()} ${product.toLowerCase()}\n- ${industry.toLowerCase()} challenges ${new Date().getFullYear()}: ${audience.toLowerCase()} perspective\n- ${competitors ? competitors.split(",")[0].trim() : "competitor"} alternative strategies\n- ${product.toLowerCase()} for distributed teams\n- sustainable ${industry.toLowerCase()} performance tools\n\n**Opportunity:** Capitalize on rising interest in AI and distributed operations by publishing fast-response content and optimized PPC ads.`,
     ],
     content: [
       `### Blog Article Ideas

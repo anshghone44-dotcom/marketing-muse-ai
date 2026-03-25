@@ -23,8 +23,9 @@ const TASK_CONFIG: Record<TaskId, { title: string; description: string }> = {
     description: "Headlines, ad copy, CTAs, visual concepts, and emotional hooks",
   },
   keywords: {
-    title: "Keyword Strategy",
-    description: "High-intent, long-tail, trending, and competitor gap keywords",
+    title: "Campaign Keyword Specialist",
+    description:
+      "Provide your campaign details or upload documents to generate high-precision keyword clusters tailored for your industry.",
   },
   content: {
     title: "Content Generation",
@@ -73,6 +74,25 @@ export default function ResultsCanvas({
           {config.description}
         </p>
       </div>
+
+      {activeTask === "keywords" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+          <div className="rounded-2xl border border-border/40 bg-card/40 p-5 backdrop-blur-xl">
+            <h3 className="text-lg font-semibold text-foreground mb-2">AI Keyword Agent</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Generate high-intent, long-tail, and trending keyword clusters in one click,
+              optimized for your selected industry and audience.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-border/40 bg-card/40 p-5 backdrop-blur-xl">
+            <h3 className="text-lg font-semibold text-foreground mb-2">Keyword Intelligence Agent</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Get competitor gap keywords and search intent insights based on real-world search behavior
+              so you can outrank rivals with content that converts.
+            </p>
+          </div>
+        </div>
+      )}
 
       {!hasContent && !isGenerating && (
         <div className="flex flex-col items-center justify-center py-24 text-center">
