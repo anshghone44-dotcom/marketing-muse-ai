@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -63,115 +64,158 @@ export default function CompanyForm({ onSubmit, initialData }: Props) {
     data.name && data.product && data.audience && data.industry && data.goal && data.tone && data.platforms.length > 0;
 
   return (
-    <div className="space-y-6 text-slate-900">
-      <div>
-        <h2 className="font-display text-2xl font-semibold text-slate-900">Company Profile</h2>
-        <p className="mt-1 text-sm text-slate-600">
-          Tell us about your business to generate tailored content.
-        </p>
-      </div>
+    <div className="bg-card/50 backdrop-blur-xl rounded-2xl border border-border/50 p-8 shadow-2xl relative overflow-hidden">
+      {/* Background gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 pointer-events-none" />
 
-      <div className="grid gap-4">
-        <div className="grid gap-1.5">
-          <Label htmlFor="name" className="text-slate-700">Company Name</Label>
-          <Input id="name" placeholder="Acme Inc." value={data.name} onChange={(e) => update("name", e.target.value)} />
+      <div className="relative">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl ai-gradient mb-4 glow animate-float">
+            <Sparkles className="h-8 w-8 text-primary-foreground" />
+          </div>
+          <h2 className="font-display text-3xl font-bold mb-2 bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
+            Company Profile
+          </h2>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            Configure your AI marketing assistant with company details for personalized content generation.
+          </p>
         </div>
 
-        <div className="grid gap-1.5">
-          <Label htmlFor="product" className="text-slate-700">Product / Service</Label>
-          <Textarea
-            id="product"
-            placeholder="Describe your product or service..."
-            rows={2}
-            value={data.product}
-            onChange={(e) => update("product", e.target.value)}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="grid gap-1.5">
-            <Label htmlFor="audience" className="text-slate-700">Target Audience</Label>
+        <div className="grid gap-6">
+          <div className="grid gap-3">
+            <Label htmlFor="name" className="text-sm font-medium text-foreground">
+              Company Name
+            </Label>
             <Input
-              id="audience"
-              placeholder="e.g. Small business owners"
-              value={data.audience}
-              onChange={(e) => update("audience", e.target.value)}
+              id="name"
+              placeholder="Acme Inc."
+              value={data.name}
+              onChange={(e) => update("name", e.target.value)}
+              className="h-12 bg-background/50 border-border/50 focus:border-primary/50 transition-all duration-200"
             />
           </div>
-          <div className="grid gap-1.5">
-            <Label htmlFor="industry" className="text-slate-700">Industry</Label>
+
+          <div className="grid gap-3">
+            <Label htmlFor="product" className="text-sm font-medium text-foreground">
+              Product / Service
+            </Label>
+            <Textarea
+              id="product"
+              placeholder="Describe your product or service in detail..."
+              rows={4}
+              value={data.product}
+              onChange={(e) => update("product", e.target.value)}
+              className="bg-background/50 border-border/50 focus:border-primary/50 transition-all duration-200 resize-none"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid gap-3">
+              <Label htmlFor="audience" className="text-sm font-medium text-foreground">
+                Target Audience
+              </Label>
+              <Input
+                id="audience"
+                placeholder="e.g. Small business owners"
+                value={data.audience}
+                onChange={(e) => update("audience", e.target.value)}
+                className="h-12 bg-background/50 border-border/50 focus:border-primary/50 transition-all duration-200"
+              />
+            </div>
+            <div className="grid gap-3">
+              <Label htmlFor="industry" className="text-sm font-medium text-foreground">
+                Industry
+              </Label>
+              <Input
+                id="industry"
+                placeholder="e.g. SaaS, Fashion"
+                value={data.industry}
+                onChange={(e) => update("industry", e.target.value)}
+                className="h-12 bg-background/50 border-border/50 focus:border-primary/50 transition-all duration-200"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid gap-3">
+              <Label className="text-sm font-medium text-foreground">Marketing Goal</Label>
+              <Select value={data.goal} onValueChange={(v) => update("goal", v)}>
+                <SelectTrigger className="h-12 bg-background/50 border-border/50 focus:border-primary/50 transition-all duration-200">
+                  <SelectValue placeholder="Select goal" />
+                </SelectTrigger>
+                <SelectContent className="bg-card/95 backdrop-blur-xl border-border/50">
+                  {GOALS.map((g) => (
+                    <SelectItem key={g} value={g} className="focus:bg-primary/10">
+                      {g}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-3">
+              <Label className="text-sm font-medium text-foreground">Brand Tone</Label>
+              <Select value={data.tone} onValueChange={(v) => update("tone", v)}>
+                <SelectTrigger className="h-12 bg-background/50 border-border/50 focus:border-primary/50 transition-all duration-200">
+                  <SelectValue placeholder="Select tone" />
+                </SelectTrigger>
+                <SelectContent className="bg-card/95 backdrop-blur-xl border-border/50">
+                  {TONES.map((t) => (
+                    <SelectItem key={t} value={t} className="focus:bg-primary/10">
+                      {t}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid gap-3">
+            <Label className="text-sm font-medium text-foreground">Target Platforms</Label>
+            <div className="flex flex-wrap gap-3">
+              {PLATFORMS.map((p) => (
+                <Badge
+                  key={p}
+                  variant={data.platforms.includes(p) ? "default" : "outline"}
+                  className={cn(
+                    "cursor-pointer select-none px-4 py-2 text-sm font-medium transition-all duration-200 hover:scale-105",
+                    data.platforms.includes(p)
+                      ? "bg-primary/10 text-primary border-primary/30 glow"
+                      : "hover:bg-muted/50 border-border/50 hover:border-primary/30"
+                  )}
+                  onClick={() => togglePlatform(p)}
+                >
+                  {p}
+                  {data.platforms.includes(p) && <X className="ml-2 h-3 w-3" />}
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-3">
+            <Label htmlFor="competitors" className="text-sm font-medium text-foreground">
+              Competitors <span className="text-muted-foreground">(optional)</span>
+            </Label>
             <Input
-              id="industry"
-              placeholder="e.g. SaaS, Fashion"
-              value={data.industry}
-              onChange={(e) => update("industry", e.target.value)}
+              id="competitors"
+              placeholder="e.g. CompetitorA, CompetitorB"
+              value={data.competitors}
+              onChange={(e) => update("competitors", e.target.value)}
+              className="h-12 bg-background/50 border-border/50 focus:border-primary/50 transition-all duration-200"
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="grid gap-1.5">
-            <Label className="text-slate-700">Marketing Goal</Label>
-            <Select value={data.goal} onValueChange={(v) => update("goal", v)}>
-              <SelectTrigger><SelectValue placeholder="Select goal" /></SelectTrigger>
-              <SelectContent>
-                {GOALS.map((g) => (
-                  <SelectItem key={g} value={g}>{g}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid gap-1.5">
-            <Label className="text-slate-700">Brand Tone</Label>
-            <Select value={data.tone} onValueChange={(v) => update("tone", v)}>
-              <SelectTrigger><SelectValue placeholder="Select tone" /></SelectTrigger>
-              <SelectContent>
-                {TONES.map((t) => (
-                  <SelectItem key={t} value={t}>{t}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        <div className="grid gap-1.5">
-          <Label className="text-slate-700">Target Platforms</Label>
-          <div className="flex flex-wrap gap-2">
-            {PLATFORMS.map((p) => (
-              <Badge
-                key={p}
-                variant={data.platforms.includes(p) ? "default" : "outline"}
-                className="cursor-pointer select-none"
-                onClick={() => togglePlatform(p)}
-              >
-                {p}
-                {data.platforms.includes(p) && <X className="ml-1 h-3 w-3" />}
-              </Badge>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid gap-1.5">
-          <Label htmlFor="competitors" className="text-slate-700">Competitors (optional)</Label>
-          <Input
-            id="competitors"
-            placeholder="e.g. CompetitorA, CompetitorB"
-            value={data.competitors}
-            onChange={(e) => update("competitors", e.target.value)}
-          />
-        </div>
+        <Button
+          variant="ai"
+          size="lg"
+          className="w-full h-14 mt-8 text-lg font-semibold glow hover:scale-[1.02] transition-all duration-200"
+          disabled={!isValid}
+          onClick={() => onSubmit(data)}
+        >
+          <Sparkles className="h-5 w-5 mr-2" />
+          Initialize AI Marketing Assistant
+        </Button>
       </div>
-
-      <Button
-        variant="ai"
-        size="lg"
-        className="w-full shadow-lg shadow-indigo-300/40"
-        disabled={!isValid}
-        onClick={() => onSubmit(data)}
-      >
-        <Sparkles className="h-4 w-4" />
-        Generate Marketing Content
-      </Button>
     </div>
   );
 }

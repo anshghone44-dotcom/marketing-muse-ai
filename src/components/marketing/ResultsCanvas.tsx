@@ -23,8 +23,9 @@ const TASK_CONFIG: Record<TaskId, { title: string; description: string }> = {
     description: "Headlines, ad copy, CTAs, visual concepts, and emotional hooks",
   },
   keywords: {
-    title: "Keyword Strategy",
-    description: "High-intent, long-tail, trending, and competitor gap keywords",
+    title: "Campaign Keyword Specialist",
+    description:
+      "Provide your campaign details or upload documents to generate high-precision keyword clusters tailored for your industry.",
   },
   content: {
     title: "Content Generation",
@@ -61,59 +62,90 @@ export default function ResultsCanvas({
   const hasContent = content.length > 0;
 
   return (
-    <div className="h-full overflow-y-auto p-6 lg:p-8">
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-6 rounded-2xl border border-indigo-100 bg-indigo-50/50 p-5">
-          <h1 className="font-display text-2xl font-bold text-slate-900">{config.title}</h1>
-          <p className="mt-1 text-sm text-slate-600">{config.description}</p>
+    <div className="max-w-5xl mx-auto">
+      <div className="mb-10 text-center">
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl ai-gradient mb-6 glow animate-pulse-glow">
+          <Sparkles className="h-10 w-10 text-primary-foreground" />
         </div>
+        <h1 className="font-display text-4xl font-bold mb-3 bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent">
+          {config.title}
+        </h1>
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          {config.description}
+        </p>
+      </div>
 
-        {!hasContent && !isGenerating && (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-indigo-200 bg-white py-20 text-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl ai-gradient">
-              <Sparkles className="h-7 w-7 text-primary-foreground" />
-            </div>
-            <h3 className="mb-2 font-display text-lg font-semibold text-slate-900">
-              Ready to generate
-            </h3>
-            <p className="mb-6 max-w-sm text-sm text-slate-600">
-              Click below to generate {config.title.toLowerCase()} for{" "}
-              <span className="font-medium text-slate-900">{companyData?.name}</span>
+      {activeTask === "keywords" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+          <div className="rounded-2xl border border-border/40 bg-card/40 p-5 backdrop-blur-xl">
+            <h3 className="text-lg font-semibold text-foreground mb-2">AI Keyword Agent</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Generate high-intent, long-tail, and trending keyword clusters in one click,
+              optimized for your selected industry and audience.
             </p>
-            <Button variant="ai" size="lg" onClick={() => onGenerate(activeTask)}>
+          </div>
+          <div className="rounded-2xl border border-border/40 bg-card/40 p-5 backdrop-blur-xl">
+            <h3 className="text-lg font-semibold text-foreground mb-2">Keyword Intelligence Agent</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Get competitor gap keywords and search intent insights based on real-world search behavior
+              so you can outrank rivals with content that converts.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {!hasContent && !isGenerating && (
+        <div className="flex flex-col items-center justify-center py-24 text-center">
+          <div className="relative mb-8">
+            <div className="w-32 h-32 rounded-3xl ai-gradient flex items-center justify-center glow animate-float">
+              <Sparkles className="h-16 w-16 text-primary-foreground" />
+            </div>
+            <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-primary/20 to-secondary/20 blur-xl animate-pulse" />
+          </div>
+          <h3 className="font-display font-bold text-2xl mb-3 text-foreground">
+            Ready to Generate Content
+          </h3>
+          <p className="text-muted-foreground mb-8 max-w-md text-lg leading-relaxed">
+            Click below to generate {config.title.toLowerCase()} tailored for{" "}
+            <span className="font-semibold text-primary">{companyData?.name}</span>
+          </p>
+          <Button
+            variant="ai"
+            size="lg"
+            onClick={() => onGenerate(activeTask)}
+            className="h-16 px-8 text-lg font-semibold glow hover:scale-105 transition-all duration-300"
+          >
+            <Sparkles className="h-6 w-6 mr-3" />
+            Generate {config.title}
+          </Button>
+        </div>
+      )}
+      {isGenerating && (
+        <div className="grid gap-4">
+          {[1, 2, 3].map((i) => (
+            <ResultCard key={i} title="" content="" isLoading />
+          ))}
+        </div>
+      )}
+
+      {hasContent && !isGenerating && (
+        <div className="grid gap-4">
+          {content.map((item, i) => (
+            <ResultCard
+              key={i}
+              title={`${config.title} #${i + 1}`}
+              content={item}
+              onRegenerate={() => onRegenerate(activeTask, i)}
+            />
+          ))}
+          <div className="flex justify-center pt-2">
+            <Button variant="outline" onClick={() => onGenerate(activeTask)}>
               <Sparkles className="h-4 w-4" />
-              Generate {config.title}
+              Regenerate All
             </Button>
           </div>
-        )}
-
-        {isGenerating && (
-          <div className="grid gap-4">
-            {[1, 2, 3].map((i) => (
-              <ResultCard key={i} title="" content="" isLoading />
-            ))}
-          </div>
-        )}
-
-        {hasContent && !isGenerating && (
-          <div className="grid gap-4">
-            {content.map((item, i) => (
-              <ResultCard
-                key={i}
-                title={`${config.title} #${i + 1}`}
-                content={item}
-                onRegenerate={() => onRegenerate(activeTask, i)}
-              />
-            ))}
-            <div className="flex justify-center pt-2">
-              <Button variant="outline" className="border-indigo-200 bg-white text-slate-700 hover:bg-indigo-50" onClick={() => onGenerate(activeTask)}>
-                <Sparkles className="h-4 w-4" />
-                Regenerate All
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

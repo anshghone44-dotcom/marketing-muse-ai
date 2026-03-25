@@ -43,22 +43,22 @@ export default function AppSidebar({ activeTask, onTaskChange, hasCompanyData }:
   return (
     <aside
       className={cn(
-        "flex h-[calc(100vh-2rem)] flex-col rounded-3xl border border-indigo-100 bg-white/90 text-slate-700 shadow-lg shadow-indigo-100/70 transition-all duration-200 lg:h-[calc(100vh-3rem)]",
+        "flex h-[calc(100vh-2rem)] flex-col rounded-3xl border border-white/10 bg-slate-900/80 text-slate-200 shadow-xl shadow-black/25 backdrop-blur-xl transition-all duration-200 lg:h-[calc(100vh-3rem)]",
         collapsed ? "w-16" : "w-64"
       )}
     >
-      <div className="flex items-center gap-2 border-b border-indigo-100 p-4">
+      <div className="flex items-center gap-2 border-b border-white/10 p-4">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg ai-gradient">
           <Sparkles className="h-4 w-4 text-primary-foreground" />
         </div>
         {!collapsed && (
-          <span className="font-display text-base font-bold tracking-tight text-slate-900">
+          <span className="font-display text-base font-bold tracking-tight text-white">
             MarketAI
           </span>
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="ml-auto rounded-md p-1 text-slate-500 hover:bg-indigo-50 hover:text-slate-800"
+          className="ml-auto rounded-md p-1 text-slate-400 hover:bg-white/10 hover:text-slate-100"
         >
           <ChevronLeft className={cn("h-4 w-4 transition-transform", collapsed && "rotate-180")} />
         </button>
@@ -76,8 +76,8 @@ export default function AppSidebar({ activeTask, onTaskChange, hasCompanyData }:
               className={cn(
                 "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive
-                  ? "bg-indigo-600 text-white shadow-sm"
-                  : "text-slate-600 hover:bg-indigo-50 hover:text-indigo-700",
+                  ? "bg-indigo-500/20 text-indigo-100"
+                  : "text-slate-300 hover:bg-white/10 hover:text-white",
                 !hasCompanyData && "cursor-not-allowed opacity-40"
               )}
             >
@@ -89,8 +89,8 @@ export default function AppSidebar({ activeTask, onTaskChange, hasCompanyData }:
       </nav>
 
       {!collapsed && (
-        <div className="border-t border-indigo-100 p-4">
-          <p className="text-xs text-slate-500">
+        <div className="border-t border-white/10 p-4">
+          <p className="text-xs text-slate-400">
             {hasCompanyData
               ? "Select a task to generate content"
               : "Enter company details to begin"}

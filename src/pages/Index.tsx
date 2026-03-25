@@ -1,45 +1,186 @@
 import { useState } from "react";
-import AppSidebar, { type TaskId } from "@/components/marketing/AppSidebar";
+import TopNavigation, { type TaskId } from "@/components/marketing/TopNavigation";
 import CompanyForm, { type CompanyData } from "@/components/marketing/CompanyForm";
 import ResultsCanvas from "@/components/marketing/ResultsCanvas";
 import { toast } from "sonner";
-import { Sparkles, WandSparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
+import {
+  generateProfessionalAdCopies,
+  hasLovableGatewayConfig,
+} from "@/lib/lovable-gateway";
 
-// Mock generation - will be replaced with AI
 function generateMockContent(task: TaskId, data: CompanyData): string[] {
   const { name, product, audience, industry, goal, tone, platforms, competitors } = data;
 
   const mockByTask: Record<TaskId, string[]> = {
     ads: [
-      `### Headline Concept 1\n**"Transform Your ${industry} Game with ${name}"**\n\n**Ad Copy:** Tired of mediocre results? ${name} delivers ${product} that ${audience} actually love. Join thousands who've already made the switch.\n\n**CTA:** Start Your Free Trial →\n\n**Visual Concept:** Split-screen showing the "before" (frustrated user) and "after" (delighted customer using ${name}).\n\n**Emotional Hook:** Fear of missing out — "Your competitors are already using this."`,
-      `### Headline Concept 2\n**"${audience} Deserve Better. We Built ${name}."**\n\n**Ad Copy:** We studied what ${audience} truly need and built ${product} from the ground up. No compromises, no shortcuts.\n\n**CTA:** See How It Works\n\n**Visual Concept:** Clean product showcase with customer testimonials overlaid. ${tone} color palette.\n\n**Emotional Hook:** Aspiration — "This is the tool you've been waiting for."`,
-      `### Headline Concept 3\n**"Stop Wasting Money on ${industry} Tools That Don't Deliver"**\n\n**Ad Copy:** ${name}'s ${product} is built for ${goal.toLowerCase()}. Real results, measurable impact, zero fluff.\n\n**CTA:** Get Started Free\n\n**Visual Concept:** Bold typography with data/metrics graphics showing ROI improvement.\n\n**Emotional Hook:** Frustration relief — "Finally, something that actually works."`,
+      `### Concept 1: Performance-Led Positioning
+
+**Strategic Angle:** Position ${name} as the professional-grade answer for ${audience.toLowerCase()} who need dependable ${goal.toLowerCase()} outcomes in ${industry}.
+
+**Primary Headline:** ${name} Helps ${audience} Turn ${product} Into Measurable Growth
+
+**Supporting Headline:** Built for teams that need stronger performance, clearer positioning, and faster decision-making.
+
+**Body Copy:** ${name} delivers a more professional approach to ${product}, helping ${audience.toLowerCase()} move from inconsistent execution to reliable business results. Designed for modern ${industry.toLowerCase()} demands, it brings together clarity, speed, and strategic value so teams can focus on outcomes instead of operational friction.
+
+**CTA:** Book a Demo
+
+**Value Proposition:** Professional execution, stronger differentiation, and practical ROI.
+
+**Differentiation From Competitors:** Unlike generic alternatives, ${name} presents a sharper value story, clearer relevance for ${audience.toLowerCase()}, and a more credible path to ${goal.toLowerCase()}.
+
+**Platform Adaptation Notes:** Lead with a bold outcome statement on LinkedIn, a concise performance hook on Instagram, and a proof-driven variation for YouTube or retargeting placements.`,
+      `### Concept 2: Trust and Credibility
+
+**Strategic Angle:** Use credibility-led messaging to reassure buyers that ${name} is the serious choice in a crowded ${industry.toLowerCase()} market.
+
+**Primary Headline:** Choose ${name} When the Standard for ${product} Needs to Be Higher
+
+**Supporting Headline:** A more professional solution for brands that want confidence, consistency, and results.
+
+**Body Copy:** In a category filled with broad promises, ${name} offers a more disciplined and business-focused approach to ${product}. Tailored for ${audience.toLowerCase()}, it helps organizations improve execution, strengthen brand perception, and achieve ${goal.toLowerCase()} with greater confidence. The message is simple: when quality matters, the right platform matters too.
+
+**CTA:** See How It Works
+
+**Value Proposition:** Premium positioning with practical business value.
+
+**Differentiation From Competitors:** While competitors compete on noise, ${name} competes on clarity, trust, and a more professional customer promise.
+
+**Platform Adaptation Notes:** Use a polished testimonial or proof point on Facebook and LinkedIn, with shorter authority-driven copy for Instagram ads and story placements.`,
+      `### Concept 3: Problem-Solution Conversion Copy
+
+**Strategic Angle:** Speak directly to the inefficiencies and missed opportunities ${audience.toLowerCase()} face without a strong ${product} solution.
+
+**Primary Headline:** Stop Letting Outdated ${industry} Approaches Hold Back Growth
+
+**Supporting Headline:** ${name} gives modern teams a smarter, more strategic way to win.
+
+**Body Copy:** If your current approach to ${product} is creating extra effort without delivering enough return, ${name} offers a stronger path forward. Created for ${audience.toLowerCase()} and aligned to ${goal.toLowerCase()}, it replaces uncertainty with a more structured, credible, and results-oriented system. The result is messaging and execution that feel more professional and perform more effectively.
+
+**CTA:** Start Today
+
+**Value Proposition:** Reduced friction, stronger conversion potential, and clearer strategic impact.
+
+**Differentiation From Competitors:** ${name} stands apart by pairing professional brand presentation with sharper market relevance and more actionable value.
+
+**Platform Adaptation Notes:** Use urgency and pain-point framing on conversion-focused placements, then adapt the supporting line into shorter hooks for Instagram and YouTube formats.`,
     ],
     keywords: [
-      `### High-Intent Keywords\n- best ${product.toLowerCase()} for ${audience.toLowerCase()}\n- ${industry.toLowerCase()} ${product.toLowerCase()} pricing\n- buy ${product.toLowerCase()} online\n- ${name.toLowerCase()} reviews\n- ${product.toLowerCase()} comparison ${new Date().getFullYear()}`,
-      `### Long-Tail Keywords\n- how to choose ${product.toLowerCase()} for ${audience.toLowerCase()}\n- best ${industry.toLowerCase()} tools for small business\n- ${product.toLowerCase()} vs ${competitors || "competitors"}\n- affordable ${product.toLowerCase()} for startups\n- ${industry.toLowerCase()} marketing automation tools`,
-      `### Trending & Competitor Gap Keywords\n- AI-powered ${product.toLowerCase()}\n- ${industry.toLowerCase()} trends ${new Date().getFullYear()}\n- ${competitors ? competitors.split(",")[0].trim() : "competitor"} alternatives\n- ${product.toLowerCase()} for remote teams\n- sustainable ${industry.toLowerCase()} solutions`,
+      `### Keyword Strategy Summary\n\n**Objective:** Position ${name} as the market-leading ${industry} solution for ${audience} with high-intent, conversion-driven search traffic.\n\n**Recommended Focus:**\n- Core intent: ${goal.toLowerCase()} and efficiency in ${product.toLowerCase()}.\n- Brand anchors: ${name}, ${product}, ${industry}.\n- Content themes: implementation guides, use cases, ROI comparisons, trust signals.\n\n### Priority Keyword Cluster\n- ${name.toLowerCase()} ${product.toLowerCase()} for ${audience.toLowerCase()}\n- ${industry.toLowerCase()} ${product.toLowerCase()} ROI\n- ${product.toLowerCase()} best practices for ${audience.toLowerCase()}\n- ${name.toLowerCase()} vs ${competitors || "competitors"}\n- ${product.toLowerCase()} adoption ${new Date().getFullYear()}\n\n**Next step:** Develop one pillar blog targeting this cluster, then internal linking to supporting long-tail posts.`,
+      `### Long-Tail & Intent-Based Keywords\n\n**Commercial intent:**\n- ${industry.toLowerCase()} ${product.toLowerCase()} comparison for ${audience.toLowerCase()}\n- buy ${product.toLowerCase()} with ${goal.toLowerCase()} guarantee\n\n**Informational intent:**\n- how to select ${product.toLowerCase()} for ${audience.toLowerCase()}\n- ${product.toLowerCase()} implementation checklist\n\n**Navigational intent:**\n- ${name.toLowerCase()} customer success stories\n- ${product.toLowerCase()} support ${industry.toLowerCase()} case study`,
+      `### Trending + Competitive Gap Keywords\n\n- AI-enhanced ${industry.toLowerCase()} ${product.toLowerCase()}\n- ${industry.toLowerCase()} challenges ${new Date().getFullYear()}: ${audience.toLowerCase()} perspective\n- ${competitors ? competitors.split(",")[0].trim() : "competitor"} alternative strategies\n- ${product.toLowerCase()} for distributed teams\n- sustainable ${industry.toLowerCase()} performance tools\n\n**Opportunity:** Capitalize on rising interest in AI and distributed operations by publishing fast-response content and optimized PPC ads.`,
     ],
     content: [
-      `### Blog Article Ideas\n1. **"The Ultimate Guide to ${product} for ${audience}"** — Comprehensive how-to that establishes ${name} as a thought leader.\n2. **"${industry} Trends in ${new Date().getFullYear()}: What You Need to Know"** — Timely content for organic traffic.\n3. **"How ${name} Helped [Customer] Achieve [Result]"** — Case study format for social proof.\n4. **"${audience}: 5 Mistakes You're Making with ${product}"** — Problem-aware content that drives urgency.`,
-      `### Landing Page Copy\n\n**Hero Section:**\n# The ${product} That ${audience} Trust\n\n${name} makes ${goal.toLowerCase()} effortless. Our ${tone.toLowerCase()} approach to ${industry.toLowerCase()} means you get results, not excuses.\n\n**Social Proof:** "Used by 10,000+ ${audience.toLowerCase()} worldwide"\n\n**Features Section:** Three benefit-driven cards highlighting speed, reliability, and ROI.`,
-      `### Email Campaign Sequence\n\n**Email 1 — Welcome:** "Welcome to ${name}! Here's what to expect..."\n\n**Email 2 — Value:** "How ${audience.toLowerCase()} are using ${product} to achieve ${goal.toLowerCase()}"\n\n**Email 3 — Social Proof:** "See why ${industry} leaders choose ${name}"\n\n**Email 4 — Urgency:** "Limited-time offer: Get 30% off your first month"`,
+      `### Blog Article Ideas
+1. **"The Ultimate Guide to ${product} for ${audience}"** - Comprehensive how-to that establishes ${name} as a thought leader.
+2. **"${industry} Trends in ${new Date().getFullYear()}: What You Need to Know"** - Timely content for organic traffic.
+3. **"How ${name} Helped [Customer] Achieve [Result]"** - Case study format for social proof.
+4. **"${audience}: 5 Mistakes You're Making with ${product}"** - Problem-aware content that drives urgency.`,
+      `### Landing Page Copy
+
+**Hero Section:**
+# The ${product} That ${audience} Trust
+
+${name} makes ${goal.toLowerCase()} effortless. Our ${tone.toLowerCase()} approach to ${industry.toLowerCase()} means you get results, not excuses.
+
+**Social Proof:** "Used by 10,000+ ${audience.toLowerCase()} worldwide"
+
+**Features Section:** Three benefit-driven cards highlighting speed, reliability, and ROI.`,
+      `### Email Campaign Sequence
+
+**Email 1 - Welcome:** "Welcome to ${name}! Here's what to expect..."
+
+**Email 2 - Value:** "How ${audience.toLowerCase()} are using ${product} to achieve ${goal.toLowerCase()}"
+
+**Email 3 - Social Proof:** "See why ${industry} leaders choose ${name}"
+
+**Email 4 - Urgency:** "Limited-time offer: Get 30% off your first month"`,
     ],
     social: platforms.map(
       (p) =>
-        `### ${p} Strategy\n\n**Content Pillars:**\n- Educational (40%): Tips about ${product} & ${industry}\n- Behind-the-scenes (25%): Team culture, product development\n- Social proof (20%): Customer stories & testimonials\n- Promotional (15%): Offers, launches, CTAs\n\n**Post Ideas:**\n1. "${audience}: Here's why ${product} will change your workflow" — carousel/thread\n2. "We asked 100 ${audience.toLowerCase()} their biggest challenge..." — poll/engagement\n3. "Day in the life using ${name}" — video/story\n\n**Hashtags:** #${name.replace(/\s/g, "")} #${industry.replace(/\s/g, "")} #${goal.replace(/\s/g, "")} #MarketingTips\n\n**Posting Frequency:** ${p === "Twitter" ? "2-3x daily" : p === "LinkedIn" ? "3-5x weekly" : p === "TikTok" ? "1-2x daily" : "1x daily"}\n\n**Engagement Strategy:** Respond to every comment within 2 hours. DM users who engage consistently.`
+        `### ${p} Strategy
+
+**Content Pillars:**
+- Educational (40%): Tips about ${product} and ${industry}
+- Behind-the-scenes (25%): Team culture, product development
+- Social proof (20%): Customer stories and testimonials
+- Promotional (15%): Offers, launches, and CTAs
+
+**Post Ideas:**
+1. "${audience}: Here's why ${product} will change your workflow" - carousel or thread
+2. "We asked 100 ${audience.toLowerCase()} their biggest challenge..." - poll or engagement post
+3. "Day in the life using ${name}" - video or story
+
+**Hashtags:** #${name.replace(/\s/g, "")} #${industry.replace(/\s/g, "")} #${goal.replace(/\s/g, "")} #MarketingTips
+
+**Posting Frequency:** ${p === "Twitter" ? "2-3x daily" : p === "LinkedIn" ? "3-5x weekly" : p === "TikTok" ? "1-2x daily" : "1x daily"}
+
+**Engagement Strategy:** Respond to every comment within 2 hours. DM users who engage consistently.`
     ),
     viral: [
-      `### Campaign: "The ${name} Challenge"\n\nInvite ${audience.toLowerCase()} to share their biggest ${industry.toLowerCase()} pain point. ${name} will solve the top-voted problem live on social media.\n\n**Why it works:** User-generated content + problem-solving = massive engagement and shareability.\n\n**Platforms:** ${platforms.join(", ")}`,
-      `### Campaign: "${industry} Myth Busters"\n\nCreate a series debunking common myths about ${product.toLowerCase()} in the ${industry.toLowerCase()} space. Use short-form video with shocking statistics.\n\n**Why it works:** Contrarian content gets shared more. Position ${name} as the truth-teller in a crowded market.`,
-      `### Campaign: "Behind the Build"\n\nDocument ${name}'s journey of building ${product} in a docu-series format. Show the real challenges, pivots, and wins.\n\n**Why it works:** Authenticity drives connection. ${audience} will root for ${name} and become loyal advocates.`,
+      `### Campaign: "The ${name} Challenge"
+
+Invite ${audience.toLowerCase()} to share their biggest ${industry.toLowerCase()} pain point. ${name} will solve the top-voted problem live on social media.
+
+**Why it works:** User-generated content plus problem-solving creates engagement and shareability.
+
+**Platforms:** ${platforms.join(", ")}`,
+      `### Campaign: "${industry} Myth Busters"
+
+Create a series debunking common myths about ${product.toLowerCase()} in the ${industry.toLowerCase()} space. Use short-form video with strong statistics.
+
+**Why it works:** Contrarian content gets shared more and positions ${name} as the truth-teller in a crowded market.`,
+      `### Campaign: "Behind the Build"
+
+Document ${name}'s journey of building ${product} in a docu-series format. Show the real challenges, pivots, and wins.
+
+**Why it works:** Authenticity drives connection. ${audience} will root for ${name} and become loyal advocates.`,
     ],
     competitor: [
-      `### Competitive Landscape\n\n**Key Competitors:** ${competitors || "Market leaders in " + industry}\n\n**Their Strengths:**\n- Established brand recognition\n- Larger marketing budgets\n- Existing customer base\n\n**Their Weaknesses:**\n- Generic messaging that doesn't resonate with ${audience.toLowerCase()}\n- Slow to adopt new ${industry.toLowerCase()} trends\n- Poor customer support experience\n\n**Your Differentiation Opportunities:**\n1. Hyper-personalized ${tone.toLowerCase()} messaging\n2. Focus on ${goal.toLowerCase()} with measurable ROI\n3. Community-driven approach on ${platforms.join(" & ")}`,
-      `### Content Gaps to Exploit\n\n- Competitors lack video content about ${product}\n- No one is creating interactive tools/calculators for ${audience.toLowerCase()}\n- Limited presence on ${platforms.filter((p) => p === "TikTok" || p === "YouTube").join(" & ") || "emerging platforms"}\n- No competitor offers a free educational resource/course about ${industry.toLowerCase()}`,
+      `### Competitive Landscape
+
+**Key Competitors:** ${competitors || "Market leaders in " + industry}
+
+**Their Strengths:**
+- Established brand recognition
+- Larger marketing budgets
+- Existing customer base
+
+**Their Weaknesses:**
+- Generic messaging that doesn't resonate with ${audience.toLowerCase()}
+- Slow to adopt new ${industry.toLowerCase()} trends
+- Poor customer support experience
+
+**Your Differentiation Opportunities:**
+1. Hyper-personalized ${tone.toLowerCase()} messaging
+2. Focus on ${goal.toLowerCase()} with measurable ROI
+3. Community-driven approach on ${platforms.join(" & ")}`,
+      `### Content Gaps to Exploit
+
+- Competitors lack video content about ${product}
+- No one is creating interactive tools or calculators for ${audience.toLowerCase()}
+- Limited presence on ${platforms.filter((p) => p === "TikTok" || p === "YouTube").join(" & ") || "emerging platforms"}
+- No competitor offers a free educational resource or course about ${industry.toLowerCase()}`,
     ],
     engagement: [
-      `### Attract Users\n\n1. **Free ${industry} Resource:** Create a downloadable guide that solves a key pain point for ${audience.toLowerCase()}\n2. **Interactive Quiz:** "What type of ${product.toLowerCase()} user are you?" — generates personalized recommendations\n3. **Webinar Series:** Monthly expert sessions on ${industry.toLowerCase()} topics\n\n### Increase Shares & Comments\n\n1. **Debate Posts:** "Unpopular opinion: [Hot take about ${industry}]"\n2. **User Spotlights:** Feature customers weekly\n3. **Polls & Questions:** Simple engagement drivers\n\n### Convert Followers to Customers\n\n1. **Exclusive Follower Discounts:** "Social-only" deals\n2. **Limited Free Trials:** Through social DMs only\n3. **Retargeting:** Use engagement data for precise ad targeting`,
+      `### Attract Users
+
+1. **Free ${industry} Resource:** Create a downloadable guide that solves a key pain point for ${audience.toLowerCase()}
+2. **Interactive Quiz:** "What type of ${product.toLowerCase()} user are you?" - generates personalized recommendations
+3. **Webinar Series:** Monthly expert sessions on ${industry.toLowerCase()} topics
+
+### Increase Shares and Comments
+
+1. **Debate Posts:** "Unpopular opinion: [Hot take about ${industry}]"
+2. **User Spotlights:** Feature customers weekly
+3. **Polls and Questions:** Simple engagement drivers
+
+### Convert Followers to Customers
+
+1. **Exclusive Follower Discounts:** "Social-only" deals
+2. **Limited Free Trials:** Through social DMs only
+3. **Retargeting:** Use engagement data for precise ad targeting`,
     ],
   };
 
@@ -60,15 +201,40 @@ export default function Index() {
     });
   };
 
-  const handleGenerate = (task: TaskId) => {
+  const handleGenerate = async (task: TaskId) => {
     if (!companyData) return;
+
     setIsGenerating(true);
-    setTimeout(() => {
-      const content = generateMockContent(task, companyData);
+
+    try {
+      const content =
+        task === "ads"
+          ? await generateProfessionalAdCopies(companyData)
+          : generateMockContent(task, companyData);
+
       setGeneratedContent((prev) => ({ ...prev, [task]: content }));
+      toast.success("Content generated!", {
+        description:
+          task === "ads" && hasLovableGatewayConfig()
+            ? "Professional ad copy was generated through the Lovable API gateway."
+            : "Review and copy what you need.",
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "An unexpected error occurred while generating content.";
+
+      if (task === "ads") {
+        const fallbackContent = generateMockContent(task, companyData);
+        setGeneratedContent((prev) => ({ ...prev, [task]: fallbackContent }));
+        toast.error("Lovable gateway unavailable", {
+          description: `${message} Showing polished local backup copy so you can keep working.`,
+        });
+      } else {
+        toast.error("Generation failed", { description: message });
+      }
+    } finally {
       setIsGenerating(false);
-      toast.success("Content generated!", { description: "Review and copy what you need." });
-    }, 1500);
+    }
   };
 
   const handleRegenerate = (task: TaskId, _index: number) => {
@@ -76,27 +242,35 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50">
-      <div className="mx-auto flex min-h-screen w-full max-w-[1500px] gap-4 p-4 lg:gap-6 lg:p-6">
-        <AppSidebar
-          activeTask={activeTask}
-          onTaskChange={setActiveTask}
-          hasCompanyData={!!companyData}
-        />
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float" />
+      <div
+        className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-float"
+        style={{ animationDelay: "2s" }}
+      />
 
-        <main className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-3xl border border-indigo-100 bg-white/95 shadow-2xl shadow-indigo-100/70">
-          <div className="border-b border-indigo-100/80 px-6 py-5 lg:px-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-indigo-500">AI Marketing Studio</p>
-            <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h1 className="text-2xl font-semibold text-slate-900 lg:text-3xl">Build campaign-ready content in minutes</h1>
-                <p className="mt-1 text-sm text-slate-600">Complete your brand profile once and generate ideas for every growth channel.</p>
+      <TopNavigation
+        activeTask={activeTask}
+        onTaskChange={setActiveTask}
+        hasCompanyData={!!companyData}
+      />
+
+      <main className="container mx-auto px-6 py-12 relative z-10">
+        {!companyData ? (
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl ai-gradient mb-6 glow animate-pulse-glow">
+                <Sparkles className="h-12 w-12 text-primary-foreground" />
               </div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
-                {companyData ? <Sparkles className="h-3.5 w-3.5" /> : <WandSparkles className="h-3.5 w-3.5" />}
-                {companyData ? `Brand loaded: ${companyData.name}` : "Setup required"}
-              </div>
+              <h1 className="font-display text-5xl font-bold mb-4 bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent">
+                Welcome to MarketAI
+              </h1>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                Generate tailored marketing content for your business with AI-powered insights and creative strategies.
+              </p>
             </div>
+            <CompanyForm onSubmit={handleCompanySubmit} />
           </div>
 
           <div className="min-h-0 flex-1 overflow-hidden">
