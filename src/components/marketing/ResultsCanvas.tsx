@@ -3,6 +3,7 @@ import type { CompanyData } from "./CompanyForm";
 import ResultCard from "./ResultCard";
 import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface GeneratedContent {
   [key: string]: string[];
