@@ -61,7 +61,7 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
       <div className="container flex h-16 max-w-screen-2xl items-center justify-between px-6">
         {/* Logo Section */}
         <div className="flex items-center space-x-3">
@@ -95,7 +95,7 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
                   "flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                   isActive
                     ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-white/5",
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
                   !hasCompanyData && "opacity-50 cursor-not-allowed hover:bg-transparent hover:text-muted-foreground"
                 )}
               >
@@ -109,7 +109,7 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
         {/* Right Side Controls */}
         <div className="flex items-center space-x-3">
           {/* Status Indicator */}
-          <div className="hidden sm:flex items-center space-x-2 rounded-full bg-white/5 px-3 py-1.5 border border-white/10">
+          <div className="hidden sm:flex items-center space-x-2 rounded-full bg-muted px-3 py-1.5 border border-border">
             <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
             <span className="text-xs text-muted-foreground font-medium">AI online</span>
           </div>
@@ -119,7 +119,7 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
             variant="ghost"
             size="icon"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="h-9 w-9 rounded-lg hover:bg-white/10"
+            className="h-9 w-9 rounded-lg hover:bg-muted"
           >
             <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
@@ -130,7 +130,7 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-9 w-9 rounded-lg p-0 hover:bg-white/10">
+                <Button variant="ghost" className="relative h-9 w-9 rounded-lg p-0 hover:bg-muted">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={user.avatar} alt={user.name} />
                     <AvatarFallback className="bg-gradient-to-br from-primary/30 to-secondary/30 text-primary font-medium text-xs">
@@ -160,7 +160,7 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
       </div>
 
       {/* Mobile Navigation */}
-      <div className="md:hidden border-t border-white/10 bg-background/50">
+      <div className="md:hidden border-t border-border bg-background/50">
         <nav className="flex overflow-x-auto px-4 py-3 space-x-2 scrollbar-hide">
           {tasks.map((task) => {
             const Icon = task.icon;
@@ -174,7 +174,7 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
                   "flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-200",
                   isActive
                     ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-white/5",
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
                   !hasCompanyData && "opacity-50 cursor-not-allowed hover:bg-transparent hover:text-muted-foreground"
                 )}
               >
