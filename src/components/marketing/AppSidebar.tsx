@@ -43,33 +43,28 @@ export default function AppSidebar({ activeTask, onTaskChange, hasCompanyData }:
   return (
     <aside
       className={cn(
-        "flex flex-col border-r border-border bg-card transition-all duration-200",
-        collapsed ? "w-16" : "w-60"
+        "flex h-[calc(100vh-2rem)] flex-col rounded-3xl border border-indigo-100 bg-white/90 text-slate-700 shadow-lg shadow-indigo-100/70 transition-all duration-200 lg:h-[calc(100vh-3rem)]",
+        collapsed ? "w-16" : "w-64"
       )}
     >
-      <div className="flex items-center gap-2 p-4 border-b border-border">
+      <div className="flex items-center gap-2 border-b border-indigo-100 p-4">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg ai-gradient">
           <Sparkles className="h-4 w-4 text-primary-foreground" />
         </div>
         {!collapsed && (
-          <span className="font-display font-bold text-base tracking-tight">
+          <span className="font-display text-base font-bold tracking-tight text-slate-900">
             MarketAI
           </span>
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="ml-auto rounded-md p-1 hover:bg-muted text-muted-foreground"
+          className="ml-auto rounded-md p-1 text-slate-500 hover:bg-indigo-50 hover:text-slate-800"
         >
-          <ChevronLeft
-            className={cn(
-              "h-4 w-4 transition-transform",
-              collapsed && "rotate-180"
-            )}
-          />
+          <ChevronLeft className={cn("h-4 w-4 transition-transform", collapsed && "rotate-180")} />
         </button>
       </div>
 
-      <nav className="flex-1 p-2 space-y-1">
+      <nav className="flex-1 space-y-1 p-2">
         {tasks.map((task) => {
           const Icon = task.icon;
           const isActive = activeTask === task.id;
@@ -79,11 +74,11 @@ export default function AppSidebar({ activeTask, onTaskChange, hasCompanyData }:
               onClick={() => onTaskChange(task.id)}
               disabled={!hasCompanyData}
               className={cn(
-                "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                !hasCompanyData && "opacity-40 cursor-not-allowed"
+                  ? "bg-indigo-600 text-white shadow-sm"
+                  : "text-slate-600 hover:bg-indigo-50 hover:text-indigo-700",
+                !hasCompanyData && "cursor-not-allowed opacity-40"
               )}
             >
               <Icon className="h-4 w-4 shrink-0" />
@@ -94,8 +89,8 @@ export default function AppSidebar({ activeTask, onTaskChange, hasCompanyData }:
       </nav>
 
       {!collapsed && (
-        <div className="p-4 border-t border-border">
-          <p className="text-xs text-muted-foreground">
+        <div className="border-t border-indigo-100 p-4">
+          <p className="text-xs text-slate-500">
             {hasCompanyData
               ? "Select a task to generate content"
               : "Enter company details to begin"}

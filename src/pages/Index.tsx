@@ -3,6 +3,7 @@ import AppSidebar, { type TaskId } from "@/components/marketing/AppSidebar";
 import CompanyForm, { type CompanyData } from "@/components/marketing/CompanyForm";
 import ResultsCanvas from "@/components/marketing/ResultsCanvas";
 import { toast } from "sonner";
+import { Sparkles, WandSparkles } from "lucide-react";
 
 // Mock generation - will be replaced with AI
 function generateMockContent(task: TaskId, data: CompanyData): string[] {
@@ -62,7 +63,6 @@ export default function Index() {
   const handleGenerate = (task: TaskId) => {
     if (!companyData) return;
     setIsGenerating(true);
-    // Simulate AI generation delay
     setTimeout(() => {
       const content = generateMockContent(task, companyData);
       setGeneratedContent((prev) => ({ ...prev, [task]: content }));
@@ -76,31 +76,57 @@ export default function Index() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <AppSidebar
-        activeTask={activeTask}
-        onTaskChange={setActiveTask}
-        hasCompanyData={!!companyData}
-      />
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50">
+      <div className="mx-auto flex min-h-screen w-full max-w-[1500px] gap-4 p-4 lg:gap-6 lg:p-6">
+        <AppSidebar
+          activeTask={activeTask}
+          onTaskChange={setActiveTask}
+          hasCompanyData={!!companyData}
+        />
 
-      <main className="flex-1 flex overflow-hidden">
-        {!companyData ? (
-          <div className="flex-1 flex items-center justify-center p-6">
-            <div className="w-full max-w-lg">
-              <CompanyForm onSubmit={handleCompanySubmit} />
+        <main className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-3xl border border-indigo-100 bg-white/95 shadow-2xl shadow-indigo-100/70">
+          <div className="border-b border-indigo-100/80 px-6 py-5 lg:px-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-indigo-500">AI Marketing Studio</p>
+            <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h1 className="text-2xl font-semibold text-slate-900 lg:text-3xl">Build campaign-ready content in minutes</h1>
+                <p className="mt-1 text-sm text-slate-600">Complete your brand profile once and generate ideas for every growth channel.</p>
+              </div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
+                {companyData ? <Sparkles className="h-3.5 w-3.5" /> : <WandSparkles className="h-3.5 w-3.5" />}
+                {companyData ? `Brand loaded: ${companyData.name}` : "Setup required"}
+              </div>
             </div>
           </div>
-        ) : (
-          <ResultsCanvas
-            activeTask={activeTask}
-            companyData={companyData}
-            generatedContent={generatedContent}
-            isGenerating={isGenerating}
-            onGenerate={handleGenerate}
-            onRegenerate={handleRegenerate}
-          />
-        )}
-      </main>
+
+          <div className="min-h-0 flex-1 overflow-hidden">
+            {!companyData ? (
+              <div className="grid h-full grid-cols-1 gap-6 overflow-y-auto p-6 lg:grid-cols-[2fr_1fr] lg:p-8">
+                <div className="rounded-2xl border border-indigo-100 bg-white p-6 shadow-sm lg:p-8">
+                  <CompanyForm onSubmit={handleCompanySubmit} />
+                </div>
+                <div className="rounded-2xl border border-indigo-100 bg-indigo-50/60 p-6">
+                  <h2 className="font-display text-lg font-semibold text-slate-900">How it works</h2>
+                  <ol className="mt-4 space-y-4 text-sm text-slate-700">
+                    <li><span className="font-semibold text-indigo-700">1.</span> Add your company profile and positioning details.</li>
+                    <li><span className="font-semibold text-indigo-700">2.</span> Pick a strategy task in the left navigation.</li>
+                    <li><span className="font-semibold text-indigo-700">3.</span> Generate, copy, and iterate campaign-ready ideas.</li>
+                  </ol>
+                </div>
+              </div>
+            ) : (
+              <ResultsCanvas
+                activeTask={activeTask}
+                companyData={companyData}
+                generatedContent={generatedContent}
+                isGenerating={isGenerating}
+                onGenerate={handleGenerate}
+                onRegenerate={handleRegenerate}
+              />
+            )}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

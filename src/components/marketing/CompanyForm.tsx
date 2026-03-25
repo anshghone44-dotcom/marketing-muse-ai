@@ -63,22 +63,22 @@ export default function CompanyForm({ onSubmit, initialData }: Props) {
     data.name && data.product && data.audience && data.industry && data.goal && data.tone && data.platforms.length > 0;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6 text-slate-900">
       <div>
-        <h2 className="font-display text-lg font-semibold">Company Profile</h2>
-        <p className="text-sm text-muted-foreground mt-0.5">
+        <h2 className="font-display text-2xl font-semibold text-slate-900">Company Profile</h2>
+        <p className="mt-1 text-sm text-slate-600">
           Tell us about your business to generate tailored content.
         </p>
       </div>
 
       <div className="grid gap-4">
         <div className="grid gap-1.5">
-          <Label htmlFor="name">Company Name</Label>
+          <Label htmlFor="name" className="text-slate-700">Company Name</Label>
           <Input id="name" placeholder="Acme Inc." value={data.name} onChange={(e) => update("name", e.target.value)} />
         </div>
 
         <div className="grid gap-1.5">
-          <Label htmlFor="product">Product / Service</Label>
+          <Label htmlFor="product" className="text-slate-700">Product / Service</Label>
           <Textarea
             id="product"
             placeholder="Describe your product or service..."
@@ -88,9 +88,9 @@ export default function CompanyForm({ onSubmit, initialData }: Props) {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="grid gap-1.5">
-            <Label htmlFor="audience">Target Audience</Label>
+            <Label htmlFor="audience" className="text-slate-700">Target Audience</Label>
             <Input
               id="audience"
               placeholder="e.g. Small business owners"
@@ -99,7 +99,7 @@ export default function CompanyForm({ onSubmit, initialData }: Props) {
             />
           </div>
           <div className="grid gap-1.5">
-            <Label htmlFor="industry">Industry</Label>
+            <Label htmlFor="industry" className="text-slate-700">Industry</Label>
             <Input
               id="industry"
               placeholder="e.g. SaaS, Fashion"
@@ -109,9 +109,9 @@ export default function CompanyForm({ onSubmit, initialData }: Props) {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="grid gap-1.5">
-            <Label>Marketing Goal</Label>
+            <Label className="text-slate-700">Marketing Goal</Label>
             <Select value={data.goal} onValueChange={(v) => update("goal", v)}>
               <SelectTrigger><SelectValue placeholder="Select goal" /></SelectTrigger>
               <SelectContent>
@@ -122,7 +122,7 @@ export default function CompanyForm({ onSubmit, initialData }: Props) {
             </Select>
           </div>
           <div className="grid gap-1.5">
-            <Label>Brand Tone</Label>
+            <Label className="text-slate-700">Brand Tone</Label>
             <Select value={data.tone} onValueChange={(v) => update("tone", v)}>
               <SelectTrigger><SelectValue placeholder="Select tone" /></SelectTrigger>
               <SelectContent>
@@ -135,7 +135,7 @@ export default function CompanyForm({ onSubmit, initialData }: Props) {
         </div>
 
         <div className="grid gap-1.5">
-          <Label>Target Platforms</Label>
+          <Label className="text-slate-700">Target Platforms</Label>
           <div className="flex flex-wrap gap-2">
             {PLATFORMS.map((p) => (
               <Badge
@@ -152,7 +152,7 @@ export default function CompanyForm({ onSubmit, initialData }: Props) {
         </div>
 
         <div className="grid gap-1.5">
-          <Label htmlFor="competitors">Competitors (optional)</Label>
+          <Label htmlFor="competitors" className="text-slate-700">Competitors (optional)</Label>
           <Input
             id="competitors"
             placeholder="e.g. CompetitorA, CompetitorB"
@@ -165,7 +165,7 @@ export default function CompanyForm({ onSubmit, initialData }: Props) {
       <Button
         variant="ai"
         size="lg"
-        className="w-full"
+        className="w-full shadow-lg shadow-indigo-300/40"
         disabled={!isValid}
         onClick={() => onSubmit(data)}
       >
