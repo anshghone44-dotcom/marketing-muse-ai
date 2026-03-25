@@ -74,9 +74,9 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
             </div>
             <div className="flex flex-col">
               <span className="font-display text-base font-bold tracking-tight text-foreground">
-                Marketing Muse AI
+                LeadBot
               </span>
-              <span className="text-xs font-medium text-primary">Creation</span>
+              <span className="text-xs font-medium text-primary">AI Marketing Engine</span>
             </div>
           </a>
         </div>

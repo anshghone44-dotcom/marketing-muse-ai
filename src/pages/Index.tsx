@@ -264,7 +264,7 @@ export default function Index() {
                 <Sparkles className="h-12 w-12 text-primary-foreground" />
               </div>
               <h1 className="font-display text-5xl font-bold mb-4 bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent">
-                Welcome to MarketAI
+                Welcome to LeadBot
               </h1>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
                 Generate tailored marketing content for your business with AI-powered insights and creative strategies.

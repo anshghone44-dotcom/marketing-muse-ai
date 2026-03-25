@@ -53,7 +53,7 @@ export default function AppSidebar({ activeTask, onTaskChange, hasCompanyData }:
         </div>
         {!collapsed && (
           <span className="font-display text-base font-bold tracking-tight text-white">
-            MarketAI
+            LeadBot
           </span>
         )}
         <button
