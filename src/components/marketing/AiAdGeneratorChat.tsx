@@ -91,7 +91,7 @@ function CampaignCard({ campaign }: { campaign: AdCampaign }) {
     SOCIAL_PLATFORMS.find((p) => p.id === campaign.platform)?.icon || Megaphone;
 
   return (
-    <div className="bg-card/40 backdrop-blur-xl border border-border/20 rounded-3xl overflow-hidden shadow-sm text-left">
+    <div className="bg-card backdrop-blur-xl border border-border/40 rounded-[2rem] overflow-hidden shadow-sm text-left">
       <div
         className={cn(
           "bg-gradient-to-br p-6 flex items-center justify-between",
@@ -99,7 +99,7 @@ function CampaignCard({ campaign }: { campaign: AdCampaign }) {
         )}
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center">
+          <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center">
             <PlatformIcon className="w-5 h-5 text-white" />
           </div>
           <div className="text-left">
@@ -281,73 +281,110 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
   };
 
   return (
-    <div className="flex flex-col h-[85vh] max-w-6xl mx-auto relative bg-transparent overflow-hidden">
-      {/* ── Empty State ── */}
+    <div className="flex flex-col h-[85vh] max-w-5xl mx-auto relative bg-transparent overflow-y-auto px-4 py-8">
+      {/* ── Header Card ── */}
       {messages.length === 0 && !isGenerating && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-24 pointer-events-none px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-sans font-bold tracking-tight text-foreground mb-4 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-            LeadBot <span className="font-light text-muted-foreground/60">Ad Creator</span>
+        <div className="w-full bg-card/80 border border-border/40 rounded-[2.5rem] p-12 mb-8 text-center shadow-sm backdrop-blur-sm animate-in fade-in slide-in-from-bottom-8 duration-700">
+          <h1 className="text-4xl md:text-5xl font-sans font-bold tracking-tight text-foreground mb-4">
+            LeadBot <span className="font-semibold text-muted-foreground/60">Ad Creator</span>
           </h1>
-          <p className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed opacity-80 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-200">
-            Describe your campaign goal and let Gemini AI craft professional ad copy for every platform you choose.
+          <p className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
+            Describe your campaign goal and let Isaac AI craft professional ad copy for every platform.
           </p>
         </div>
       )}
 
-      {/* ── Platform selector bar (Modern Tech Style) ── */}
-      <div className="flex-shrink-0 px-6 pt-4 flex flex-wrap items-center gap-2 justify-center">
-        {SOCIAL_PLATFORMS.map(({ id, icon: Icon, color }) => {
-          const selected = selectedPlatforms.includes(id);
-          return (
-            <button
-              key={id}
-              onClick={() => togglePlatform(id)}
-              className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-semibold border transition-all duration-300",
-                selected
-                  ? "bg-primary text-primary-foreground border-primary shadow-lg ring-2 ring-primary/20 scale-105"
-                  : "bg-background/50 border-border/40 text-muted-foreground hover:border-primary/30 hover:bg-muted/50"
-              )}
-            >
-              <Icon className={cn("w-4 h-4", selected ? "text-primary-foreground" : color)} />
-              {id}
-            </button>
-          );
-        })}
-
-        {/* Goal selector */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-semibold border border-border/40 bg-background/50 text-muted-foreground hover:border-primary/30 hover:bg-muted/50 transition-all">
-              <BarChart3 className="w-4 h-4 text-primary" />
-              Goal: {selectedGoal}
-              <ChevronDown className="w-3.5 h-3.5 opacity-50" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="center" className="w-56 bg-background/95 backdrop-blur-xl border border-border/40 rounded-2xl p-1.5 shadow-2xl">
-            {AD_GOALS.map((goal) => (
-              <DropdownMenuItem
-                key={goal}
-                onClick={() => setSelectedGoal(goal)}
+      {/* ── Platform selection chips (Modern minimalist style) ── */}
+      {messages.length === 0 && !isGenerating && (
+        <div className="flex flex-wrap items-center gap-2 justify-center mb-10 animate-in fade-in slide-in-from-bottom-12 duration-700 delay-100">
+          {SOCIAL_PLATFORMS.map(({ id }) => {
+            const selected = selectedPlatforms.includes(id);
+            return (
+              <button
+                key={id}
+                onClick={() => togglePlatform(id)}
                 className={cn(
-                  "rounded-xl px-3 py-2.5 text-sm cursor-pointer transition-colors",
-                  selectedGoal === goal ? "text-primary font-bold bg-primary/10" : "hover:bg-muted"
+                  "px-5 py-2 rounded-full text-[12px] font-semibold border transition-all duration-300",
+                  selected
+                    ? "bg-muted border-border/60 text-foreground"
+                    : "bg-background border-border/30 text-muted-foreground hover:border-primary/20"
                 )}
               >
-                <div className="flex items-center justify-between w-full">
-                  {goal}
-                  {selectedGoal === goal && <Check className="w-4 h-4 text-primary" />}
-                </div>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+                {id}
+              </button>
+            );
+          })}
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="px-5 py-2 rounded-full text-[12px] font-semibold border border-purple-200/50 bg-purple-50/30 text-purple-600 hover:bg-purple-100/50 transition-all flex items-center gap-1">
+                Goal: {selectedGoal}
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="center" className="w-56 bg-background/95 backdrop-blur-xl border border-border/40 rounded-2xl p-1.5 shadow-2xl">
+              {AD_GOALS.map((goal) => (
+                <DropdownMenuItem
+                  key={goal}
+                  onClick={() => setSelectedGoal(goal)}
+                  className={cn(
+                    "rounded-xl px-3 py-2.5 text-sm cursor-pointer transition-colors",
+                    selectedGoal === goal ? "text-primary font-bold bg-primary/20" : "hover:bg-muted"
+                  )}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    {goal}
+                    {selectedGoal === goal && <Check className="w-4 h-4 text-primary" />}
+                  </div>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )}
 
-      {/* ── Chat Messages ── */}
+      {/* ── Campaign Input Card ── */}
+      {messages.length === 0 && !isGenerating && (
+        <div className="w-full bg-card/30 border border-border/20 rounded-[2.5rem] p-8 md:p-10 shadow-sm backdrop-blur-sm animate-in fade-in slide-in-from-bottom-16 duration-700 delay-200 text-left">
+          <label className="block text-sm font-bold text-foreground mb-4">
+            Campaign goal
+          </label>
+          <div className="relative group">
+            <Textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) =>
+                e.key === "Enter" &&
+                !e.shiftKey &&
+                (e.preventDefault(), generateAds(input))
+              }
+              placeholder="Describe your campaign goal (e.g. acquire 500 ecommerce leads in 30 days)..."
+              className="w-full min-h-[120px] bg-background border border-border/40 rounded-2xl p-6 text-sm resize-none focus:border-primary/40 transition-shadow hover:shadow-md"
+            />
+            <div className="absolute top-1/2 -translate-y-1/2 right-6">
+               <Button
+                onClick={() => generateAds(input)}
+                disabled={isGenerating || !input.trim()}
+                className="h-12 px-8 rounded-xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:opacity-90 transition-all shadow-md"
+              >
+                {isGenerating ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : "Generate"}
+              </Button>
+            </div>
+          </div>
+          <p className="mt-4 text-[11px] text-muted-foreground opacity-60">
+            Powering results with Gemini-inspired professional ads format.
+          </p>
+        </div>
+      )}
+
+      {/* ── Chat Content (After Generation) ── */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto p-6 md:p-10 space-y-12 scroll-smooth"
+        className={cn(
+          "space-y-12 scroll-smooth",
+          messages.length > 0 ? "flex-1 overflow-y-auto" : "hidden"
+        )}
       >
         {messages.map((m) => (
           <div
@@ -357,13 +394,13 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
               m.role === "user" ? "justify-end" : "justify-start"
             )}
           >
-            <div className={cn("max-w-[90%] space-y-4", m.role === "user" ? "items-end" : "items-start")}>
+            <div className={cn("max-w-4xl w-full space-y-4", m.role === "user" ? "items-end" : "items-start")}>
               <div
                 className={cn(
-                  "p-6 md:p-8 rounded-3xl text-sm leading-relaxed overflow-hidden shadow-sm text-left w-full",
+                  "p-8 md:p-10 rounded-[2.5rem] text-sm leading-relaxed overflow-hidden shadow-sm text-left w-full",
                   m.role === "user"
-                    ? "bg-muted/50 text-foreground border border-border/40"
-                    : "bg-card/40 backdrop-blur-xl border border-border/10 text-foreground"
+                    ? "bg-muted/30 text-foreground border border-border/40"
+                    : "bg-card border border-border/20 text-foreground"
                 )}
               >
                 <div className="prose prose-sm dark:prose-invert font-medium text-left max-w-none">
@@ -372,24 +409,24 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
 
                 {/* ── Campaign Results ── */}
                 {m.result && (
-                  <div className="mt-8 space-y-10 border-t border-border/10 pt-10 text-left">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="bg-muted/20 border border-border/10 rounded-2xl p-5 space-y-2 text-left">
+                  <div className="mt-12 space-y-12 border-t border-border/10 pt-12 text-left">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="bg-muted/10 border border-border/10 rounded-[2rem] p-6 space-y-3">
                         <div className="flex items-center gap-2 text-primary">
-                          <TrendingUp className="w-4 h-4" />
+                          <TrendingUp className="w-5 h-5" />
                           <span className="text-[10px] font-bold uppercase tracking-widest">Overall Strategy</span>
                         </div>
-                        <p className="text-sm text-muted-foreground leading-relaxed text-left">{m.result.overallStrategy}</p>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{m.result.overallStrategy}</p>
                       </div>
-                      <div className="bg-muted/20 border border-border/10 rounded-2xl p-5 space-y-2 text-left">
+                      <div className="bg-muted/10 border border-border/10 rounded-[2rem] p-6 space-y-3">
                         <div className="flex items-center gap-2 text-primary">
-                          <BarChart3 className="w-4 h-4" />
+                          <BarChart3 className="w-5 h-5" />
                           <span className="text-[10px] font-bold uppercase tracking-widest">KPIs to Track</span>
                         </div>
-                        <ul className="space-y-1 text-left">
+                        <ul className="space-y-2">
                           {m.result.kpis.map((kpi, i) => (
-                            <li key={i} className="text-sm text-muted-foreground flex items-start gap-2 text-left">
-                              <Check className="w-3.5 h-3.5 text-primary mt-0.5 shrink-0" />
+                            <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
+                              <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />
                               {kpi}
                             </li>
                           ))}
@@ -397,20 +434,12 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
                       </div>
                     </div>
 
-                    <div className="bg-primary/5 border border-primary/15 rounded-2xl p-4 flex items-start gap-3 text-left">
-                      <Lightbulb className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                      <div>
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1 text-left">Budget Recommendation</p>
-                        <p className="text-sm text-muted-foreground text-left">{m.result.budgetRecommendation}</p>
+                    <div className="space-y-8">
+                      <div className="flex items-center gap-2">
+                        <Megaphone className="w-6 h-6 text-primary" />
+                        <h2 className="text-xl font-bold tracking-tight">Platform Campaigns</h2>
                       </div>
-                    </div>
-
-                    <div className="space-y-6">
-                      <div className="flex items-center gap-2 text-left">
-                        <Megaphone className="w-5 h-5 text-primary" />
-                        <h2 className="text-lg font-bold tracking-tight">Platform Campaigns</h2>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {m.result.campaigns.map((camp, i) => (
                           <CampaignCard key={i} campaign={camp} />
                         ))}
@@ -424,109 +453,26 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
         ))}
 
         {isGenerating && (
-          <div className="flex items-center gap-4 p-6 bg-muted/20 rounded-3xl max-w-fit animate-pulse">
-            <Loader2 className="w-5 h-5 animate-spin text-primary" />
-            <span className="text-sm font-semibold tracking-tight">{generatingLabel}</span>
+          <div className="flex items-center gap-4 p-8 bg-muted/20 rounded-[2rem] max-w-fit animate-pulse">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+            <span className="text-base font-semibold tracking-tight">{generatingLabel}</span>
           </div>
         )}
       </div>
 
-      {/* ── Input Console (Modern Tech Style) ── */}
-      <div className="pb-10 px-6">
-        <div className="max-w-3xl mx-auto relative flex items-center">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                className={cn(
-                  "absolute left-6 z-10 p-2 hover:bg-muted rounded-full transition-all text-muted-foreground",
-                  selectedSource && "bg-primary/10 text-primary"
-                )}
-              >
-                <Plus
-                  className={cn(
-                    "w-6 h-6 transition-transform",
-                    selectedSource ? "rotate-45" : ""
-                  )}
-                />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="start"
-              className="w-64 p-2 bg-background/95 backdrop-blur-xl border border-border/40 shadow-2xl rounded-2xl"
-            >
-              <DropdownMenuItem
-                onClick={() => setSelectedSource("platforms")}
-                className="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-muted"
-              >
-                <Megaphone className="w-4 h-4 text-orange-500" />
-                <div className="flex flex-col">
-                  <span className="text-sm font-semibold">Ad Campaign</span>
-                  <span className="text-[10px] text-muted-foreground">
-                    Describe your campaign goal
-                  </span>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  setSelectedSource("files");
-                  fileInputRef.current?.click();
-                }}
-                className="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-muted"
-              >
-                <FileText className="w-4 h-4 text-blue-500" />
-                <div className="flex flex-col">
-                  <span className="text-sm font-semibold">Upload Brief</span>
-                  <span className="text-[10px] text-muted-foreground">PDF or DOC Files</span>
-                </div>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={() =>
-              toast.info("For best results, describe your campaign goal in the text box.")
-            }
-            className="hidden"
-            accept=".pdf,.doc,.docx"
-          />
-
-          <Textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) =>
-              e.key === "Enter" &&
-              !e.shiftKey &&
-              (e.preventDefault(), generateAds(input))
-            }
-            placeholder="Describe your campaign goal (e.g. 'Generate leads for our new fitness app')..."
-            className="w-full min-h-[64px] bg-muted/40 border-border/40 rounded-[2rem] pl-16 pr-44 py-5 resize-none focus:border-primary/40 shadow-sm transition-shadow hover:shadow-md"
-          />
-
-          <div className="absolute right-3 flex items-center gap-2">
-            <Button
-              onClick={() => generateAds(input)}
-              disabled={isGenerating || !input.trim()}
-              className="h-11 px-6 rounded-full font-bold bg-gradient-to-r from-blue-600 to-violet-600 text-white hover:scale-105 transition-all shadow-lg active:scale-95 border-none"
-            >
-              {isGenerating ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <div className="flex items-center gap-2">
-                  <span>Generate</span>
-                  <ArrowRight className="w-4 h-4" />
-                </div>
-              )}
-            </Button>
-          </div>
-        </div>
-        <div className="flex items-center justify-center gap-8 mt-4 opacity-40">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Modern Ad Architecture</p>
-          <div className="w-1 h-1 rounded-full bg-border" />
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Cross-Platform Logic</p>
-        </div>
-      </div>
+      {/* ── Re-draft Button (Visible after results) ── */}
+      {messages.length > 0 && (
+         <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50">
+           <Button
+            onClick={() => { setMessages([]); setInput(""); }}
+            variant="outline"
+            className="rounded-full px-8 h-12 bg-background/80 backdrop-blur-md border-border/40 hover:bg-muted font-bold flex items-center gap-2"
+           >
+             <Plus className="w-4 h-4" />
+             Start New Campaign
+           </Button>
+         </div>
+      )}
     </div>
   );
 }
