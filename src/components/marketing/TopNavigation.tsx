@@ -44,12 +44,12 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
   const { theme, setTheme } = useTheme();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 max-w-screen-2xl items-center justify-between px-6">
         {/* Logo Section */}
         <div className="mr-8 flex items-center">
           <a href="/" className="flex items-center space-x-3 transition-opacity hover:opacity-90">
-            <span className="font-display text-2xl font-bold tracking-tight text-foreground sm:inline-block">
+            <span className="font-display text-lg font-bold tracking-tight text-foreground sm:inline-block">
               LeadBot
             </span>
           </a>

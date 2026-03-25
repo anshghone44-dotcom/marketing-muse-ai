@@ -111,7 +111,7 @@ export default function Index() {
         {!companyData ? (
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-16 animate-in fade-in slide-in-from-top-12 duration-1000">
-              <h1 className="font-display text-5xl md:text-7xl font-bold mb-6 tracking-tight bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent px-4">
+              <h1 className="font-display text-4xl md:text-5xl font-bold mb-6 tracking-tight bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent px-4">
                 Welcome to LeadBot
               </h1>
               <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed opacity-80">

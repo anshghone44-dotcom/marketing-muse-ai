@@ -175,8 +175,8 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
       {/* ── Empty State ── */}
       {messages.length === 0 && !isGenerating && (
         <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-24 pointer-events-none px-4 text-center">
-          <h1 className="text-5xl md:text-6xl font-sans font-bold tracking-tight text-foreground mb-4 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-            LeadBot Keyword Engine
+          <h1 className="text-4xl md:text-5xl font-sans font-bold tracking-tight text-foreground mb-4 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+            LeadBot <span className="font-light text-muted-foreground/60">Keyword Engine</span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed opacity-80 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-200">
             Generate high-precision keyword clusters, long-tail search opportunities, and competitor gap keywords in a single workflow.

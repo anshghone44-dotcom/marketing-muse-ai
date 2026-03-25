@@ -91,8 +91,7 @@ function CampaignCard({ campaign }: { campaign: AdCampaign }) {
     SOCIAL_PLATFORMS.find((p) => p.id === campaign.platform)?.icon || Megaphone;
 
   return (
-    <div className="bg-card/40 backdrop-blur-xl border border-border/20 rounded-3xl overflow-hidden shadow-sm">
-      {/* Platform header banner */}
+    <div className="bg-card/40 backdrop-blur-xl border border-border/20 rounded-3xl overflow-hidden shadow-sm text-left">
       <div
         className={cn(
           "bg-gradient-to-br p-6 flex items-center justify-between",
@@ -103,7 +102,7 @@ function CampaignCard({ campaign }: { campaign: AdCampaign }) {
           <div className="w-10 h-10 rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center">
             <PlatformIcon className="w-5 h-5 text-white" />
           </div>
-          <div>
+          <div className="text-left">
             <p className="text-[10px] font-bold uppercase tracking-widest text-white/70">
               Platform
             </p>
@@ -120,10 +119,8 @@ function CampaignCard({ campaign }: { campaign: AdCampaign }) {
         </div>
       </div>
 
-      {/* Ad preview */}
       <div className="p-6 space-y-5">
-        {/* Headline */}
-        <div className="space-y-1">
+        <div className="space-y-1 text-left">
           <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
             Headline
           </p>
@@ -132,8 +129,7 @@ function CampaignCard({ campaign }: { campaign: AdCampaign }) {
           </p>
         </div>
 
-        {/* Primary text */}
-        <div className="space-y-1">
+        <div className="space-y-1 text-left">
           <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
             Ad Copy
           </p>
@@ -142,7 +138,6 @@ function CampaignCard({ campaign }: { campaign: AdCampaign }) {
           </p>
         </div>
 
-        {/* CTA pill */}
         <div
           className={cn(
             "inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-black text-white shadow-lg",
@@ -153,8 +148,7 @@ function CampaignCard({ campaign }: { campaign: AdCampaign }) {
           {campaign.callToAction}
         </div>
 
-        {/* Target audience & hashtags row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-border/10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-border/10 text-left">
           <div className="space-y-1.5">
             <div className="flex items-center gap-1.5 text-muted-foreground">
               <Target className="w-3.5 h-3.5" />
@@ -181,9 +175,8 @@ function CampaignCard({ campaign }: { campaign: AdCampaign }) {
           </div>
         </div>
 
-        {/* Pro tips */}
         {campaign.proTips.length > 0 && (
-          <div className="space-y-2 pt-2 border-t border-border/10">
+          <div className="space-y-2 pt-2 border-t border-border/10 text-left">
             <div className="flex items-center gap-1.5 text-primary">
               <Lightbulb className="w-3.5 h-3.5" />
               <span className="text-[10px] font-bold uppercase tracking-widest">
@@ -191,7 +184,7 @@ function CampaignCard({ campaign }: { campaign: AdCampaign }) {
               </span>
             </div>
             {campaign.proTips.map((tip, i) => (
-              <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+              <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground text-left">
                 <Check className="w-3.5 h-3.5 text-primary mt-0.5 shrink-0" />
                 {tip}
               </div>
@@ -210,7 +203,6 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
   const [generatingLabel, setGeneratingLabel] = useState("Crafting campaigns…");
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([
     "Instagram",
-    "Facebook",
   ]);
   const [selectedGoal, setSelectedGoal] = useState("Lead Generation");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -290,16 +282,19 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
 
   return (
     <div className="flex flex-col h-[85vh] max-w-6xl mx-auto relative bg-transparent overflow-hidden">
+      {/* ── Empty State ── */}
+      {messages.length === 0 && !isGenerating && (
         <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-24 pointer-events-none px-4 text-center">
-          <h1 className="text-5xl md:text-6xl font-sans font-bold tracking-tight text-foreground mb-4 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-            LeadBot Ad Creator
+          <h1 className="text-4xl md:text-5xl font-sans font-bold tracking-tight text-foreground mb-4 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+            LeadBot <span className="font-light text-muted-foreground/60">Ad Creator</span>
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed opacity-80 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-200">
-            Describe your campaign goal and let Isaac AI craft professional ad copy for every platform.
+          <p className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed opacity-80 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-200">
+            Describe your campaign goal and let Gemini AI craft professional ad copy for every platform you choose.
           </p>
         </div>
+      )}
 
-      {/* ── Platform selector bar (always visible) ── */}
+      {/* ── Platform selector bar (Modern Tech Style) ── */}
       <div className="flex-shrink-0 px-6 pt-4 flex flex-wrap items-center gap-2 justify-center">
         {SOCIAL_PLATFORMS.map(({ id, icon: Icon, color }) => {
           const selected = selectedPlatforms.includes(id);
@@ -308,13 +303,13 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
               key={id}
               onClick={() => togglePlatform(id)}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all duration-200",
+                "flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-semibold border transition-all duration-300",
                 selected
-                  ? "bg-primary text-primary-foreground border-primary shadow-md scale-105"
-                  : "bg-muted/40 border-border/40 text-muted-foreground hover:bg-muted"
+                  ? "bg-primary text-primary-foreground border-primary shadow-lg ring-2 ring-primary/20 scale-105"
+                  : "bg-background/50 border-border/40 text-muted-foreground hover:border-primary/30 hover:bg-muted/50"
               )}
             >
-              <Icon className={cn("w-3.5 h-3.5", selected ? "text-primary-foreground" : color)} />
+              <Icon className={cn("w-4 h-4", selected ? "text-primary-foreground" : color)} />
               {id}
             </button>
           );
@@ -323,24 +318,26 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
         {/* Goal selector */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border border-border/40 bg-muted/40 text-muted-foreground hover:bg-muted transition-all">
-              <BarChart3 className="w-3.5 h-3.5 text-primary" />
+            <button className="flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-semibold border border-border/40 bg-background/50 text-muted-foreground hover:border-primary/30 hover:bg-muted/50 transition-all">
+              <BarChart3 className="w-4 h-4 text-primary" />
               Goal: {selectedGoal}
-              <ChevronDown className="w-3 h-3" />
+              <ChevronDown className="w-3.5 h-3.5 opacity-50" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="center" className="w-48 bg-background/95 backdrop-blur-xl border border-border/40 rounded-2xl p-1">
+          <DropdownMenuContent align="center" className="w-56 bg-background/95 backdrop-blur-xl border border-border/40 rounded-2xl p-1.5 shadow-2xl">
             {AD_GOALS.map((goal) => (
               <DropdownMenuItem
                 key={goal}
                 onClick={() => setSelectedGoal(goal)}
                 className={cn(
-                  "rounded-xl px-3 py-2 text-sm cursor-pointer",
-                  selectedGoal === goal && "text-primary font-bold bg-primary/5"
+                  "rounded-xl px-3 py-2.5 text-sm cursor-pointer transition-colors",
+                  selectedGoal === goal ? "text-primary font-bold bg-primary/10" : "hover:bg-muted"
                 )}
               >
-                {selectedGoal === goal && <Check className="w-3.5 h-3.5 mr-2 text-primary" />}
-                {goal}
+                <div className="flex items-center justify-between w-full">
+                  {goal}
+                  {selectedGoal === goal && <Check className="w-4 h-4 text-primary" />}
+                </div>
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
@@ -363,37 +360,35 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
             <div className={cn("max-w-[90%] space-y-4", m.role === "user" ? "items-end" : "items-start")}>
               <div
                 className={cn(
-                  "p-6 md:p-8 rounded-3xl text-base leading-relaxed overflow-hidden shadow-sm",
+                  "p-6 md:p-8 rounded-3xl text-sm leading-relaxed overflow-hidden shadow-sm text-left w-full",
                   m.role === "user"
                     ? "bg-muted/50 text-foreground border border-border/40"
                     : "bg-card/40 backdrop-blur-xl border border-border/10 text-foreground"
                 )}
               >
-                <div className="prose prose-base dark:prose-invert font-medium">
+                <div className="prose prose-sm dark:prose-invert font-medium text-left max-w-none">
                   <ReactMarkdown>{m.content}</ReactMarkdown>
                 </div>
 
                 {/* ── Campaign Results ── */}
                 {m.result && (
-                  <div className="mt-8 space-y-10 border-t border-border/10 pt-10">
-
-                    {/* Overall strategy + KPIs */}
+                  <div className="mt-8 space-y-10 border-t border-border/10 pt-10 text-left">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="bg-muted/20 border border-border/10 rounded-2xl p-5 space-y-2">
+                      <div className="bg-muted/20 border border-border/10 rounded-2xl p-5 space-y-2 text-left">
                         <div className="flex items-center gap-2 text-primary">
                           <TrendingUp className="w-4 h-4" />
                           <span className="text-[10px] font-bold uppercase tracking-widest">Overall Strategy</span>
                         </div>
-                        <p className="text-sm text-muted-foreground leading-relaxed">{m.result.overallStrategy}</p>
+                        <p className="text-sm text-muted-foreground leading-relaxed text-left">{m.result.overallStrategy}</p>
                       </div>
-                      <div className="bg-muted/20 border border-border/10 rounded-2xl p-5 space-y-2">
+                      <div className="bg-muted/20 border border-border/10 rounded-2xl p-5 space-y-2 text-left">
                         <div className="flex items-center gap-2 text-primary">
                           <BarChart3 className="w-4 h-4" />
                           <span className="text-[10px] font-bold uppercase tracking-widest">KPIs to Track</span>
                         </div>
-                        <ul className="space-y-1">
+                        <ul className="space-y-1 text-left">
                           {m.result.kpis.map((kpi, i) => (
-                            <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
+                            <li key={i} className="text-sm text-muted-foreground flex items-start gap-2 text-left">
                               <Check className="w-3.5 h-3.5 text-primary mt-0.5 shrink-0" />
                               {kpi}
                             </li>
@@ -402,18 +397,16 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
                       </div>
                     </div>
 
-                    {/* Budget */}
-                    <div className="bg-primary/5 border border-primary/15 rounded-2xl p-4 flex items-start gap-3">
+                    <div className="bg-primary/5 border border-primary/15 rounded-2xl p-4 flex items-start gap-3 text-left">
                       <Lightbulb className="w-4 h-4 text-primary mt-0.5 shrink-0" />
                       <div>
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1">Budget Recommendation</p>
-                        <p className="text-sm text-muted-foreground">{m.result.budgetRecommendation}</p>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1 text-left">Budget Recommendation</p>
+                        <p className="text-sm text-muted-foreground text-left">{m.result.budgetRecommendation}</p>
                       </div>
                     </div>
 
-                    {/* Per-platform campaign cards */}
                     <div className="space-y-6">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 text-left">
                         <Megaphone className="w-5 h-5 text-primary" />
                         <h2 className="text-lg font-bold tracking-tight">Platform Campaigns</h2>
                       </div>
@@ -423,7 +416,6 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
                         ))}
                       </div>
                     </div>
-
                   </div>
                 )}
               </div>
@@ -439,7 +431,7 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
         )}
       </div>
 
-      {/* ── Input Console (mirrors Competitor Analyzer) ── */}
+      {/* ── Input Console (Modern Tech Style) ── */}
       <div className="pb-10 px-6">
         <div className="max-w-3xl mx-auto relative flex items-center">
           <DropdownMenu>
@@ -508,7 +500,7 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
               !e.shiftKey &&
               (e.preventDefault(), generateAds(input))
             }
-            placeholder="Describe your campaign goal (e.g. 'Generate leads for our new fitness app targeting women 25–40')..."
+            placeholder="Describe your campaign goal (e.g. 'Generate leads for our new fitness app')..."
             className="w-full min-h-[64px] bg-muted/40 border-border/40 rounded-[2rem] pl-16 pr-44 py-5 resize-none focus:border-primary/40 shadow-sm transition-shadow hover:shadow-md"
           />
 
@@ -521,12 +513,18 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
               {isGenerating ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                <>
-                  Generate <ArrowRight className="w-3.5 h-3.5 ml-1" />
-                </>
+                <div className="flex items-center gap-2">
+                  <span>Generate</span>
+                  <ArrowRight className="w-4 h-4" />
+                </div>
               )}
             </Button>
           </div>
+        </div>
+        <div className="flex items-center justify-center gap-8 mt-4 opacity-40">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Modern Ad Architecture</p>
+          <div className="w-1 h-1 rounded-full bg-border" />
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Cross-Platform Logic</p>
         </div>
       </div>
     </div>

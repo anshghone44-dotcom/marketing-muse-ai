@@ -70,7 +70,6 @@ export default function CompanyForm({ onSubmit, initialData }: Props) {
 
       <div className="relative">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/15 border border-primary/30 mb-4" />
           <h2 className="font-display text-3xl font-bold mb-2 bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
             Company Profile
           </h2>
@@ -89,7 +88,7 @@ export default function CompanyForm({ onSubmit, initialData }: Props) {
               placeholder="Acme Inc."
               value={data.name}
               onChange={(e) => update("name", e.target.value)}
-              className="h-12 bg-background/50 border-border/50 focus:border-primary/50 transition-all duration-200"
+              className="h-12 bg-background/50 border-border/20 focus:border-primary/50 transition-all duration-200"
             />
           </div>
 
@@ -103,7 +102,7 @@ export default function CompanyForm({ onSubmit, initialData }: Props) {
               rows={4}
               value={data.product}
               onChange={(e) => update("product", e.target.value)}
-              className="bg-background/50 border-border/50 focus:border-primary/50 transition-all duration-200 resize-none"
+              className="bg-background/50 border-border/20 focus:border-primary/50 transition-all duration-200 resize-none"
             />
           </div>
 
@@ -117,7 +116,7 @@ export default function CompanyForm({ onSubmit, initialData }: Props) {
                 placeholder="e.g. Small business owners"
                 value={data.audience}
                 onChange={(e) => update("audience", e.target.value)}
-                className="h-12 bg-background/50 border-border/50 focus:border-primary/50 transition-all duration-200"
+                className="h-12 bg-background/50 border-border/20 focus:border-primary/50 transition-all duration-200"
               />
             </div>
             <div className="grid gap-3">
@@ -129,7 +128,7 @@ export default function CompanyForm({ onSubmit, initialData }: Props) {
                 placeholder="e.g. SaaS, Fashion"
                 value={data.industry}
                 onChange={(e) => update("industry", e.target.value)}
-                className="h-12 bg-background/50 border-border/50 focus:border-primary/50 transition-all duration-200"
+                className="h-12 bg-background/50 border-border/20 focus:border-primary/50 transition-all duration-200"
               />
             </div>
           </div>
@@ -138,7 +137,7 @@ export default function CompanyForm({ onSubmit, initialData }: Props) {
             <div className="grid gap-3">
               <Label className="text-sm font-medium text-foreground">Marketing Goal</Label>
               <Select value={data.goal} onValueChange={(v) => update("goal", v)}>
-                <SelectTrigger className="h-12 bg-background/50 border-border/50 focus:border-primary/50 transition-all duration-200">
+                <SelectTrigger className="h-12 bg-background/50 border-border/20 focus:border-primary/50 transition-all duration-200">
                   <SelectValue placeholder="Select goal" />
                 </SelectTrigger>
                 <SelectContent className="bg-card/95 backdrop-blur-xl border-border/50">
@@ -153,7 +152,7 @@ export default function CompanyForm({ onSubmit, initialData }: Props) {
             <div className="grid gap-3">
               <Label className="text-sm font-medium text-foreground">Brand Tone</Label>
               <Select value={data.tone} onValueChange={(v) => update("tone", v)}>
-                <SelectTrigger className="h-12 bg-background/50 border-border/50 focus:border-primary/50 transition-all duration-200">
+                <SelectTrigger className="h-12 bg-background/50 border-border/20 focus:border-primary/50 transition-all duration-200">
                   <SelectValue placeholder="Select tone" />
                 </SelectTrigger>
                 <SelectContent className="bg-card/95 backdrop-blur-xl border-border/50">
