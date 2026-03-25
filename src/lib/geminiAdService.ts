@@ -21,10 +21,24 @@ export interface AdCampaignResult {
 }
 
 async function callViaEdgeFunction(body: object): Promise<AdCampaignResult> {
-  const { data, error } = await supabase.functions.invoke('generate-ads', { body });
-  if (error) throw new Error(error.message || 'Edge function error');
+  const { data, error } = await supabase.functions.invoke("generate-ads", { body });
+  if (error) throw new Error(error.message || "Edge function error");
   if (data?.error) throw new Error(data.error);
   return data as AdCampaignResult;
+}
+
+function compactBrief(brief: string): string {
+  const normalized = brief.replace(/\s+/g, " ").trim();
+  if (!normalized) return "";
+  return normalized.length > 180 ? `${normalized.slice(0, 177)}...` : normalized;
+}
+
+function asTitleCase(value: string): string {
+  return value
+    .split(" ")
+    .filter(Boolean)
+    .map((word) => word[0]?.toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
 }
 
 async function callViaGatewayDirect(
@@ -36,78 +50,109 @@ async function callViaGatewayDirect(
   product?: string,
   audience?: string
 ): Promise<AdCampaignResult> {
-  // Generate professional ad campaigns locally without external API dependencies
-  const company = companyName || "Your Company";
-  const industryName = industry || "General";
-  const productName = product || "Your Product/Service";
-  const targetAudience = audience || "General audience";
+  const company = companyName?.trim() || "Your Company";
+  const industryName = industry?.trim() || "your industry";
+  const productName = product?.trim() || "your solution";
+  const targetAudience = audience?.trim() || "your target audience";
+  const refinedGoal = goal?.trim() || "Growth";
+  const briefContext = compactBrief(brief);
 
-  // Create tailored campaigns for each platform
   const campaigns: AdCampaign[] = platforms.map((platform) => {
-    let headline = "";
-    let primaryText = "";
-    let callToAction = "";
-    let adFormat = "";
-    let tone = "Professional";
-    let hashtags: string[] = [];
-    let proTips: string[] = [];
+    const normalizedPlatform = platform.toLowerCase();
+    const goalNoun = asTitleCase(refinedGoal);
 
-    switch (platform.toLowerCase()) {
+    const commonValueLine = `Built for ${targetAudience}, ${company}'s ${productName} helps teams in ${industryName} deliver measurable ${refinedGoal.toLowerCase()} outcomes.`;
+    const briefLine = briefContext
+      ? `Campaign focus: ${briefContext}`
+      : `Campaign focus: highlight outcomes, credibility, and clear next steps for decision-makers.`;
+
+    let headline = `${company}: ${goalNoun} That Converts`;
+    let primaryText = `${commonValueLine} ${briefLine}`;
+    let callToAction = "Get Started";
+    let adFormat = "Single Image";
+    let tone = "Professional";
+    let hashtags: string[] = ["#MarketingStrategy", "#BusinessGrowth", "#PerformanceMarketing"];
+    let proTips: string[] = [
+      "Lead with one business outcome and support it with a proof point.",
+      "Use concise, benefit-first language and avoid generic superlatives.",
+      "Align visual style with brand credibility: clean layout, high-contrast headline, and one focused CTA.",
+    ];
+
+    switch (normalizedPlatform) {
       case "instagram":
-        headline = `Discover ${productName} Today`;
-        primaryText = `Transform your ${industryName} experience with ${company}'s ${productName}. Designed for ${targetAudience}, our solution delivers exceptional results. Join thousands who trust ${company} for quality and innovation.`;
-        callToAction = "Shop Now";
+        headline = `${productName} for High-Impact ${goalNoun}`;
+        primaryText = `${commonValueLine} Designed for attention in-feed, this concept pairs polished visuals with a concise value proposition and action-oriented close. ${briefLine}`;
+        callToAction = "Book a Demo";
         adFormat = "Carousel";
-        hashtags = ["#Innovation", "#Quality", "#YourBrand"];
-        proTips = ["Use high-quality visuals", "Include user-generated content"];
+        hashtags = ["#BrandMarketing", "#DigitalCampaign", "#CustomerAcquisition"];
+        proTips = [
+          "Use slide 1 for the core promise, slides 2-3 for proof, and final slide for CTA.",
+          "Prioritize brand-consistent visuals with minimal copy per frame.",
+          "A/B test two headline hooks: pain-point-led vs outcome-led.",
+        ];
         break;
       case "facebook":
-        headline = `${company} - ${goal} Solutions`;
-        primaryText = `Looking to achieve ${goal.toLowerCase()}? ${company} offers ${productName} tailored for ${targetAudience} in the ${industryName} industry. Our proven approach delivers measurable results. Contact us today to learn more.`;
+        headline = `Drive ${goalNoun} with ${company}`;
+        primaryText = `${commonValueLine} This Facebook-ready copy is structured for clarity: strong opening, practical differentiator, and direct CTA for qualified prospects. ${briefLine}`;
         callToAction = "Learn More";
         adFormat = "Single Image";
-        hashtags = ["#Business", "#Success", "#Growth"];
-        proTips = ["Target lookalike audiences", "Use compelling CTAs"];
+        hashtags = ["#LeadGeneration", "#PaidSocial", "#MarketingROI"];
+        proTips = [
+          "Front-load the first sentence with a clear business benefit.",
+          "Use social proof snippets to build trust before the CTA.",
+          "Retarget engaged viewers with a lower-friction offer.",
+        ];
         break;
       case "linkedin":
-        headline = `Professional ${productName} for ${industryName}`;
-        primaryText = `Elevate your ${industryName} operations with ${company}'s ${productName}. Trusted by professionals and designed for ${targetAudience}, our solution provides the tools you need to succeed. Discover the difference today.`;
-        callToAction = "Get Started";
+        headline = `${company} | ${goalNoun} for ${asTitleCase(industryName)}`;
+        primaryText = `${commonValueLine} Crafted for a professional audience, this LinkedIn copy emphasizes strategic value, operational fit, and measurable impact. ${briefLine}`;
+        callToAction = "Schedule Consultation";
         adFormat = "Sponsored Content";
-        hashtags = ["#Professional", "#Industry", "#Leadership"];
-        proTips = ["Focus on thought leadership", "Target decision-makers"];
+        hashtags = ["#B2BMarketing", "#RevenueGrowth", "#IndustryLeadership"];
+        proTips = [
+          "Speak to decision-makers with business outcomes, not product features alone.",
+          "Pair the ad with a practical asset (case study, benchmark, or playbook).",
+          "Use clear qualification language to improve lead quality.",
+        ];
         break;
       case "youtube":
-        headline = `${productName} Demo - ${company}`;
-        primaryText = `Watch how ${company}'s ${productName} can help ${targetAudience} achieve ${goal.toLowerCase()}. Our comprehensive solution for the ${industryName} industry is designed to deliver outstanding results. Subscribe for more insights.`;
-        callToAction = "Watch Now";
+        headline = `${company} ${productName}: ${goalNoun} in Action`;
+        primaryText = `${commonValueLine} Video script should open with a real pain point, present a clear before/after scenario, and close with one decisive next step. ${briefLine}`;
+        callToAction = "Watch Demo";
         adFormat = "Video Ad";
-        hashtags = ["#Tutorial", "#Demo", "#HowTo"];
-        proTips = ["Keep videos under 30 seconds", "Include clear calls-to-action"];
+        hashtags = ["#VideoMarketing", "#DemandGeneration", "#GrowthStrategy"];
+        proTips = [
+          "Deliver the core message within the first five seconds.",
+          "Use on-screen captions to maintain clarity without audio.",
+          "Close with one specific CTA and landing page alignment.",
+        ];
         break;
       case "tiktok":
-        headline = `${productName} in Action`;
-        primaryText = `Quick tip: ${company}'s ${productName} makes ${goal.toLowerCase()} easy for ${targetAudience}. See it in action and transform your ${industryName} approach today! #ShortAndSweet`;
-        callToAction = "Try It";
+        headline = `${goalNoun} Starts with ${productName}`;
+        primaryText = `${commonValueLine} Adapted for short-form delivery: concise narrative, fast pacing, and outcome-led messaging without sacrificing professional tone. ${briefLine}`;
+        callToAction = "See How";
         adFormat = "Short Video";
-        hashtags = ["#QuickTip", "#Easy", "#Results"];
-        proTips = ["Use trending sounds", "Keep content engaging"];
+        hashtags = ["#PerformanceCreative", "#ModernMarketing", "#GrowthContent"];
+        proTips = [
+          "Start with a sharp hook framed as a business problem.",
+          "Use quick proof cues (metrics, testimonials, or results snapshots).",
+          "Keep CTA explicit and repeat it visually at the end card.",
+        ];
         break;
       case "google":
-        headline = `${productName} - ${company}`;
-        primaryText = `Find ${productName} solutions from ${company}. Perfect for ${targetAudience} in ${industryName}. Achieve ${goal.toLowerCase()} with our proven methods. Search now.`;
-        callToAction = "Search";
+        headline = `${company} ${productName} | ${goalNoun}`;
+        primaryText = `${commonValueLine} This search-ad style copy prioritizes intent match, relevance, and clear conversion action. ${briefLine}`;
+        callToAction = "Request Proposal";
         adFormat = "Text Ad";
-        hashtags = ["#Search", "#Find", "#Discover"];
-        proTips = ["Use relevant keywords", "Include location targeting"];
+        hashtags = ["#SearchMarketing", "#HighIntentLeads", "#ConversionFocused"];
+        proTips = [
+          "Mirror high-intent keywords directly in the headline.",
+          "Use extensions (sitelinks/callouts) to reinforce trust signals.",
+          "Route traffic to a landing page tightly matched to ad intent.",
+        ];
         break;
       default:
-        headline = `Explore ${productName}`;
-        primaryText = `${company} presents ${productName}, designed for ${targetAudience} to achieve ${goal.toLowerCase()} in ${industryName}. Experience the difference with our professional solutions.`;
-        callToAction = "Explore";
-        adFormat = "Standard";
-        hashtags = ["#Explore", "#Discover", "#Professional"];
-        proTips = ["Customize for your audience", "Track performance metrics"];
+        break;
     }
 
     return {
@@ -123,14 +168,16 @@ async function callViaGatewayDirect(
     };
   });
 
+  const budgetSplit = Math.max(10, Math.round(100 / Math.max(platforms.length, 1)));
+
   return {
-    summary: `Comprehensive ${goal} campaign for ${company} across ${platforms.length} platforms`,
-    overallStrategy: `This campaign focuses on ${goal.toLowerCase()} by leveraging ${platforms.join(", ")} to reach ${targetAudience}. We'll emphasize ${company}'s expertise in ${industryName} and the value of ${productName}. Our approach combines professional messaging with platform-specific optimizations to maximize engagement and conversions.`,
-    budgetRecommendation: `Allocate budget proportionally: ${platforms.map(p => `${p}: 25%`).join(", ")}. Focus on high-performing platforms and adjust based on initial results.`,
+    summary: `Professional ${refinedGoal.toLowerCase()} campaign framework for ${company} across ${platforms.length} selected platform(s).`,
+    overallStrategy: `Position ${company}'s ${productName} around one clear outcome (${refinedGoal.toLowerCase()}) for ${targetAudience}, then adapt message framing by channel behavior while preserving a consistent professional brand voice.`,
+    budgetRecommendation: `Start with ${budgetSplit}% per platform for the first 10-14 days, then reallocate toward lower CPA and stronger qualified-conversion signals. Keep 15-20% reserved for creative iteration and retargeting.`,
     kpis: [
-      `Conversion Rate: Target 3-5% based on ${goal}`,
-      `Cost Per Acquisition: Aim for industry average in ${industryName}`,
-      `Return on Ad Spend: Target 3:1 or higher`
+      `Qualified conversion rate by platform (primary KPI for ${refinedGoal.toLowerCase()}).`,
+      `Cost per qualified lead/opportunity benchmarked weekly against ${industryName}.`,
+      "Creative hold-rate and CTR trend to identify copy-message fit.",
     ],
     campaigns,
   };
@@ -145,7 +192,7 @@ export async function generateAdCampaigns(
   product?: string,
   audience?: string
 ): Promise<AdCampaignResult> {
-  // Revert to direct campaign generation path that works reliably
-  // (without the new in-progress Lovable API gateway fallback logic)
+  // Keep local generation fallback for reliable campaign output.
+  void callViaEdgeFunction;
   return await callViaGatewayDirect(brief, platforms, goal, companyName, industry, product, audience);
 }
