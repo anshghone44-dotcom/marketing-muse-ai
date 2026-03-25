@@ -272,34 +272,17 @@ export default function Index() {
             </div>
             <CompanyForm onSubmit={handleCompanySubmit} />
           </div>
-
-          <div className="min-h-0 flex-1 overflow-hidden">
-            {!companyData ? (
-              <div className="grid h-full grid-cols-1 gap-6 overflow-y-auto p-6 lg:grid-cols-[2fr_1fr] lg:p-8">
-                <div className="rounded-2xl border border-indigo-100 bg-white p-6 shadow-sm lg:p-8">
-                  <CompanyForm onSubmit={handleCompanySubmit} />
-                </div>
-                <div className="rounded-2xl border border-indigo-100 bg-indigo-50/60 p-6">
-                  <h2 className="font-display text-lg font-semibold text-slate-900">How it works</h2>
-                  <ol className="mt-4 space-y-4 text-sm text-slate-700">
-                    <li><span className="font-semibold text-indigo-700">1.</span> Add your company profile and positioning details.</li>
-                    <li><span className="font-semibold text-indigo-700">2.</span> Pick a strategy task in the left navigation.</li>
-                    <li><span className="font-semibold text-indigo-700">3.</span> Generate, copy, and iterate campaign-ready ideas.</li>
-                  </ol>
-                </div>
-              </div>
-            ) : (
-              <ResultsCanvas
-                activeTask={activeTask}
-                companyData={companyData}
-                generatedContent={generatedContent}
-                isGenerating={isGenerating}
-                onGenerate={handleGenerate}
-                onRegenerate={handleRegenerate}
-              />
-            )}
-          </div>
-        </main>
+        ) : (
+          <ResultsCanvas
+            activeTask={activeTask}
+            companyData={companyData}
+            generatedContent={generatedContent}
+            isGenerating={isGenerating}
+            onGenerate={handleGenerate}
+            onRegenerate={handleRegenerate}
+          />
+        )}
+      </main>
       </div>
     </div>
   );
