@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { TaskId } from "./AppSidebar";
 import type { CompanyData } from "./CompanyForm";
 import ResultCard from "./ResultCard";
@@ -62,6 +63,9 @@ export default function ResultsCanvas({
   const content = generatedContent[activeTask] || [];
   const hasContent = content.length > 0;
   const isAdCreator = activeTask === "ads";
+  const [campaignGoal, setCampaignGoal] = useState("");
+
+  const adGenerateLabel = campaignGoal.trim() || "Generate";
 
   return (
     <div className={cn("max-w-5xl mx-auto", isAdCreator ? "bg-white/70 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-border" : "")}>
@@ -77,6 +81,42 @@ export default function ResultsCanvas({
         </p>
       </div>
 
+      {activeTask === "ads" && (
+        <>
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-6">
+            {['Instagram', 'Facebook', 'LinkedIn', 'YouTube', 'TikTok', 'Google'].map((platform) => (
+              <span
+                key={platform}
+                className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground bg-white/80 backdrop-blur"
+              >
+                {platform}
+              </span>
+            ))}
+            <span className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-primary bg-primary/10">
+              Goal: Lead Generation
+            </span>
+          </div>
+          <div className="rounded-2xl border border-border/40 bg-white/90 p-5 mb-8 shadow-sm">
+            <label className="mb-2 block text-sm font-semibold text-slate-700">Campaign goal</label>
+            <div className="flex items-center gap-3">
+              <input
+                className="w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-800 outline-none focus:ring-2 focus:ring-primary/40"
+                value={campaignGoal}
+                onChange={(e) => setCampaignGoal(e.target.value)}
+                placeholder="Describe your campaign goal (e.g. acquire 500 ecommerce leads in 30 days)..."
+              />
+              <Button
+                onClick={() => onGenerate(activeTask)}
+                variant="ai"
+                className="h-12 px-5 text-sm font-semibold"
+              >
+                {adGenerateLabel}
+              </Button>
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">Powering results with Gemini-inspired professional ads format.</p>
+          </div>
+        </>
+      )}
       {activeTask === "keywords" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
           <div className="rounded-2xl border border-border/40 bg-card/40 p-5 backdrop-blur-xl">
