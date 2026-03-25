@@ -25,25 +25,25 @@ const TASK_CONFIG: Record<TaskId, { title: string; description: string }> = {
     description: "Describe your campaign goal and let Isaac AI craft professional ad copy for every platform.",
   },
   keywords: {
-    title: "Campaign Keyword Specialist",
+    title: "LeadBot Keyword Engine",
     description:
-      "Provide your campaign details or upload documents to generate high-precision keyword clusters tailored for your industry.",
+      "Generate high-precision keyword clusters, long-tail search opportunities, and competitor gap keywords in a single workflow.",
   },
   content: {
-    title: "Content Generation",
-    description: "Blog ideas, landing page copy, social captions, email campaigns",
+    title: "LeadBot Content Studio",
+    description: "AI-generated blog posts, landing page copy, social captions, and email sequences.",
   },
   social: {
-    title: "Social Media Strategy",
-    description: "Platform-specific strategies with post ideas, hashtags, and engagement tactics",
+    title: "LeadBot Social Strategy",
+    description: "Platform-specific campaign plans with post ideas, hashtag stacks, and engagement scripts.",
   },
   viral: {
-    title: "Viral Campaign Ideas",
-    description: "Creative concepts to maximize brand visibility and sharing",
+    title: "LeadBot Viral Ideas",
+    description: "High-velocity campaign concepts designed for shareability and growth loops.",
   },
   competitor: {
-    title: "Competitor Analysis",
-    description: "Competitive insights and differentiation strategies",
+    title: "LeadBot Competitor Analyzer",
+    description: "In-depth competitor intelligence, positioning opportunities, and differentiation playbooks.",
   },
   engagement: {
     title: "Customer Engagement",
@@ -64,8 +64,20 @@ export default function ResultsCanvas({
   const hasContent = content.length > 0;
   const isAdCreator = activeTask === "ads";
   const [campaignGoal, setCampaignGoal] = useState("");
+  const [taskPrompt, setTaskPrompt] = useState("");
 
   const adGenerateLabel = campaignGoal.trim() || "Generate";
+  const taskGenerateLabel = taskPrompt.trim() || "Generate";
+
+  const taskPromptPlaceholders: Record<TaskId, string> = {
+    ads: "Describe your campaign goal...",
+    keywords: "Share target audience, industry and focus keywords...",
+    content: "Describe the content type and topic (blog, landing page, email)...",
+    social: "Share platform, audience and primary engagement objective...",
+    viral: "Describe the viral hook, audience emotion and channel...",
+    competitor: "Enter competitor name or URL for analysis...",
+    engagement: "Share customer segment and engagement goal...",
+  };
 
   return (
     <div className={cn("max-w-5xl mx-auto", isAdCreator ? "bg-white/70 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-border" : "")}>
@@ -116,6 +128,25 @@ export default function ResultsCanvas({
             <p className="mt-2 text-xs text-muted-foreground">Powering results with Gemini-inspired professional ads format.</p>
           </div>
         </>
+      )}
+      {activeTask !== "ads" && (
+        <div className="rounded-2xl border border-border/40 bg-white/90 p-5 mb-6 shadow-sm">
+          <label className="mb-2 block text-sm font-semibold text-slate-700">Best prompt for {config.title}</label>
+          <div className="flex items-center gap-3">
+            <input
+              className="w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-slate-800 outline-none focus:ring-2 focus:ring-primary/40"
+              value={taskPrompt}
+              onChange={(e) => setTaskPrompt(e.target.value)}
+              placeholder={taskPromptPlaceholders[activeTask]}
+            />
+            <Button onClick={() => onGenerate(activeTask)} variant="ai" className="h-12 px-5 text-sm font-semibold">
+              {taskGenerateLabel}
+            </Button>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Send a clear goal for better AI output quality in {config.title.toLowerCase()}.
+          </p>
+        </div>
       )}
       {activeTask === "keywords" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
