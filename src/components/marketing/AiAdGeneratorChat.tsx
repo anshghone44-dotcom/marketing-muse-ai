@@ -290,18 +290,14 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
 
   return (
     <div className="flex flex-col h-[85vh] max-w-6xl mx-auto relative bg-transparent overflow-hidden">
-      {/* ── Empty State ── */}
-      {messages.length === 0 && !isGenerating && (
         <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-24 pointer-events-none px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-sans font-semibold tracking-tight text-foreground flex flex-col md:flex-row items-center gap-2 md:gap-3">
-            <span className="opacity-90">LeadBot</span>
-            <span className="text-muted-foreground/60 font-light">Ad Creator</span>
+          <h1 className="text-5xl md:text-6xl font-sans font-bold tracking-tight text-foreground mb-4 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+            LeadBot Ad Creator
           </h1>
-          <p className="mt-4 text-sm text-muted-foreground max-w-md">
-            Describe your campaign goal and let Gemini AI craft professional ad copy for every platform you choose.
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed opacity-80 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-200">
+            Describe your campaign goal and let Isaac AI craft professional ad copy for every platform.
           </p>
         </div>
-      )}
 
       {/* ── Platform selector bar (always visible) ── */}
       <div className="flex-shrink-0 px-6 pt-4 flex flex-wrap items-center gap-2 justify-center">
@@ -520,7 +516,7 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
             <Button
               onClick={() => generateAds(input)}
               disabled={isGenerating || !input.trim()}
-              className="h-11 px-6 rounded-full font-bold bg-foreground text-background hover:scale-105 transition-all shadow-lg active:scale-95"
+              className="h-11 px-6 rounded-full font-bold bg-gradient-to-r from-blue-600 to-violet-600 text-white hover:scale-105 transition-all shadow-lg active:scale-95 border-none"
             >
               {isGenerating ? (
                 <Loader2 className="w-4 h-4 animate-spin" />

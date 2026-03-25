@@ -199,12 +199,11 @@ export default function AiCompetitorAnalysisChat({ companyData, onCompanySubmit 
       {/* Empty State */}
       {messages.length === 0 && !isAnalyzing && (
         <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-24 pointer-events-none px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-sans font-semibold tracking-tight text-foreground flex flex-col md:flex-row items-center gap-2 md:gap-3">
-            <span className="opacity-90">LeadBot</span>
-            <span className="text-muted-foreground/60 font-light">Competitor Analyzer</span>
+          <h1 className="text-5xl md:text-6xl font-sans font-bold tracking-tight text-foreground mb-4 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+            LeadBot Competitor Analyzer
           </h1>
-          <p className="mt-4 text-sm text-muted-foreground max-w-md">
-            Enter any company name or website URL to get a detailed AI-powered competitive intelligence report.
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed opacity-80 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-200">
+            In-depth competitor intelligence, positioning opportunities, and differentiation playbooks.
           </p>
         </div>
       )}

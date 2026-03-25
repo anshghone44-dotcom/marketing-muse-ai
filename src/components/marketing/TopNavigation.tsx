@@ -44,12 +44,14 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
   const { theme, setTheme } = useTheme();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/20 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 max-w-screen-2xl items-center justify-between px-6">
         {/* Logo Section */}
-        <div className="flex items-center">
-          <a href="/" className="font-display text-base font-bold tracking-tight text-foreground">
-            LeadBot
+        <div className="mr-8 flex items-center">
+          <a href="/" className="flex items-center space-x-3 transition-opacity hover:opacity-90">
+            <span className="font-display text-2xl font-bold tracking-tight text-foreground sm:inline-block">
+              LeadBot
+            </span>
           </a>
         </div>
 
@@ -65,7 +67,7 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
                 className={cn(
                   "flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                   isActive
-                    ? "text-primary"
+                    ? "text-primary bg-primary/5 border border-primary/10"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 )}
               >
@@ -105,7 +107,7 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
                 className={cn(
                   "flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-200",
                   isActive
-                    ? "text-primary"
+                    ? "text-primary bg-primary/5"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 )}
               >
