@@ -42,11 +42,6 @@ export function LoginPage() {
         {/* Logo/Brand */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-4">
-            <div className="relative">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15 border border-primary/30 shadow-lg">
-                <span className="text-white font-bold">L</span>
-              </div>
-            </div>
             <span className="text-2xl font-display font-bold text-foreground">
               LeadBot
             </span>

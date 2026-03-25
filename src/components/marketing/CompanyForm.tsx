@@ -64,15 +64,13 @@ export default function CompanyForm({ onSubmit, initialData }: Props) {
     data.name && data.product && data.audience && data.industry && data.goal && data.tone && data.platforms.length > 0;
 
   return (
-    <div className="bg-card/50 backdrop-blur-xl rounded-2xl border border-border/50 p-8 shadow-2xl relative overflow-hidden">
+    <div className="bg-card/50 backdrop-blur-xl rounded-2xl p-8 shadow-2xl relative overflow-hidden">
       {/* Background gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 pointer-events-none" />
 
       <div className="relative">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/15 border border-primary/30 mb-4">
-            <span className="text-2xl font-bold text-primary">L</span>
-          </div>
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/15 border border-primary/30 mb-4" />
           <h2 className="font-display text-3xl font-bold mb-2 bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
             Company Profile
           </h2>

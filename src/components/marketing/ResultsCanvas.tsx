@@ -80,10 +80,7 @@ export default function ResultsCanvas({
 
   return (
     <div className={cn("max-w-5xl mx-auto", isAdCreator ? "bg-white/70 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-border" : "")}>
-      <div className={cn("mb-10 text-center", isAdCreator && "bg-white/90 p-8 rounded-2xl shadow-lg border border-border") }>
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-primary/15 border border-primary/30 mb-6">
-          <span className="text-2xl font-bold text-primary">L</span>
-        </div>
+      <div className={cn("mb-10 text-center", isAdCreator && "bg-white/90 p-8 rounded-2xl shadow-lg border border-border/40") }>
         <h1 className={cn("font-display text-4xl font-bold mb-3", isAdCreator ? "text-slate-900" : "bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent") }>
           {config.title}
         </h1>
@@ -169,9 +166,7 @@ export default function ResultsCanvas({
       {!hasContent && !isGenerating && (
         <div className="flex flex-col items-center justify-center py-24 text-center">
           <div className="relative mb-8">
-            <div className="w-32 h-32 rounded-3xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-              <span className="text-4xl font-bold text-primary">L</span>
-            </div>
+            <div className="w-32 h-32 rounded-3xl bg-primary/10 border border-primary/20" />
             <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-primary/20 to-secondary/20 blur-xl animate-pulse" />
           </div>
           <h3 className="font-display font-bold text-2xl mb-3 text-foreground">

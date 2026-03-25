@@ -41,14 +41,11 @@ export default function AppSidebar({ activeTask, onTaskChange, hasCompanyData }:
   return (
     <aside
       className={cn(
-        "flex h-[calc(100vh-2rem)] flex-col rounded-3xl border border-white/10 bg-slate-900/80 text-slate-200 shadow-xl shadow-black/25 backdrop-blur-xl transition-all duration-200 lg:h-[calc(100vh-3rem)]",
+        "flex h-[calc(100vh-2rem)] flex-col rounded-3xl bg-slate-900/80 text-slate-200 shadow-xl shadow-black/15 backdrop-blur-xl transition-all duration-200 lg:h-[calc(100vh-3rem)]",
         collapsed ? "w-16" : "w-64"
       )}
     >
-      <div className="flex items-center gap-2 border-b border-white/10 p-4">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/15 border border-primary/30">
-          <span className="text-sm font-bold text-primary">L</span>
-        </div>
+      <div className="flex items-center gap-2 p-4">
         {!collapsed && (
           <span className="font-display text-base font-bold tracking-tight text-white">
             LeadBot
@@ -70,13 +67,11 @@ export default function AppSidebar({ activeTask, onTaskChange, hasCompanyData }:
             <button
               key={task.id}
               onClick={() => onTaskChange(task.id)}
-              disabled={!hasCompanyData}
               className={cn(
                 "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive
                   ? "bg-indigo-500/20 text-indigo-100"
-                  : "text-slate-300 hover:bg-white/10 hover:text-white",
-                !hasCompanyData && "cursor-not-allowed opacity-40"
+                  : "text-slate-300 hover:bg-white/10 hover:text-white"
               )}
             >
               <Icon className="h-4 w-4 shrink-0" />
@@ -89,9 +84,7 @@ export default function AppSidebar({ activeTask, onTaskChange, hasCompanyData }:
       {!collapsed && (
         <div className="border-t border-white/10 p-4">
           <p className="text-xs text-slate-400">
-            {hasCompanyData
-              ? "Select a task to generate content"
-              : "Enter company details to begin"}
+            Select any task to start generating content.
           </p>
         </div>
       )}

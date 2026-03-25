@@ -44,19 +44,12 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
   const { theme, setTheme } = useTheme();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
+    <header className="sticky top-0 z-50 w-full border-b border-border/20 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
       <div className="container flex h-16 max-w-screen-2xl items-center justify-between px-6">
         {/* Logo Section */}
-        <div className="flex items-center space-x-3">
-          <a href="/" className="flex items-center space-x-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15 border border-primary/30">
-              <span className="text-base font-bold text-primary">L</span>
-            </div>
-            <div>
-              <span className="font-display text-base font-bold tracking-tight text-foreground">
-                LeadBot
-              </span>
-            </div>
+        <div className="flex items-center">
+          <a href="/" className="font-display text-base font-bold tracking-tight text-foreground">
+            LeadBot
           </a>
         </div>
 
@@ -69,13 +62,11 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
               <button
                 key={task.id}
                 onClick={() => onTaskChange(task.id)}
-                disabled={!hasCompanyData}
                 className={cn(
                   "flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                   isActive
                     ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
-                  !hasCompanyData && "opacity-50 cursor-not-allowed hover:bg-transparent hover:text-muted-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 )}
               >
                 <Icon className="h-4 w-4" />
@@ -111,13 +102,11 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
               <button
                 key={task.id}
                 onClick={() => onTaskChange(task.id)}
-                disabled={!hasCompanyData}
                 className={cn(
                   "flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-200",
                   isActive
                     ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
-                  !hasCompanyData && "opacity-50 cursor-not-allowed hover:bg-transparent hover:text-muted-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 )}
               >
                 <Icon className="h-3.5 w-3.5" />
