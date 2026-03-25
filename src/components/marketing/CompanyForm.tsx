@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { X, Sparkles } from "lucide-react";
+import { X } from "lucide-react";
 
 export interface CompanyData {
   name: string;
@@ -70,8 +70,8 @@ export default function CompanyForm({ onSubmit, initialData }: Props) {
 
       <div className="relative">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl ai-gradient mb-4 glow animate-float">
-            <Sparkles className="h-8 w-8 text-primary-foreground" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/15 border border-primary/30 mb-4">
+            <span className="text-2xl font-bold text-primary">L</span>
           </div>
           <h2 className="font-display text-3xl font-bold mb-2 bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
             Company Profile
@@ -208,11 +208,10 @@ export default function CompanyForm({ onSubmit, initialData }: Props) {
         <Button
           variant="ai"
           size="lg"
-          className="w-full h-14 mt-8 text-lg font-semibold glow hover:scale-[1.02] transition-all duration-200"
+          className="w-full h-14 mt-8 text-lg font-semibold hover:scale-[1.02] transition-all duration-200"
           disabled={!isValid}
           onClick={() => onSubmit(data)}
         >
-          <Sparkles className="h-5 w-5 mr-2" />
           Initialize AI Marketing Assistant
         </Button>
       </div>

@@ -2,7 +2,6 @@ import { useState } from "react";
 import type { TaskId } from "./AppSidebar";
 import type { CompanyData } from "./CompanyForm";
 import ResultCard from "./ResultCard";
-import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -82,8 +81,8 @@ export default function ResultsCanvas({
   return (
     <div className={cn("max-w-5xl mx-auto", isAdCreator ? "bg-white/70 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-border" : "")}>
       <div className={cn("mb-10 text-center", isAdCreator && "bg-white/90 p-8 rounded-2xl shadow-lg border border-border") }>
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl ai-gradient mb-6 glow animate-pulse-glow">
-          <Sparkles className="h-10 w-10 text-primary-foreground" />
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-primary/15 border border-primary/30 mb-6">
+          <span className="text-2xl font-bold text-primary">L</span>
         </div>
         <h1 className={cn("font-display text-4xl font-bold mb-3", isAdCreator ? "text-slate-900" : "bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent") }>
           {config.title}
@@ -170,8 +169,8 @@ export default function ResultsCanvas({
       {!hasContent && !isGenerating && (
         <div className="flex flex-col items-center justify-center py-24 text-center">
           <div className="relative mb-8">
-            <div className="w-32 h-32 rounded-3xl ai-gradient flex items-center justify-center glow animate-float">
-              <Sparkles className="h-16 w-16 text-primary-foreground" />
+            <div className="w-32 h-32 rounded-3xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+              <span className="text-4xl font-bold text-primary">L</span>
             </div>
             <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-primary/20 to-secondary/20 blur-xl animate-pulse" />
           </div>
@@ -186,9 +185,8 @@ export default function ResultsCanvas({
             variant="ai"
             size="lg"
             onClick={() => onGenerate(activeTask)}
-            className="h-16 px-8 text-lg font-semibold glow hover:scale-105 transition-all duration-300"
+            className="h-16 px-8 text-lg font-semibold hover:scale-105 transition-all duration-300"
           >
-            <Sparkles className="h-6 w-6 mr-3" />
             Generate {config.title}
           </Button>
         </div>
@@ -213,7 +211,6 @@ export default function ResultsCanvas({
           ))}
           <div className="flex justify-center pt-2">
             <Button variant="outline" onClick={() => onGenerate(activeTask)}>
-              <Sparkles className="h-4 w-4" />
               Regenerate All
             </Button>
           </div>

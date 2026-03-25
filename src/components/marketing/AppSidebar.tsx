@@ -9,9 +9,7 @@ import {
   BarChart3,
   Users,
   ChevronLeft,
-  Sparkles,
 } from "lucide-react";
-
 export type TaskId =
   | "ads"
   | "keywords"
@@ -48,8 +46,8 @@ export default function AppSidebar({ activeTask, onTaskChange, hasCompanyData }:
       )}
     >
       <div className="flex items-center gap-2 border-b border-white/10 p-4">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg ai-gradient">
-          <Sparkles className="h-4 w-4 text-primary-foreground" />
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/15 border border-primary/30">
+          <span className="text-sm font-bold text-primary">L</span>
         </div>
         {!collapsed && (
           <span className="font-display text-base font-bold tracking-tight text-white">

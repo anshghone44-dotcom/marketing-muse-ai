@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Copy, Check, Sparkles, PenTool, FileText, Layout, Mail, MessageSquare } from "lucide-react";
+import { Copy, Check, PenTool, FileText, Layout, Mail, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import type { CompanyData } from "./CompanyForm";
 import CompanyForm from "./CompanyForm";
@@ -20,7 +20,7 @@ const CONTENT_TYPES = [
   { id: "landing", label: "Landing Page Copy", icon: Layout, description: "High-converting web page text" },
   { id: "email", label: "Email Campaign", icon: Mail, description: "Newsletters and sales sequences" },
   { id: "social", label: "Social Caption", icon: MessageSquare, description: "Engaging posts for social platforms" },
-  { id: "ad", label: "Ad Copy", icon: Sparkles, description: "Short, punchy text for digital ads" },
+  { id: "ad", label: "Ad Copy", icon: PenTool, description: "Short, punchy text for digital ads" },
 ];
 
 const TONES = [
@@ -72,7 +72,7 @@ export default function AiContentGeneratorChat({ companyData, onCompanySubmit }:
       const typeLabel = CONTENT_TYPES.find(t => t.id === contentType)?.label || "Content";
       
       let mockBody = "";
-      let mockTitle = `${typeLabel}: ${topic}`;
+      const mockTitle = `${typeLabel}: ${topic}`;
 
       switch (contentType) {
         case "blog":
@@ -345,7 +345,6 @@ The future belongs to those who adapt. How is your team addressing the complexit
             size="lg"
             className="w-full gap-2 font-semibold h-12 shadow-lg hover:shadow-primary/20"
           >
-            <Sparkles className="w-5 h-5" />
             {isGenerating ? "Crafting Your Content..." : "Generate AI Content"}
           </Button>
         </div>
@@ -354,8 +353,7 @@ The future belongs to those who adapt. How is your team addressing the complexit
       {/* Results Section */}
       {generatedContent.length > 0 && (
         <div className="space-y-6">
-          <h3 className="text-xl font-bold flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-primary" />
+          <h3 className="text-xl font-bold">
             Generated Drafts
           </h3>
           <div className="grid gap-6">

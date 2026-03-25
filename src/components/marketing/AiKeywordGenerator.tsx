@@ -8,7 +8,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Sparkles,
   Copy,
   Check,
   X,
@@ -261,7 +260,6 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border border-border/40 bg-muted/40 text-muted-foreground hover:bg-muted transition-all">
-              <Sparkles className="w-3.5 h-3.5 text-primary" />
               {selectedFactors.length} vectors selected
               <ChevronDown className="w-3 h-3" />
             </button>
@@ -404,7 +402,7 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
               className="w-64 p-2 bg-background/95 backdrop-blur-xl border border-border/40 shadow-2xl rounded-2xl"
             >
               <DropdownMenuItem onClick={() => setSelectedSource("brief")} className="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-muted">
-                <Sparkles className="w-4 h-4 text-primary" />
+                <div className="w-4 h-4 rounded bg-primary/20 flex items-center justify-center text-xs font-semibold text-primary">B</div>
                 <div className="flex flex-col">
                   <span className="text-sm font-semibold">Keyword Brief</span>
                   <span className="text-[10px] text-muted-foreground">Describe the campaign context</span>
@@ -452,8 +450,8 @@ export default function AiKeywordGenerator({ companyData, onCompanySubmit }: Pro
             </Button>
           </div>
         </div>
-        <p className="text-[10px] text-center text-muted-foreground mt-3 flex items-center justify-center gap-1">
-          <Sparkles className="w-3 h-3" /> LeadBot Keyword Agent • Professional intent-mapped clusters for campaign planning.
+        <p className="text-[10px] text-center text-muted-foreground mt-3">
+          LeadBot Keyword Agent • Professional intent-mapped clusters for campaign planning.
         </p>
       </div>
     </div>
