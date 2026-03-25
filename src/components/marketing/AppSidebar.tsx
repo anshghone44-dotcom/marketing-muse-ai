@@ -60,12 +60,7 @@ export default function AppSidebar({ activeTask, onTaskChange, hasCompanyData }:
           onClick={() => setCollapsed(!collapsed)}
           className="ml-auto rounded-md p-1 text-slate-400 hover:bg-white/10 hover:text-slate-100"
         >
-          <ChevronLeft
-            className={cn(
-              "h-4 w-4 transition-transform",
-              collapsed && "rotate-180"
-            )}
-          />
+          <ChevronLeft className={cn("h-4 w-4 transition-transform", collapsed && "rotate-180")} />
         </button>
       </div>
 
