@@ -206,7 +206,7 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
       {messages.length === 0 && (
         <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-16 pointer-events-none px-4 text-center">
           <div className="flex items-center gap-3 mb-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-            <h1 className="text-4xl md:text-5xl font-sans tracking-tight text-foreground">
+            <h1 className="text-4xl md:text-5xl tracking-tight text-foreground">
               <span className="font-bold">LeadBot</span> <span className="font-light">Ad Creator</span>
             </h1>
           </div>
@@ -222,7 +222,7 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
         <div className="max-w-3xl mx-auto w-full relative group">
           
           {/* Main Input Pill */}
-          <div className="relative flex items-center bg-background border border-border/60 rounded-[2rem] shadow-sm hover:shadow-md hover:border-border transition-all duration-300 overflow-visible p-1.5 pl-3">
+          <div className="relative flex items-center bg-background rounded-[2rem] shadow-sm hover:shadow-md transition-all duration-300 overflow-visible p-1.5 pl-3">
             
             {/* Left Attachment Icon */}
             <button
