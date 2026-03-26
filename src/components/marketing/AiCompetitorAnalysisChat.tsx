@@ -204,9 +204,9 @@ export default function AiCompetitorAnalysisChat({ companyData }: Props) {
             )}
             <div
               className={cn(
-                "max-w-[85%] rounded-2xl px-5 py-4 text-[15px] leading-relaxed",
+                "max-w-[85%] rounded-2xl px-5 py-4 text-[15px] leading-relaxed shadow-sm",
                 m.role === "user"
-                  ? "bg-muted text-foreground"
+                  ? "bg-primary/5 text-foreground border border-primary/10"
                   : "prose prose-sm dark:prose-invert font-normal text-foreground max-w-none text-left bg-transparent"
               )}
             >
@@ -226,12 +226,12 @@ export default function AiCompetitorAnalysisChat({ companyData }: Props) {
                         { icon: Users, label: "Employees", value: a.employeeCount },
                         { icon: TrendingUp, label: "Revenue", value: a.revenueRange },
                       ].map(({ icon: Icon, label, value }) => (
-                        <div key={label} className="bg-muted/30 border border-border/20 rounded-2xl p-4 space-y-1">
-                          <div className="flex items-center gap-1.5 text-muted-foreground">
+                        <div key={label} className="bg-white dark:bg-muted/30 border border-border/50 rounded-2xl p-4 space-y-1 shadow-sm transition-all hover:shadow-md">
+                          <div className="flex items-center gap-1.5 text-muted-foreground/70">
                             <Icon className="w-3.5 h-3.5" />
                             <span className="text-[10px] font-bold uppercase tracking-widest">{label}</span>
                           </div>
-                          <p className="text-sm font-semibold leading-tight">{value || "—"}</p>
+                          <p className="text-sm font-semibold leading-tight text-foreground">{value || "—"}</p>
                         </div>
                       ))}
                     </div>
@@ -242,21 +242,21 @@ export default function AiCompetitorAnalysisChat({ companyData }: Props) {
                         <FileText className="w-5 h-5 text-primary" />
                         <h2 className="text-lg font-bold tracking-tight">Executive Intelligence Report</h2>
                       </div>
-                      <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none text-muted-foreground leading-relaxed bg-muted/10 p-6 rounded-2xl border border-border/10">
+                      <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none text-muted-foreground leading-relaxed bg-white dark:bg-muted/10 p-6 rounded-2xl border border-border/10 shadow-sm">
                         <ReactMarkdown>{buildDetailedReport(a)}</ReactMarkdown>
                       </div>
                     </div>
 
                     {/* ── Target Audience & Products ── */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in duration-700">
-                      <div className="bg-muted/20 border border-border/10 rounded-2xl p-5 space-y-3">
+                      <div className="bg-white dark:bg-muted/20 border border-border/10 rounded-2xl p-5 space-y-3 shadow-sm">
                         <div className="flex items-center gap-2 text-primary">
                           <Target className="w-4 h-4" />
                           <span className="text-xs font-bold uppercase tracking-widest">Target Audience</span>
                         </div>
                         <p className="text-sm leading-relaxed text-muted-foreground">{a.targetAudience}</p>
                       </div>
-                      <div className="bg-muted/20 border border-border/10 rounded-2xl p-5 space-y-3">
+                      <div className="bg-white dark:bg-muted/20 border border-border/10 rounded-2xl p-5 space-y-3 shadow-sm">
                         <div className="flex items-center gap-2 text-primary">
                           <Package className="w-4 h-4" />
                           <span className="text-xs font-bold uppercase tracking-widest">Key Products & Services</span>
@@ -386,8 +386,8 @@ export default function AiCompetitorAnalysisChat({ companyData }: Props) {
         ))}
         {isAnalyzing && (
           <div className="flex w-full animate-in fade-in duration-500 justify-start items-center">
-            <div className="w-8 h-8 rounded-full bg-foreground flex items-center justify-center mr-4 shrink-0">
-               <Loader2 className="w-4 h-4 text-background animate-spin" />
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-4 shrink-0">
+               <Loader2 className="w-4 h-4 text-primary animate-spin" />
             </div>
             <div className="text-muted-foreground text-sm font-medium animate-pulse">
               {analyzingLabel}

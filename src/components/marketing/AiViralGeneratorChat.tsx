@@ -142,7 +142,7 @@ export default function AiViralGeneratorChat({ companyData }: Props) {
               className={cn(
                 "max-w-[85%] rounded-2xl px-5 py-4 text-[15px] leading-relaxed",
                 m.role === "user"
-                  ? "bg-muted text-foreground"
+                  ? "bg-primary/5 text-foreground border border-primary/10 shadow-sm"
                   : "prose prose-sm dark:prose-invert font-normal text-foreground max-w-none text-left bg-transparent"
               )}
             >
@@ -152,8 +152,8 @@ export default function AiViralGeneratorChat({ companyData }: Props) {
         ))}
         {isGenerating && (
           <div className="flex w-full animate-in fade-in duration-500 justify-start items-center">
-            <div className="w-8 h-8 rounded-full bg-foreground flex items-center justify-center mr-4 shrink-0">
-               <Loader2 className="w-4 h-4 text-background animate-spin" />
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-4 shrink-0">
+               <Loader2 className="w-4 h-4 text-primary animate-spin" />
             </div>
             <div className="text-muted-foreground text-sm font-medium animate-pulse">
               Generating viral loops...
