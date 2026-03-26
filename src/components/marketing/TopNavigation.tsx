@@ -88,14 +88,22 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
               <div key={task.id} className="relative group flex items-center h-full cursor-pointer py-2">
                 {buttonElement}
                 
-                {/* Hover Dropdown */}
-                <div className="absolute top-12 left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100]">
-                  <div className="w-56 bg-background/95 backdrop-blur-xl border border-border/40 rounded-2xl p-1.5 shadow-2xl animate-in slide-in-from-top-1 fade-in duration-200">
+                <div className="absolute top-12 left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100] transform scale-95 group-hover:scale-100 origin-top-left">
+                  <div className="w-64 bg-background/98 backdrop-blur-2xl border border-border/50 rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.15)] animate-in fade-in zoom-in-95 duration-200">
+                    <div className="px-3 py-2 text-[11px] font-bold text-muted-foreground uppercase tracking-wider opacity-60">
+                      Available Tools
+                    </div>
                     <button
                       onClick={() => onTaskChange(task.id)}
-                      className="w-full text-left rounded-xl px-3 py-2 text-sm cursor-pointer hover:bg-muted font-medium text-foreground transition-colors"
+                      className="group/item w-full flex items-center justify-between rounded-xl px-3 py-2.5 text-sm cursor-pointer hover:bg-muted/80 transition-all duration-200"
                     >
-                      {task.label} Chatbot
+                      <div className="flex items-center space-x-3">
+                        <div className="p-2 rounded-lg bg-primary/5 text-primary group-hover/item:bg-primary/10 transition-colors">
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <span className="font-medium text-foreground">{task.label} Chatbot</span>
+                      </div>
+                      <div className="h-1.5 w-1.5 rounded-full bg-primary/40 opacity-0 group-hover/item:opacity-100 transition-opacity" />
                     </button>
                   </div>
                 </div>
@@ -153,14 +161,19 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
               <div key={`${task.id}-mobile`} className="relative group flex items-center h-full cursor-pointer">
                 {buttonElement}
                 
-                {/* Hover Dropdown */}
-                <div className="absolute bottom-full left-0 pb-2 mb-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100]">
-                  <div className="w-48 bg-background/95 backdrop-blur-xl border border-border/40 rounded-2xl p-1.5 shadow-2xl animate-in slide-in-from-bottom-1 fade-in duration-200">
+                <div className="absolute bottom-full left-0 pb-2 mb-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100] transform scale-95 group-hover:scale-100 origin-bottom-left">
+                  <div className="w-56 bg-background/98 backdrop-blur-2xl border border-border/50 rounded-2xl p-1.5 shadow-[0_-10px_30px_rgba(0,0,0,0.15)] animate-in fade-in zoom-in-95 duration-200">
                     <button
                       onClick={() => onTaskChange(task.id)}
-                      className="w-full text-left rounded-xl px-3 py-2 text-xs cursor-pointer hover:bg-muted font-medium text-foreground transition-colors"
+                      className="group/item w-full flex items-center justify-between rounded-xl px-3 py-2 text-xs cursor-pointer hover:bg-muted/80 transition-all duration-200"
                     >
-                      {task.label} Chatbot
+                      <div className="flex items-center space-x-2">
+                        <div className="p-1.5 rounded-lg bg-primary/5 text-primary group-hover/item:bg-primary/10 transition-colors">
+                          <Icon className="h-3.5 w-3.5" />
+                        </div>
+                        <span className="font-medium text-foreground">{task.label} Chatbot</span>
+                      </div>
+                      <div className="h-1 w-1 rounded-full bg-primary/40 opacity-0 group-hover/item:opacity-100 transition-opacity" />
                     </button>
                   </div>
                 </div>

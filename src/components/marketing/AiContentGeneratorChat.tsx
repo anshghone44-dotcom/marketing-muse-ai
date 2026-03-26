@@ -150,7 +150,7 @@ export default function AiContentGeneratorChat({ companyData }: Props) {
         <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-16 pointer-events-none px-4 text-center">
           <div className="flex items-center gap-3 mb-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
             <h1 className="text-4xl md:text-5xl font-sans tracking-tight text-foreground">
-              <span className="font-bold">LeadBot</span> <span className="font-light">Content Architect</span>
+              <span className="font-bold">LeadBot</span> <span className="font-light drop-shadow-[0_2px_8px_rgba(0,0,0,0.1)]">Content Architect</span>
             </h1>
           </div>
         </div>
