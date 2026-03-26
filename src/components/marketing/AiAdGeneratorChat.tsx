@@ -215,7 +215,8 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
 
       {/* ── Input Bar (Grok Style) ── */}
       <div className={cn(
-        "absolute inset-x-0 bottom-0 px-4 pb-8 pt-4 bg-gradient-to-t from-background via-background to-transparent transition-all duration-700 ease-in-out z-20",
+        "absolute inset-x-0 bottom-0 px-4 pb-8 pt-4 transition-all duration-700 ease-in-out z-20",
+        messages.length > 0 ? "bg-gradient-to-t from-background via-background to-transparent" : "",
         messages.length === 0 ? "top-1/2 -translate-y-1/2 pt-16 flex flex-col justify-center" : ""
       )}>
         <div className="max-w-3xl mx-auto w-full relative group">
