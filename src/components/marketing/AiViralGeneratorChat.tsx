@@ -166,7 +166,7 @@ export default function AiViralGeneratorChat({ companyData }: Props) {
       {messages.length === 0 && (
         <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-16 pointer-events-none px-4 text-center">
           <div className="flex items-center gap-3 mb-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-            <h1 className="text-4xl md:text-5xl tracking-tight text-foreground">
+            <h1 className="text-4xl md:text-5xl font-sans tracking-tight text-foreground">
               <span className="font-bold">LeadBot</span> <span className="font-light">Viral Architect</span>
             </h1>
           </div>

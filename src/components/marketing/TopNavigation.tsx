@@ -49,7 +49,7 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
         {/* Logo Section */}
         <div className="mr-8 flex items-center">
           <a href="/" className="flex items-center space-x-3 transition-opacity hover:opacity-90">
-            <span className="text-lg font-bold tracking-tight text-foreground sm:inline-block">
+            <span className="font-display text-lg font-bold tracking-tight text-foreground sm:inline-block">
               LeadBot
             </span>
           </a>
