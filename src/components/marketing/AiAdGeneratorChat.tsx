@@ -12,7 +12,6 @@ import {
   Loader2,
   Check,
   ChevronDown,
-  ChevronDown,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
@@ -208,7 +207,7 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
         <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-16 pointer-events-none px-4 text-center">
           <div className="flex items-center gap-3 mb-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
             <h1 className="text-4xl md:text-5xl font-sans tracking-tight text-foreground">
-              <span className="font-bold">LeadBot</span> <span className="font-light text-muted-foreground/60">Ad Creator</span>
+              <span className="font-bold">LeadBot</span> <span className="font-light">Ad Creator</span>
             </h1>
           </div>
         </div>
@@ -227,7 +226,7 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
             {/* Left Attachment Icon */}
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="p-2.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors shrink-0"
+              className="p-2.5 text-muted-foreground hover:opacity-80 transition-opacity shrink-0"
               title="Upload file constraints"
             >
               <Paperclip className="w-5 h-5" />
@@ -256,7 +255,7 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
               <button
                 onClick={generateAds}
                 disabled={isGenerating || !input.trim()}
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[13px] font-semibold text-primary bg-primary/10 hover:bg-primary/20 transition-all mr-1 disabled:opacity-50 disabled:pointer-events-none"
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[13px] font-semibold text-primary bg-primary/10 hover:opacity-80 transition-opacity mr-1 disabled:opacity-50 disabled:pointer-events-none"
               >
                 Analyze
               </button>
