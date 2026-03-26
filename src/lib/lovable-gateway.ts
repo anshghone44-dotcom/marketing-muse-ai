@@ -4,6 +4,8 @@ const LOVABLE_API_GATEWAY_URL = import.meta.env.VITE_LOVABLE_API_GATEWAY_URL?.tr
 const LOVABLE_AD_CREATOR_ROUTE = import.meta.env.VITE_LOVABLE_AD_CREATOR_ROUTE?.trim();
 const LOVABLE_COMPETITOR_ANALYZER_ROUTE =
   import.meta.env.VITE_LOVABLE_COMPETITOR_ANALYZER_ROUTE?.trim();
+const LOVABLE_KEYWORD_GENERATOR_ROUTE = import.meta.env.VITE_LOVABLE_KEYWORD_GENERATOR_ROUTE?.trim();
+const LOVABLE_VIRAL_GENERATOR_ROUTE = import.meta.env.VITE_LOVABLE_VIRAL_GENERATOR_ROUTE?.trim();
 const LOVABLE_SYSTEM_ROUTE = import.meta.env.VITE_LOVABLE_SYSTEM_ROUTE?.trim();
 const LOVABLE_API_AUTH_TOKEN =
   import.meta.env.VITE_LOVABLE_API_AUTH_TOKEN?.trim() ||
@@ -12,6 +14,8 @@ const LOVABLE_API_AUTH_TOKEN =
 const resolvedSystemRoute =
   LOVABLE_AD_CREATOR_ROUTE ||
   LOVABLE_COMPETITOR_ANALYZER_ROUTE ||
+  LOVABLE_KEYWORD_GENERATOR_ROUTE ||
+  LOVABLE_VIRAL_GENERATOR_ROUTE ||
   LOVABLE_SYSTEM_ROUTE;
 
 function buildProfessionalAdPrompt(data: CompanyData): string {
@@ -153,7 +157,8 @@ function extractAdCopies(payload: unknown): string[] {
 }
 
 export function hasLovableGatewayConfig(): boolean {
-  return Boolean(LOVABLE_API_GATEWAY_URL && resolvedSystemRoute);
+  // We now support direct fallback even if environment variables are missing
+  return true;
 }
 
 export async function generateProfessionalAdCopies(data: CompanyData): Promise<string[]> {
@@ -162,49 +167,73 @@ export async function generateProfessionalAdCopies(data: CompanyData): Promise<s
   return extractAdCopies(result).slice(0, 3);
 }
 
-export async function generateProfessionalKeywords(prompt: string, factors: string[], data: CompanyData | null): Promise<any> {
+export async function generateProfessionalKeywords(prompt: string, factors: string[], data: CompanyData | null): Promise<string> {
   const fullPrompt = buildProfessionalKeywordPrompt(prompt, factors, data);
-  return await callGateway(fullPrompt, "keyword-generator", "keywords");
+  const result = await callGateway(fullPrompt, "keyword-generator", "keywords");
+  return stringifyContent(result) || (typeof result === 'string' ? result : JSON.stringify(result));
 }
 
-export async function generateProfessionalContent(topic: string, type: string, tone: string, data: CompanyData | null): Promise<any> {
+export async function generateProfessionalContent(topic: string, type: string, tone: string, data: CompanyData | null): Promise<string> {
   const fullPrompt = buildProfessionalContentPrompt(topic, type, tone, data);
-  return await callGateway(fullPrompt, "content-generator", "content");
+  const result = await callGateway(fullPrompt, "content-generator", "content");
+  return stringifyContent(result) || (typeof result === 'string' ? result : JSON.stringify(result));
 }
 
-export async function generateProfessionalViralIdeas(prompt: string, data: CompanyData | null): Promise<any> {
+export async function generateProfessionalViralIdeas(prompt: string, data: CompanyData | null): Promise<string> {
   const fullPrompt = buildProfessionalViralPrompt(prompt, data);
-  return await callGateway(fullPrompt, "viral-generator", "viral-ideas");
+  const result = await callGateway(fullPrompt, "viral-generator", "viral-ideas");
+  return stringifyContent(result) || (typeof result === 'string' ? result : JSON.stringify(result));
 }
 
 async function callGateway(prompt: string, chatbot: string, task: string): Promise<any> {
-  if (!LOVABLE_API_GATEWAY_URL || !resolvedSystemRoute) {
-    throw new Error("Lovable gateway not configured correctly. Check your environment variables.");
+  // 1. Try Configured Gateway (Edge Route)
+  if (LOVABLE_API_GATEWAY_URL && resolvedSystemRoute) {
+    try {
+      const response = await fetch(LOVABLE_API_GATEWAY_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(LOVABLE_API_AUTH_TOKEN ? { Authorization: `Bearer ${LOVABLE_API_AUTH_TOKEN}` } : {}),
+        },
+        body: JSON.stringify({
+          route: resolvedSystemRoute,
+          systemRoute: resolvedSystemRoute,
+          chatbot,
+          task,
+          input: prompt,
+          messages: [
+            { role: "system", content: `You are a professional AI assistant specializing in ${task}. Provide polished, high-quality responses.` },
+            { role: "user", content: prompt },
+          ],
+        }),
+      });
+
+      if (response.ok) {
+        return await response.json();
+      }
+      console.warn(`Gateway route ${resolvedSystemRoute} failed: ${response.status}. Falling back to direct gateway.`);
+    } catch (err) {
+      console.warn("Configured gateway fetch error. Falling back to direct gateway:", err);
+    }
   }
 
-  const response = await fetch(LOVABLE_API_GATEWAY_URL, {
+  // 2. Direct Fallback to ai.gateway.lovable.dev (Mirroring Competitor Service)
+  const directResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(LOVABLE_API_AUTH_TOKEN ? { Authorization: `Bearer ${LOVABLE_API_AUTH_TOKEN}` } : {}),
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      route: resolvedSystemRoute,
-      systemRoute: resolvedSystemRoute,
-      chatbot,
-      task,
-      input: prompt,
+      model: "google/gemini-flash-1.5",
       messages: [
-        { role: "system", content: `You are a professional AI assistant specializing in ${task}. Provide polished, high-quality responses.` },
+        { role: "system", content: `You are a professional AI marketing assistant specializing in ${task}. Return polished markdown.` },
         { role: "user", content: prompt },
       ],
     }),
   });
 
-  if (!response.ok) {
-    throw new Error(`Lovable gateway request failed with status ${response.status}`);
+  if (!directResponse.ok) {
+    throw new Error(`AI gateway error (${directResponse.status})`);
   }
 
-  const payload = await response.json();
-  return payload;
+  const data = await directResponse.json();
+  return data.choices?.[0]?.message?.content || "";
 }
