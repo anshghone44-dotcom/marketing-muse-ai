@@ -2,6 +2,7 @@ import { useState } from "react";
 import TopNavigation, { type TaskId } from "@/components/marketing/TopNavigation";
 import CompanyForm, { type CompanyData } from "@/components/marketing/CompanyForm";
 import ResultsCanvas from "@/components/marketing/ResultsCanvas";
+import AiAdGeneratorChat from "@/components/marketing/AiAdGeneratorChat";
 import { toast } from "sonner";
 import {
   generateProfessionalAdCopies,
@@ -108,7 +109,12 @@ export default function Index() {
       />
 
       <main className="container mx-auto px-6 py-12 relative z-10">
-        {!companyData ? (
+        {activeTask === "ads" ? (
+          <AiAdGeneratorChat 
+            companyData={companyData} 
+            onCompanySubmit={handleCompanySubmit} 
+          />
+        ) : !companyData ? (
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-16 animate-in fade-in slide-in-from-top-12 duration-1000">
               <h1 className="font-display text-4xl md:text-5xl font-bold mb-6 tracking-tight bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent px-4">
