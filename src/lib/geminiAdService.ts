@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { generateProfessionalAdCopies, hasLovableGatewayConfig } from "./lovable-gateway";
 
 export interface AdCampaign {
   platform: string;
@@ -192,7 +193,43 @@ export async function generateAdCampaigns(
   product?: string,
   audience?: string
 ): Promise<AdCampaignResult> {
-  // Keep local generation fallback for reliable campaign output.
-  void callViaEdgeFunction;
+  // If Lovable Gateway is configured, use it for professional results
+  if (hasLovableGatewayConfig()) {
+    try {
+      const companyData = {
+        name: companyName || "",
+        industry: industry || "",
+        product: product || "",
+        audience: audience || "",
+        goal: goal || "",
+        tone: "Professional",
+        platforms: platforms,
+        competitors: ""
+      };
+
+      const copies = await generateProfessionalAdCopies(companyData);
+      
+      return {
+        summary: `Professional ${goal} campaign generated via Lovable AI Gateway.`,
+        campaigns: copies.map((copy, index) => ({
+          platform: platforms[index % platforms.length],
+          headline: "Professional Headline",
+          primaryText: copy,
+          callToAction: "Learn More",
+          targetAudience: audience || "Optimized Audience",
+          adFormat: "Optimized Format",
+          tone: "Professional",
+          hashtags: [],
+          proTips: []
+        })),
+        overallStrategy: "Gateway-driven precision targeting.",
+        budgetRecommendation: "Optimize for highest-performing gateway variants.",
+        kpis: ["Conversion Rate", "Click-Through Rate"]
+      };
+    } catch (err) {
+      console.warn("Lovable gateway failed, falling back to local generation:", err);
+    }
+  }
+
   return await callViaGatewayDirect(brief, platforms, goal, companyName, industry, product, audience);
 }

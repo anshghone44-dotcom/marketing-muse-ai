@@ -37,6 +37,36 @@ function buildProfessionalAdPrompt(data: CompanyData): string {
   ].join(" ");
 }
 
+function buildProfessionalKeywordPrompt(prompt: string, factors: string[], data: CompanyData | null): string {
+  return [
+    "You are a SEO and SEM expert.",
+    `User request: ${prompt}`,
+    `Focus factors: ${factors.join(", ")}.`,
+    data ? `Brand Context: ${data.name} in ${data.industry}. Product: ${data.product}. Audience: ${data.audience}.` : "",
+    "Generate a professional keyword strategy.",
+    "Return a summary and categorized keyword clusters in a polished format.",
+  ].join(" ");
+}
+
+function buildProfessionalContentPrompt(topic: string, type: string, tone: string, data: CompanyData | null): string {
+  return [
+    `Create a professional ${type} on the topic: ${topic}.`,
+    `Tone: ${tone}.`,
+    data ? `Brand: ${data.name}. Product: ${data.product}. Audience: ${data.audience}.` : "",
+    "The content should be high-quality, engaging, and ready for professional use.",
+  ].join(" ");
+}
+
+function buildProfessionalViralPrompt(prompt: string, data: CompanyData | null): string {
+  return [
+    "You are a viral marketing strategist.",
+    `Goal: ${prompt}`,
+    data ? `Brand: ${data.name}. Product: ${data.product}. Audience: ${data.audience}.` : "",
+    "Generate 3 innovative viral marketing ideas.",
+    "Each idea should include: Title, Description, Mechanics, and 'Why it works'.",
+  ].join(" ");
+}
+
 function stringifyContent(value: unknown): string | null {
   if (typeof value === "string") {
     return value.trim() || null;
@@ -127,17 +157,31 @@ export function hasLovableGatewayConfig(): boolean {
 }
 
 export async function generateProfessionalAdCopies(data: CompanyData): Promise<string[]> {
-  if (!LOVABLE_API_GATEWAY_URL) {
-    throw new Error("Missing `VITE_LOVABLE_API_GATEWAY_URL`.");
-  }
-
-  if (!resolvedSystemRoute) {
-    throw new Error(
-      "Missing Lovable system route. Set `VITE_LOVABLE_AD_CREATOR_ROUTE` or reuse `VITE_LOVABLE_COMPETITOR_ANALYZER_ROUTE`."
-    );
-  }
-
   const prompt = buildProfessionalAdPrompt(data);
+  const result = await callGateway(prompt, "ad-creator", "ads");
+  return extractAdCopies(result).slice(0, 3);
+}
+
+export async function generateProfessionalKeywords(prompt: string, factors: string[], data: CompanyData | null): Promise<any> {
+  const fullPrompt = buildProfessionalKeywordPrompt(prompt, factors, data);
+  return await callGateway(fullPrompt, "keyword-generator", "keywords");
+}
+
+export async function generateProfessionalContent(topic: string, type: string, tone: string, data: CompanyData | null): Promise<any> {
+  const fullPrompt = buildProfessionalContentPrompt(topic, type, tone, data);
+  return await callGateway(fullPrompt, "content-generator", "content");
+}
+
+export async function generateProfessionalViralIdeas(prompt: string, data: CompanyData | null): Promise<any> {
+  const fullPrompt = buildProfessionalViralPrompt(prompt, data);
+  return await callGateway(fullPrompt, "viral-generator", "viral-ideas");
+}
+
+async function callGateway(prompt: string, chatbot: string, task: string): Promise<any> {
+  if (!LOVABLE_API_GATEWAY_URL || !resolvedSystemRoute) {
+    throw new Error("Lovable gateway not configured correctly. Check your environment variables.");
+  }
+
   const response = await fetch(LOVABLE_API_GATEWAY_URL, {
     method: "POST",
     headers: {
@@ -147,36 +191,20 @@ export async function generateProfessionalAdCopies(data: CompanyData): Promise<s
     body: JSON.stringify({
       route: resolvedSystemRoute,
       systemRoute: resolvedSystemRoute,
-      chatbot: "ad-creator",
-      task: "ads",
-      mode: "professional-ad-copy",
-      companyProfile: data,
+      chatbot,
+      task,
       input: prompt,
-      prompt,
       messages: [
-        {
-          role: "system",
-          content:
-            "You are a senior advertising copywriter who creates polished, professional, high-converting ad campaigns.",
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
+        { role: "system", content: `You are a professional AI assistant specializing in ${task}. Provide polished, high-quality responses.` },
+        { role: "user", content: prompt },
       ],
     }),
   });
 
   if (!response.ok) {
-    throw new Error(`Lovable gateway request failed with status ${response.status}.`);
+    throw new Error(`Lovable gateway request failed with status ${response.status}`);
   }
 
   const payload = await response.json();
-  const copies = extractAdCopies(payload).slice(0, 3);
-
-  if (!copies.length) {
-    throw new Error("The Lovable gateway response did not include ad copy content.");
-  }
-
-  return copies;
+  return payload;
 }
