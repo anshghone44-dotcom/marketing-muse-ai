@@ -14,12 +14,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/hooks/use-theme";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
 
 export type TaskId =
   | "ads"
@@ -67,7 +61,7 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
             const Icon = task.icon;
             const isActive = activeTask === task.id;
             const buttonElement = (
-              <button
+              <div
                 key={`${task.id}-btn`}
                 onClick={() => {
                   if (task.id === "social") onTaskChange(task.id);
@@ -82,8 +76,8 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
               >
                 <Icon className="h-4 w-4" />
                 <span>{task.label}</span>
-                {task.id !== "social" && <ChevronDown className="h-3 w-3 ml-1 opacity-50" />}
-              </button>
+                {task.id !== "social" && <ChevronDown className="h-3 w-3 ml-1 opacity-50 transition-transform duration-200 group-hover:rotate-180" />}
+              </div>
             );
 
             if (task.id === "social") {
@@ -91,19 +85,21 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
             }
 
             return (
-              <DropdownMenu key={task.id}>
-                <DropdownMenuTrigger asChild>
-                  {buttonElement}
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-48 bg-background/95 backdrop-blur-xl border border-border/40 rounded-2xl p-1.5 shadow-2xl z-[100]">
-                  <DropdownMenuItem
-                    onClick={() => onTaskChange(task.id)}
-                    className="rounded-xl px-3 py-2 text-sm cursor-pointer hover:bg-muted font-medium text-foreground transition-colors"
-                  >
-                    {task.label} Chatbot
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div key={task.id} className="relative group flex items-center h-full cursor-pointer py-2">
+                {buttonElement}
+                
+                {/* Hover Dropdown */}
+                <div className="absolute top-12 left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100]">
+                  <div className="w-56 bg-background/95 backdrop-blur-xl border border-border/40 rounded-2xl p-1.5 shadow-2xl animate-in slide-in-from-top-1 fade-in duration-200">
+                    <button
+                      onClick={() => onTaskChange(task.id)}
+                      className="w-full text-left rounded-xl px-3 py-2 text-sm cursor-pointer hover:bg-muted font-medium text-foreground transition-colors"
+                    >
+                      {task.label} Chatbot
+                    </button>
+                  </div>
+                </div>
+              </div>
             );
           })}
         </nav>
@@ -131,7 +127,7 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
             const Icon = task.icon;
             const isActive = activeTask === task.id;
             const buttonElement = (
-              <button
+              <div
                 key={`${task.id}-mobile-btn`}
                 onClick={() => {
                   if (task.id === "social") onTaskChange(task.id);
@@ -145,8 +141,8 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
               >
                 <Icon className="h-3.5 w-3.5" />
                 <span>{task.label}</span>
-                {task.id !== "social" && <ChevronDown className="h-3 w-3 ml-0.5 opacity-50" />}
-              </button>
+                {task.id !== "social" && <ChevronDown className="h-3 w-3 ml-0.5 opacity-50 transition-transform duration-200 group-hover:rotate-180" />}
+              </div>
             );
 
             if (task.id === "social") {
@@ -154,19 +150,21 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
             }
 
             return (
-              <DropdownMenu key={`${task.id}-mobile`}>
-                <DropdownMenuTrigger asChild>
-                  {buttonElement}
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-48 bg-background/95 backdrop-blur-xl border border-border/40 rounded-2xl p-1.5 shadow-2xl z-[100]">
-                  <DropdownMenuItem
-                    onClick={() => onTaskChange(task.id)}
-                    className="rounded-xl px-3 py-2 text-sm cursor-pointer hover:bg-muted font-medium text-foreground transition-colors"
-                  >
-                    {task.label} Chatbot
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div key={`${task.id}-mobile`} className="relative group flex items-center h-full cursor-pointer">
+                {buttonElement}
+                
+                {/* Hover Dropdown */}
+                <div className="absolute bottom-full left-0 pb-2 mb-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100]">
+                  <div className="w-48 bg-background/95 backdrop-blur-xl border border-border/40 rounded-2xl p-1.5 shadow-2xl animate-in slide-in-from-bottom-1 fade-in duration-200">
+                    <button
+                      onClick={() => onTaskChange(task.id)}
+                      className="w-full text-left rounded-xl px-3 py-2 text-xs cursor-pointer hover:bg-muted font-medium text-foreground transition-colors"
+                    >
+                      {task.label} Chatbot
+                    </button>
+                  </div>
+                </div>
+              </div>
             );
           })}
         </nav>

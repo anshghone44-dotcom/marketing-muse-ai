@@ -3,6 +3,10 @@ import TopNavigation, { type TaskId } from "@/components/marketing/TopNavigation
 import CompanyForm, { type CompanyData } from "@/components/marketing/CompanyForm";
 import ResultsCanvas from "@/components/marketing/ResultsCanvas";
 import AiAdGeneratorChat from "@/components/marketing/AiAdGeneratorChat";
+import AiKeywordGenerator from "@/components/marketing/AiKeywordGenerator";
+import AiContentGeneratorChat from "@/components/marketing/AiContentGeneratorChat";
+import AiViralGeneratorChat from "@/components/marketing/AiViralGeneratorChat";
+import AiCompetitorAnalysisChat from "@/components/marketing/AiCompetitorAnalysisChat";
 import { toast } from "sonner";
 import {
   generateProfessionalAdCopies,
@@ -127,13 +131,24 @@ export default function Index() {
             onCompanySubmit={handleCompanySubmit} 
           />
         ) : activeTask === "keywords" ? (
-          <ResultsCanvas
-            activeTask={activeTask}
+          <AiKeywordGenerator
             companyData={companyData}
-            generatedContent={generatedContent}
-            isGenerating={isGenerating}
-            onGenerate={handleGenerate}
-            onRegenerate={handleRegenerate}
+            onCompanySubmit={handleCompanySubmit}
+          />
+        ) : activeTask === "content" ? (
+          <AiContentGeneratorChat
+            companyData={companyData}
+            onCompanySubmit={handleCompanySubmit}
+          />
+        ) : activeTask === "viral" ? (
+          <AiViralGeneratorChat
+            companyData={companyData}
+            onCompanySubmit={handleCompanySubmit}
+          />
+        ) : activeTask === "competitor" ? (
+          <AiCompetitorAnalysisChat
+            companyData={companyData}
+            onCompanySubmit={handleCompanySubmit}
           />
         ) : (
           <ResultsCanvas
