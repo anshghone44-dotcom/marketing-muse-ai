@@ -42,7 +42,7 @@ function generateMockContent(task: TaskId, data: CompanyData): string[] {
 
 export default function Index() {
   const [companyData, setCompanyData] = useState<CompanyData | null>(null);
-  const [activeTask, setActiveTask] = useState<TaskId>("ads");
+  const [activeTask, setActiveTask] = useState<TaskId | null>(null);
   const [generatedContent, setGeneratedContent] = useState<Record<string, string[]>>({});
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -109,12 +109,7 @@ export default function Index() {
       />
 
       <main className="container mx-auto px-6 py-12 relative z-10">
-        {activeTask === "ads" ? (
-          <AiAdGeneratorChat 
-            companyData={companyData} 
-            onCompanySubmit={handleCompanySubmit} 
-          />
-        ) : !companyData ? (
+        {!activeTask || (activeTask === "social" && !companyData) ? (
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-16 animate-in fade-in slide-in-from-top-12 duration-1000">
               <h1 className="font-display text-4xl md:text-5xl font-bold mb-6 tracking-tight bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent px-4">
@@ -126,6 +121,20 @@ export default function Index() {
             </div>
             <CompanyForm onSubmit={handleCompanySubmit} />
           </div>
+        ) : activeTask === "ads" ? (
+          <AiAdGeneratorChat 
+            companyData={companyData} 
+            onCompanySubmit={handleCompanySubmit} 
+          />
+        ) : activeTask === "keywords" ? (
+          <ResultsCanvas
+            activeTask={activeTask}
+            companyData={companyData}
+            generatedContent={generatedContent}
+            isGenerating={isGenerating}
+            onGenerate={handleGenerate}
+            onRegenerate={handleRegenerate}
+          />
         ) : (
           <ResultsCanvas
             activeTask={activeTask}

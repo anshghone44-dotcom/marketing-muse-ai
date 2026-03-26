@@ -12,7 +12,7 @@ import {
   Loader2,
   Check,
   ChevronDown,
-  Sparkles,
+  ChevronDown,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
@@ -175,8 +175,8 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
             )}
           >
             {m.role === "assistant" && (
-              <div className="w-8 h-8 rounded-full bg-foreground flex items-center justify-center mr-4 shrink-0 mt-1">
-                <Sparkles className="w-4 h-4 text-background" />
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-4 shrink-0 mt-1">
+                <span className="text-primary text-xs font-bold">AI</span>
               </div>
             )}
             <div
@@ -207,9 +207,8 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
       {messages.length === 0 && (
         <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-16 pointer-events-none px-4 text-center">
           <div className="flex items-center gap-3 mb-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-            <Sparkles className="w-10 h-10 text-foreground" />
-            <h1 className="text-4xl md:text-5xl font-sans font-bold tracking-tight text-foreground">
-              LeadBot
+            <h1 className="text-4xl md:text-5xl font-sans tracking-tight text-foreground">
+              <span className="font-bold">LeadBot</span> <span className="font-light text-muted-foreground/60">Ad Creator</span>
             </h1>
           </div>
         </div>
@@ -253,44 +252,13 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
             {/* Right Controls Container */}
             <div className="flex items-center gap-1.5 shrink-0 pr-1">
               
-              {/* Auto Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-all bg-transparent">
-                    {selectedGoal === "Auto" ? "Auto" : "Custom"}
-                    <ChevronDown className="w-3.5 h-3.5" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="center" className="w-48 bg-background/95 backdrop-blur-xl border border-border/40 rounded-2xl p-1.5 shadow-2xl">
-                  <DropdownMenuItem
-                     onClick={() => setSelectedGoal("Auto")}
-                     className={cn("rounded-xl px-3 py-2 text-sm cursor-pointer", selectedGoal === "Auto" ? "bg-muted font-bold" : "hover:bg-muted")}
-                  >
-                    Auto
-                    {selectedGoal === "Auto" && <Check className="w-4 h-4 ml-auto text-foreground" />}
-                  </DropdownMenuItem>
-                  {AD_GOALS.map((goal) => (
-                    <DropdownMenuItem
-                      key={goal}
-                      onClick={() => setSelectedGoal(goal)}
-                      className={cn(
-                        "rounded-xl px-3 py-2 text-sm cursor-pointer transition-colors",
-                        selectedGoal === goal ? "bg-muted font-bold" : "hover:bg-muted"
-                      )}
-                    >
-                      {goal}
-                      {selectedGoal === goal && <Check className="w-4 h-4 ml-auto text-foreground" />}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {/* Mic Icon */}
-              <button 
-                className="p-2.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors"
-                onClick={() => toast.info("Voice input coming soon!")}
+              {/* Analyze Button */}
+              <button
+                onClick={generateAds}
+                disabled={isGenerating || !input.trim()}
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[13px] font-semibold text-primary bg-primary/10 hover:bg-primary/20 transition-all mr-1 disabled:opacity-50 disabled:pointer-events-none"
               >
-                <Mic className="w-5 h-5" />
+                Analyze
               </button>
 
               {/* Submit Button */}
@@ -300,8 +268,8 @@ export default function AiAdGeneratorChat({ companyData, onCompanySubmit }: Prop
                 className={cn(
                   "p-2.5 rounded-full flex items-center justify-center transition-all duration-300",
                   input.trim() 
-                    ? "bg-foreground text-background hover:scale-105 active:scale-95 shadow-md" 
-                    : "bg-muted text-muted-foreground/50 pointer-events-none"
+                    ? "bg-muted text-foreground hover:bg-muted/80" 
+                    : "bg-muted/50 text-muted-foreground/30 pointer-events-none"
                 )}
               >
                 <ArrowUp className="w-5 h-5 stroke-[2.5]" />
