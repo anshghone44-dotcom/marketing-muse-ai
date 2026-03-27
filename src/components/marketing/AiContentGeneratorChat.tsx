@@ -10,7 +10,7 @@ import type { CompanyData } from "./CompanyForm";
 import {
   generateMarketingContent,
   type GeneratedContent,
-} from "@/lib/contentGeneratorService";
+} from "@/lib/geminiContentService";
 
 interface Message {
   id: string;

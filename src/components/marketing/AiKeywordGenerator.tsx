@@ -2,6 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import {
   Paperclip,
   Loader2,
+  List,
+  Target,
+  Search,
+  TrendingUp,
+  Award,
+  Zap,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
@@ -10,7 +16,7 @@ import type { CompanyData } from "./CompanyForm";
 import {
   generateKeywords,
   type KeywordResult,
-} from "@/lib/keywordGeneratorService";
+} from "@/lib/geminiKeywordService";
 
 export const KEYWORD_FACTORS = [
   "Lead-Gen",

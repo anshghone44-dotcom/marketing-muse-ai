@@ -2,6 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import {
   Paperclip,
   Loader2,
+  Share2,
+  Zap,
+  TrendingUp,
+  Users,
+  MessageSquare,
+  Gift,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
@@ -10,7 +16,7 @@ import type { CompanyData } from "./CompanyForm";
 import {
   generateViralIdeas,
   type ViralCampaignResult,
-} from "@/lib/viralGeneratorService";
+} from "@/lib/geminiViralService";
 
 interface Message {
   id: string;
