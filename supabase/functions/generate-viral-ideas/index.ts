@@ -54,7 +54,7 @@ Return this exact JSON structure:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-flash-1.5",
+        model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: "You are a viral marketing strategist. Return only valid JSON, no markdown." },
           { role: "user", content: `Goal: ${userPrompt}\n\n${systemPrompt}` },
