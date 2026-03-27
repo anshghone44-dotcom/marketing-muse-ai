@@ -45,13 +45,19 @@ export async function generateMarketingContent(
           ? response.replace(/```json\n?/gi, '').replace(/```\n?/g, '').trim()
           : JSON.stringify(response);
           
-        return JSON.parse(cleaned) as GeneratedContent;
+        const parsed = JSON.parse(cleaned);
+        return {
+          title: parsed.title || topic,
+          metaDescription: parsed.metaDescription || "Professional marketing content generated via Gemini.",
+          sections: Array.isArray(parsed.sections) ? parsed.sections : [{ heading: "Content Overview", content: typeof response === 'string' ? response : JSON.stringify(response) }],
+          cta: parsed.cta || { text: "Learn More", subtext: "Contact us today" }
+        };
       } catch (parseErr) {
-        console.warn("Failed to parse content JSON, falling back to basic structure:", parseErr);
+        console.warn("Failed to parse content JSON:", parseErr);
         return {
           title: topic,
           metaDescription: "Professional marketing content generated via Gemini.",
-          sections: [{ heading: "Overview", content: typeof response === 'string' ? response : JSON.stringify(response) }],
+          sections: [{ heading: "Content Overview", content: typeof response === 'string' ? response : JSON.stringify(response) }],
           cta: { text: "Learn More", subtext: "Contact us today" }
         };
       }
