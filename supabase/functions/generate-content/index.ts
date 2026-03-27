@@ -25,7 +25,7 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    const systemPrompt = `You are a professional content strategist. Generate high-quality marketing content in JSON format only (no markdown, no blocks).
+    const systemPrompt = `You are a professional content strategist. Generate high-quality marketing content in JSON format only (no markdown blocks around it).
 
 Type: ${contentType}
 Topic: ${topic}
@@ -35,12 +35,16 @@ Industry: ${industry || "Not specified"}
 Product: ${product || "Not specified"}
 Audience: ${audience || "General"}
 
+Structure the content professionally with an introduction, key sub-sections, and a conclusion.
+
 Return this exact JSON structure:
 {
   "title": "Compelling Title",
   "metaDescription": "SEO-friendly meta description",
   "sections": [
-    { "heading": "Section Heading", "content": "Detailed markdown content" }
+    { "heading": "I. Introduction", "content": "Detailed markdown content..." },
+    { "heading": "II. Strategy/Analysis", "content": "Detailed markdown content..." },
+    { "heading": "III. Summary", "content": "Detailed markdown content..." }
   ],
   "cta": { "text": "Call to Action Label", "subtext": "Psychological trigger" }
 }`;

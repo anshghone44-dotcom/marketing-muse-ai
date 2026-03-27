@@ -66,18 +66,20 @@ function buildProfessionalKeywordPrompt(prompt: string, factors: string[], data:
 
 function buildProfessionalContentPrompt(topic: string, type: string, tone: string, data: CompanyData | null): string {
   return [
-    `Create a professional ${type} on the topic: ${topic}.`,
+    `Create a professional ${type} (blog/article/landing page) on the topic: ${topic}.`,
     `Tone: ${tone}.`,
     data ? `Brand: ${data.name}. Product: ${data.product}. Audience: ${data.audience}.` : "",
-    "Return the result as a raw JSON object only (no markdown, no blocks) with this structure:",
+    "IMPORTANT: Structure the content professionally with an introduction, key sub-sections, and a conclusion.",
+    "Return the result as a raw JSON object ONLY (no markdown blocks around it) with this structure:",
     "{",
-    '  "title": "Compelling Title",',
-    '  "metaDescription": "SEO meta description",',
+    '  "title": "Expertly Crafted Title",',
+    '  "metaDescription": "Concise, SEO-optimized meta description (150-160 chars)",',
     '  "sections": [',
-    '    { "heading": "First Section Heading", "content": "Markdown content here" },',
-    '    { "heading": "Second Section Heading", "content": "Markdown content here" }',
+    '    { "heading": "I. Introduction", "content": "Compelling intro in markdown..." },',
+    '    { "heading": "II. Key Strategy Name", "content": "Detailed body in markdown..." },',
+    '    { "heading": "III. Summary/Next Steps", "content": "Professional conclusion..." }',
     '  ],',
-    '  "cta": { "text": "Button Text", "subtext": "Psychological trigger" }',
+    '  "cta": { "text": "Call to Action Message", "subtext": "Irresistible psychological hook" }',
     "}",
   ].join(" ");
 }

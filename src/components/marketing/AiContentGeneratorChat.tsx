@@ -142,13 +142,15 @@ export default function AiContentGeneratorChat({ companyData }: Props) {
               {m.type === "results" && m.result && (
                 <div className="mt-6 space-y-8 animate-in fade-in duration-1000">
                   {/* Meta Information Card */}
-                  <div className="bg-muted/30 border border-border/50 rounded-2xl p-5 space-y-3">
-                    <div className="flex items-center gap-2 text-primary">
-                      <Search className="w-4 h-4" />
-                      <span className="text-[10px] font-bold uppercase tracking-widest">SEO Meta Data</span>
+                  {m.result.metaDescription && (
+                    <div className="bg-muted/30 border border-border/50 rounded-2xl p-5 space-y-3">
+                      <div className="flex items-center gap-2 text-primary">
+                        <Search className="w-4 h-4" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest">SEO Meta Data</span>
+                      </div>
+                      <p className="text-sm text-foreground/80 italic leading-relaxed">"{m.result.metaDescription}"</p>
                     </div>
-                    <p className="text-sm text-foreground/80 italic leading-relaxed">"{m.result.metaDescription}"</p>
-                  </div>
+                  )}
 
                   {/* Content Sections */}
                   <div className="space-y-12">

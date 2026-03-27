@@ -23,17 +23,26 @@ function normalizeContentResult(response: any, topic: string): GeneratedContent 
       : JSON.stringify(response);
       
     const parsed = JSON.parse(cleaned);
+    
+    // Support legacy 'body' or missing sections
+    let sections = Array.isArray(parsed.sections) ? parsed.sections : [];
+    if (sections.length === 0 && parsed.body) {
+      sections = [{ heading: "Content", content: parsed.body }];
+    } else if (sections.length === 0) {
+      sections = [{ heading: "Content Overview", content: typeof response === 'string' ? response : JSON.stringify(response) }];
+    }
+
     return {
       title: parsed.title || topic,
-      metaDescription: parsed.metaDescription || "Professional marketing content generated via Gemini.",
-      sections: Array.isArray(parsed.sections) ? parsed.sections : [{ heading: "Content Overview", content: typeof response === 'string' ? response : JSON.stringify(response) }],
+      metaDescription: parsed.metaDescription || "",
+      sections: sections,
       cta: parsed.cta || { text: "Learn More", subtext: "Contact us today" }
     };
   } catch (parseErr) {
     console.warn("Failed to parse content JSON:", parseErr);
     return {
       title: topic,
-      metaDescription: "Professional marketing content generated via Gemini.",
+      metaDescription: "",
       sections: [{ heading: "Content Overview", content: typeof response === 'string' ? response : JSON.stringify(response) }],
       cta: { text: "Learn More", subtext: "Contact us today" }
     };
