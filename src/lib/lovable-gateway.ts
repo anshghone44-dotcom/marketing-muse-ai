@@ -83,6 +83,22 @@ function buildProfessionalViralPrompt(prompt: string, data: CompanyData | null):
   ].join(" ");
 }
 
+function buildProfessionalEngagementPrompt(prompt: string, data: CompanyData | null): string {
+  return [
+    "You are an audience engagement and community building expert.",
+    `Objective: ${prompt}`,
+    data ? `Brand: ${data.name}. Product: ${data.product}. Audience: ${data.audience}.` : "",
+    "Generate 3 powerful audience engagement strategies.",
+    "Return the result as a raw JSON object only (no markdown, no blocks) with this structure:",
+    "{",
+    '  "summary": "High-level engagement strategy",',
+    '  "strategies": [',
+    '    { "title": "...", "description": "...", "implementation": "...", "benefit": "...", "difficulty": "Low/Medium/High" }',
+    '  ]',
+    "}",
+  ].join(" ");
+}
+
 function stringifyContent(value: unknown): string | null {
   if (typeof value === "string") {
     return value.trim() || null;
@@ -193,7 +209,13 @@ export async function generateProfessionalContent(topic: string, type: string, t
 
 export async function generateProfessionalViralIdeas(prompt: string, data: CompanyData | null): Promise<string> {
   const fullPrompt = buildProfessionalViralPrompt(prompt, data);
-  const result = await callGateway(fullPrompt, "viral-generator", "viral-ideas");
+  const result = await callGateway(fullPrompt, "viral-ideas", "viral marketing");
+  return stringifyContent(result) || (typeof result === 'string' ? result : JSON.stringify(result));
+}
+
+export async function generateProfessionalEngagement(prompt: string, data: CompanyData | null): Promise<string> {
+  const fullPrompt = buildProfessionalEngagementPrompt(prompt, data);
+  const result = await callGateway(fullPrompt, "engagement", "audience engagement");
   return stringifyContent(result) || (typeof result === 'string' ? result : JSON.stringify(result));
 }
 

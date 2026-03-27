@@ -7,6 +7,7 @@ import AiKeywordGenerator from "@/components/marketing/AiKeywordGenerator";
 import AiContentGeneratorChat from "@/components/marketing/AiContentGeneratorChat";
 import AiViralGeneratorChat from "@/components/marketing/AiViralGeneratorChat";
 import AiCompetitorAnalysisChat from "@/components/marketing/AiCompetitorAnalysisChat";
+import AiEngagementChat from "@/components/marketing/AiEngagementChat";
 import { toast } from "sonner";
 import {
   generateProfessionalAdCopies,
@@ -147,6 +148,11 @@ export default function Index() {
           />
         ) : activeTask === "competitor" ? (
           <AiCompetitorAnalysisChat
+            companyData={companyData}
+            onCompanySubmit={handleCompanySubmit}
+          />
+        ) : activeTask === "engagement" ? (
+          <AiEngagementChat
             companyData={companyData}
             onCompanySubmit={handleCompanySubmit}
           />
