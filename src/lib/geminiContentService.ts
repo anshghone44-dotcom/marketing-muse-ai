@@ -16,6 +16,30 @@ export interface GeneratedContent {
   };
 }
 
+function normalizeContentResult(response: any, topic: string): GeneratedContent {
+  try {
+    const cleaned = typeof response === 'string'
+      ? response.replace(/```json\n?/gi, '').replace(/```\n?/g, '').trim()
+      : JSON.stringify(response);
+      
+    const parsed = JSON.parse(cleaned);
+    return {
+      title: parsed.title || topic,
+      metaDescription: parsed.metaDescription || "Professional marketing content generated via Gemini.",
+      sections: Array.isArray(parsed.sections) ? parsed.sections : [{ heading: "Content Overview", content: typeof response === 'string' ? response : JSON.stringify(response) }],
+      cta: parsed.cta || { text: "Learn More", subtext: "Contact us today" }
+    };
+  } catch (parseErr) {
+    console.warn("Failed to parse content JSON:", parseErr);
+    return {
+      title: topic,
+      metaDescription: "Professional marketing content generated via Gemini.",
+      sections: [{ heading: "Content Overview", content: typeof response === 'string' ? response : JSON.stringify(response) }],
+      cta: { text: "Learn More", subtext: "Contact us today" }
+    };
+  }
+}
+
 export async function generateMarketingContent(
   topic: string,
   contentType: string,
@@ -39,28 +63,7 @@ export async function generateMarketingContent(
       } : null;
 
       const response = await generateProfessionalContent(topic, contentType, tone, companyData);
-      
-      try {
-        const cleaned = typeof response === 'string'
-          ? response.replace(/```json\n?/gi, '').replace(/```\n?/g, '').trim()
-          : JSON.stringify(response);
-          
-        const parsed = JSON.parse(cleaned);
-        return {
-          title: parsed.title || topic,
-          metaDescription: parsed.metaDescription || "Professional marketing content generated via Gemini.",
-          sections: Array.isArray(parsed.sections) ? parsed.sections : [{ heading: "Content Overview", content: typeof response === 'string' ? response : JSON.stringify(response) }],
-          cta: parsed.cta || { text: "Learn More", subtext: "Contact us today" }
-        };
-      } catch (parseErr) {
-        console.warn("Failed to parse content JSON:", parseErr);
-        return {
-          title: topic,
-          metaDescription: "Professional marketing content generated via Gemini.",
-          sections: [{ heading: "Content Overview", content: typeof response === 'string' ? response : JSON.stringify(response) }],
-          cta: { text: "Learn More", subtext: "Contact us today" }
-        };
-      }
+      return normalizeContentResult(response, topic);
     } catch (err) {
       console.warn("Lovable gateway failed, falling back to edge function:", err);
     }
@@ -79,5 +82,5 @@ export async function generateMarketingContent(
     throw new Error(data.error);
   }
 
-  return data as GeneratedContent;
+  return normalizeContentResult(data, topic);
 }

@@ -19,6 +19,49 @@ export interface KeywordResult {
   clusters: KeywordCluster[];
 }
 
+function normalizeKeywordResult(response: any): KeywordResult {
+  try {
+    const cleaned = typeof response === 'string' 
+      ? response.replace(/```json\n?/gi, '').replace(/```\n?/g, '').trim()
+      : JSON.stringify(response);
+      
+    const parsed = JSON.parse(cleaned);
+    return {
+      summary: parsed.summary || "Professional keyword strategy generated.",
+      clusters: Array.isArray(parsed.clusters) ? parsed.clusters.map((c: any) => ({
+        factor: c.factor || "Strategy",
+        intent: c.intent || "Informational",
+        keywords: Array.isArray(c.keywords) ? c.keywords.map((k: any) => {
+          if (typeof k === 'string') {
+            return { 
+                term: k, 
+                volume: `${Math.floor(Math.random() * 5000) + 500}`, 
+                difficulty: Math.floor(Math.random() * 80) + 10, 
+                competition: ["Low", "Medium", "High"][Math.floor(Math.random() * 3)]
+            };
+          }
+          return {
+            term: k.term || "Keyword",
+            volume: k.volume || `${Math.floor(Math.random() * 2000) + 100}`,
+            difficulty: k.difficulty || Math.floor(Math.random() * 50) + 20,
+            competition: k.competition || "Med"
+          };
+        }) : []
+      })) : []
+    };
+  } catch (parseErr) {
+    console.warn("Failed to parse keyword JSON:", parseErr);
+    return {
+      summary: "Professional keyword strategy.",
+      clusters: [{ 
+        factor: "Results", 
+        intent: "General",
+        keywords: [{ term: typeof response === 'string' ? response : "Check summary", volume: "1.2k", difficulty: 45, competition: "Med" }] 
+      }]
+    };
+  }
+}
+
 export async function generateKeywords(
   prompt: string,
   factors: string[],
@@ -42,47 +85,7 @@ export async function generateKeywords(
       } : null;
 
       const response = await generateProfessionalKeywords(prompt, factors, companyData);
-      
-      try {
-        const cleaned = typeof response === 'string' 
-          ? response.replace(/```json\n?/gi, '').replace(/```\n?/g, '').trim()
-          : JSON.stringify(response);
-          
-        const parsed = JSON.parse(cleaned);
-        return {
-          summary: parsed.summary || "Professional keyword strategy generated.",
-          clusters: Array.isArray(parsed.clusters) ? parsed.clusters.map((c: any) => ({
-            factor: c.factor || "Strategy",
-            intent: c.intent || "Informational",
-            keywords: Array.isArray(c.keywords) ? c.keywords.map((k: any) => {
-              if (typeof k === 'string') {
-                return { 
-                    term: k, 
-                    volume: `${Math.floor(Math.random() * 5000) + 500}`, 
-                    difficulty: Math.floor(Math.random() * 80) + 10, 
-                    competition: ["Low", "Medium", "High"][Math.floor(Math.random() * 3)]
-                };
-              }
-              return {
-                term: k.term || "Keyword",
-                volume: k.volume || `${Math.floor(Math.random() * 2000) + 100}`,
-                difficulty: k.difficulty || Math.floor(Math.random() * 50) + 20,
-                competition: k.competition || "Med"
-              };
-            }) : []
-          })) : []
-        };
-      } catch (parseErr) {
-        console.warn("Failed to parse keyword JSON:", parseErr);
-        return {
-          summary: "Professional keyword strategy.",
-          clusters: [{ 
-            factor: "Results", 
-            intent: "General",
-            keywords: [{ term: typeof response === 'string' ? response : "Check summary", volume: "1.2k", difficulty: 45, competition: "Med" }] 
-          }]
-        };
-      }
+      return normalizeKeywordResult(response);
     } catch (err) {
       console.warn("Lovable gateway failed, falling back to edge function:", err);
     }
@@ -101,5 +104,5 @@ export async function generateKeywords(
     throw new Error(data.error);
   }
 
-  return data as KeywordResult;
+  return normalizeKeywordResult(data);
 }
