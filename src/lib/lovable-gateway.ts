@@ -236,7 +236,7 @@ async function callGateway(prompt: string, chatbot: string, task: string): Promi
     body: JSON.stringify({
       model: "google/gemini-flash-1.5",
       messages: [
-        { role: "system", content: `You are a professional AI marketing assistant specializing in ${task}. Return polished markdown.` },
+        { role: "system", content: `You are a professional AI marketing assistant specializing in ${task}. Return only valid JSON, no markdown.` },
         { role: "user", content: prompt },
       ],
     }),
