@@ -25,21 +25,24 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    const systemPrompt = `You are a world-class SEO and keyword strategist. Generate specialized keyword clusters based on the factors provided. Return ONLY raw JSON with no markdown.
+    const systemPrompt = `You are an SEO expert. Generate a professional keyword strategy in JSON format only (no markdown).
 
+Prompt: ${userPrompt}
 Company: ${companyName || "Not specified"}
 Industry: ${industry || "Not specified"}
 Product: ${product || "Not specified"}
-Audience: ${audience || "General audience"}
-Factors: ${factors.join(", ")}
+Audience: ${audience || "General"}
 
 Return this exact JSON structure:
 {
-  "summary": "Keyword strategy overview",
+  "summary": "Strategic overview",
   "clusters": [
-    {
-      "factor": "One of the provided factors",
-      "keywords": ["Keyword 1", "Keyword 2", "Keyword 3", "Keyword 4", "Keyword 5"]
+    { 
+      "factor": "Category Name", 
+      "intent": "Search Intent",
+      "keywords": [
+        { "term": "keyword", "volume": "e.g. 1.2k", "difficulty": 45, "competition": "Low/Med/High" }
+      ] 
     }
   ]
 }`;

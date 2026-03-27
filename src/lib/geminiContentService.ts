@@ -1,9 +1,19 @@
 import { supabase } from "@/integrations/supabase/client";
 import { generateProfessionalContent, hasLovableGatewayConfig } from "./lovable-gateway";
 
+export interface ContentSection {
+  heading: string;
+  content: string;
+}
+
 export interface GeneratedContent {
   title: string;
-  body: string;
+  metaDescription: string;
+  sections: ContentSection[];
+  cta: {
+    text: string;
+    subtext: string;
+  };
 }
 
 export async function generateMarketingContent(
@@ -28,15 +38,23 @@ export async function generateMarketingContent(
         competitors: ""
       } : null;
 
-      const result = await generateProfessionalContent(topic, contentType, tone, companyData);
+      const response = await generateProfessionalContent(topic, contentType, tone, companyData);
       
-      if (typeof result === 'string') {
-          return {
-              title: "Professional Content Generated",
-              body: result
-          };
+      try {
+        const cleaned = typeof response === 'string'
+          ? response.replace(/```json\n?/gi, '').replace(/```\n?/g, '').trim()
+          : JSON.stringify(response);
+          
+        return JSON.parse(cleaned) as GeneratedContent;
+      } catch (parseErr) {
+        console.warn("Failed to parse content JSON, falling back to basic structure:", parseErr);
+        return {
+          title: topic,
+          metaDescription: "Professional marketing content generated via Gemini.",
+          sections: [{ heading: "Overview", content: typeof response === 'string' ? response : JSON.stringify(response) }],
+          cta: { text: "Learn More", subtext: "Contact us today" }
+        };
       }
-      return result as GeneratedContent;
     } catch (err) {
       console.warn("Lovable gateway failed, falling back to edge function:", err);
     }

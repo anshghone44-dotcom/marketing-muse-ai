@@ -25,20 +25,24 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    const systemPrompt = `You are a world-class professional copywriter. Generate high-quality marketing content in Markdown format based on the user's objective.
+    const systemPrompt = `You are a professional content strategist. Generate high-quality marketing content in JSON format only (no markdown, no blocks).
 
-Context:
+Type: ${contentType}
+Topic: ${topic}
+Tone: ${tone}
 Company: ${companyName || "Not specified"}
 Industry: ${industry || "Not specified"}
 Product: ${product || "Not specified"}
-Audience: ${audience || "General audience"}
-Content Type: ${contentType}
-Tone: ${tone}
+Audience: ${audience || "General"}
 
 Return this exact JSON structure:
 {
-  "title": "Compelling title or subject line",
-  "body": "Full content body in Markdown format. Use headers, bolding, and lists where appropriate."
+  "title": "Compelling Title",
+  "metaDescription": "SEO-friendly meta description",
+  "sections": [
+    { "heading": "Section Heading", "content": "Detailed markdown content" }
+  ],
+  "cta": { "text": "Call to Action Label", "subtext": "Psychological trigger" }
 }`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {

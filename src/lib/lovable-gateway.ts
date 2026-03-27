@@ -52,7 +52,13 @@ function buildProfessionalKeywordPrompt(prompt: string, factors: string[], data:
     "{",
     '  "summary": "High-level strategic overview",',
     '  "clusters": [',
-    '    { "factor": "Category Name", "keywords": ["kw1", "kw2"], "difficulty": "Low/Medium/High", "intent": "Informational/Transactional/etc" }',
+    '    { ',
+    '      "factor": "Category Name", ',
+    '      "keywords": [',
+    '        { "term": "keyword", "volume": "e.g. 1.2k", "difficulty": 45, "competition": "Low/Med/High" }',
+    '      ],',
+    '      "intent": "Informational/Transactional/etc" ',
+    '    }',
     '  ]',
     "}",
   ].join(" ");
@@ -63,7 +69,16 @@ function buildProfessionalContentPrompt(topic: string, type: string, tone: strin
     `Create a professional ${type} on the topic: ${topic}.`,
     `Tone: ${tone}.`,
     data ? `Brand: ${data.name}. Product: ${data.product}. Audience: ${data.audience}.` : "",
-    "The content should be high-quality, engaging, and ready for professional use.",
+    "Return the result as a raw JSON object only (no markdown, no blocks) with this structure:",
+    "{",
+    '  "title": "Compelling Title",',
+    '  "metaDescription": "SEO meta description",',
+    '  "sections": [',
+    '    { "heading": "First Section Heading", "content": "Markdown content here" },',
+    '    { "heading": "Second Section Heading", "content": "Markdown content here" }',
+    '  ],',
+    '  "cta": { "text": "Button Text", "subtext": "Psychological trigger" }',
+    "}",
   ].join(" ");
 }
 

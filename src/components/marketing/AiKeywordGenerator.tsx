@@ -8,6 +8,8 @@ import {
   TrendingUp,
   Award,
   Zap,
+  BarChart3,
+  ArrowUpRight,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
@@ -181,11 +183,35 @@ export default function AiKeywordGenerator({ companyData }: Props) {
                           )}
                         </div>
                         
-                        <div className="flex flex-wrap gap-2">
+                        <div className="grid grid-cols-1 gap-2.5">
                           {cluster.keywords.map((kw, ki) => (
-                            <span key={ki} className="text-sm bg-muted/50 text-foreground px-3 py-1 rounded-lg border border-border/20">
-                              {kw}
-                            </span>
+                            <div key={ki} className="flex items-center justify-between bg-muted/30 hover:bg-muted/50 p-2.5 rounded-xl border border-border/20 transition-all group/kw">
+                              <div className="flex flex-col">
+                                <span className="text-sm font-semibold text-foreground">{kw.term}</span>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <span className="text-[9px] flex items-center gap-1 text-muted-foreground/70">
+                                    <BarChart3 className="w-3 h-3" />
+                                    {kw.volume} Vol.
+                                  </span>
+                                  <span className="text-[9px] flex items-center gap-1 text-muted-foreground/70">
+                                    <TrendingUp className="w-3 h-3" />
+                                    {kw.competition} Comp.
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="flex flex-col items-end gap-1">
+                                <div className="w-12 h-1 bg-muted rounded-full overflow-hidden">
+                                  <div 
+                                    className={cn(
+                                      "h-full rounded-full transition-all",
+                                      kw.difficulty > 70 ? "bg-red-500" : kw.difficulty > 40 ? "bg-orange-500" : "bg-emerald-500"
+                                    )}
+                                    style={{ width: `${kw.difficulty}%` }}
+                                  />
+                                </div>
+                                <span className="text-[8px] font-bold text-muted-foreground">DIFF: {kw.difficulty}</span>
+                              </div>
+                            </div>
                           ))}
                         </div>
 

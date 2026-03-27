@@ -2,10 +2,16 @@ import { useState, useRef, useEffect } from "react";
 import {
   Paperclip,
   Loader2,
+  Search,
+  Zap,
+  Layout,
+  FileText,
+  Target
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import type { CompanyData } from "./CompanyForm";
 import {
   generateMarketingContent,
@@ -16,6 +22,8 @@ interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
+  type?: "results";
+  result?: GeneratedContent;
 }
 
 interface Props {
@@ -67,12 +75,12 @@ export default function AiContentGeneratorChat({ companyData }: Props) {
         companyAudience
       );
 
-      const markdownContent = `### ${result.title}\n\n${result.body}`;
-
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: markdownContent,
+        content: result.title,
+        type: "results",
+        result,
       };
       
       setMessages((prev) => [...prev, aiResponse]);
@@ -129,7 +137,46 @@ export default function AiContentGeneratorChat({ companyData }: Props) {
                   : "prose prose-sm dark:prose-invert font-normal text-foreground max-w-none text-left bg-transparent"
               )}
             >
-              <ReactMarkdown>{m.content}</ReactMarkdown>
+              <h3 className="text-xl font-bold mb-4">{m.content}</h3>
+              
+              {m.type === "results" && m.result && (
+                <div className="mt-6 space-y-8 animate-in fade-in duration-1000">
+                  {/* Meta Information Card */}
+                  <div className="bg-muted/30 border border-border/50 rounded-2xl p-5 space-y-3">
+                    <div className="flex items-center gap-2 text-primary">
+                      <Search className="w-4 h-4" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest">SEO Meta Data</span>
+                    </div>
+                    <p className="text-sm text-foreground/80 italic leading-relaxed">"{m.result.metaDescription}"</p>
+                  </div>
+
+                  {/* Content Sections */}
+                  <div className="space-y-12">
+                    {m.result.sections.map((section, idx) => (
+                      <div key={idx} className="space-y-4">
+                        <h4 className="text-lg font-bold border-l-4 border-primary pl-4 py-1">{section.heading}</h4>
+                        <div className="text-foreground/90 leading-relaxed font-sans pl-1">
+                          <ReactMarkdown>{section.content}</ReactMarkdown>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Call to Action Card */}
+                  <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 flex flex-col items-center text-center space-y-3 mt-12">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Zap className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <h5 className="font-bold text-lg">{m.result.cta.text}</h5>
+                      <p className="text-sm text-muted-foreground">{m.result.cta.subtext}</p>
+                    </div>
+                    <Button variant="default" className="rounded-xl px-8">
+                      Copy CTA Copy
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         ))}
