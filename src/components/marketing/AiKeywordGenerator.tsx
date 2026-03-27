@@ -30,6 +30,8 @@ interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
+  type?: "results";
+  result?: KeywordResult;
 }
 
 interface Props {
@@ -97,7 +99,9 @@ export default function AiKeywordGenerator({ companyData }: Props) {
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: markdownContent,
+        content: result.summary,
+        type: "results",
+        result,
       };
       setMessages((prev) => [...prev, aiResponse]);
     } catch (err: unknown) {
@@ -154,6 +158,48 @@ export default function AiKeywordGenerator({ companyData }: Props) {
               )}
             >
               <ReactMarkdown>{m.content}</ReactMarkdown>
+
+              {m.type === "results" && m.result && (
+                <div className="mt-6 space-y-6 border-t border-border/10 pt-6 animate-in fade-in duration-700">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {m.result.clusters.map((cluster, i) => (
+                      <div key={i} className="bg-white dark:bg-muted/30 border border-border/50 rounded-2xl p-5 space-y-4 shadow-sm hover:shadow-md transition-all">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-primary">
+                            <Target className="w-4 h-4" />
+                            <span className="text-[10px] font-bold uppercase tracking-widest">{cluster.factor}</span>
+                          </div>
+                          {(cluster as any).difficulty && (
+                            <span className={cn(
+                              "text-[9px] px-2 py-0.5 rounded-full font-bold uppercase",
+                              (cluster as any).difficulty === 'High' ? "bg-red-100 text-red-600" :
+                              (cluster as any).difficulty === 'Medium' ? "bg-orange-100 text-orange-600" :
+                              "bg-emerald-100 text-emerald-600"
+                            )}>
+                              {(cluster as any).difficulty}
+                            </span>
+                          )}
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-2">
+                          {cluster.keywords.map((kw, ki) => (
+                            <span key={ki} className="text-sm bg-muted/50 text-foreground px-3 py-1 rounded-lg border border-border/20">
+                              {kw}
+                            </span>
+                          ))}
+                        </div>
+
+                        {(cluster as any).intent && (
+                          <div className="flex items-center gap-1.5 text-muted-foreground/60">
+                            <Zap className="w-3 h-3" />
+                            <span className="text-[10px] italic">Intent: {(cluster as any).intent}</span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         ))}

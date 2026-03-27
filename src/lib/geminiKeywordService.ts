@@ -33,16 +33,25 @@ export async function generateKeywords(
         competitors: ""
       } : null;
 
-      const result = await generateProfessionalKeywords(prompt, factors, companyData);
+      const response = await generateProfessionalKeywords(prompt, factors, companyData);
       
-      // If the gateway returns a string (markdown), we need to parse it or wrap it
-      if (typeof result === 'string') {
-          return {
-              summary: "Professional keyword strategy generated via Lovable AI Gateway.",
-              clusters: [{ factor: "Results", keywords: [result] }]
-          };
+      try {
+        const cleaned = typeof response === 'string' 
+          ? response.replace(/```json\n?/gi, '').replace(/```\n?/g, '').trim()
+          : JSON.stringify(response);
+          
+        const parsed = JSON.parse(cleaned);
+        return {
+          summary: parsed.summary || "Professional keyword strategy generated.",
+          clusters: Array.isArray(parsed.clusters) ? parsed.clusters : []
+        };
+      } catch (parseErr) {
+        console.warn("Failed to parse keyword JSON, returned raw content:", parseErr);
+        return {
+          summary: "Professional keyword strategy.",
+          clusters: [{ factor: "Results", keywords: [typeof response === 'string' ? response : JSON.stringify(response)] }]
+        };
       }
-      return result as KeywordResult;
     } catch (err) {
       console.warn("Lovable gateway failed, falling back to edge function:", err);
     }

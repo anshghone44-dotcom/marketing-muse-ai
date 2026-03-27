@@ -8,6 +8,7 @@ import {
   Users,
   MessageSquare,
   Gift,
+  Award,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
@@ -22,6 +23,8 @@ interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
+  type?: "results";
+  result?: ViralCampaignResult;
 }
 
 interface Props {
@@ -95,7 +98,9 @@ export default function AiViralGeneratorChat({ companyData }: Props) {
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: markdownContent,
+        content: result.summary,
+        type: "results",
+        result,
       };
       
       setMessages((prev) => [...prev, aiResponse]);
@@ -153,6 +158,58 @@ export default function AiViralGeneratorChat({ companyData }: Props) {
               )}
             >
               <ReactMarkdown>{m.content}</ReactMarkdown>
+
+              {m.type === "results" && m.result && (
+                <div className="mt-6 flex flex-col gap-6 border-t border-border/10 pt-6 animate-in slide-in-from-bottom-4 duration-700">
+                  {m.result.ideas.map((idea, i) => (
+                    <div key={i} className="bg-white dark:bg-muted/30 border border-border/50 rounded-2xl p-6 space-y-5 shadow-sm hover:shadow-md transition-all">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-primary font-bold">
+                          <Zap className="w-5 h-5" />
+                          <h3 className="text-base tracking-tight">{idea.title}</h3>
+                        </div>
+                        {(idea as any).reachEstimate && (
+                          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/5 border border-primary/10">
+                            <TrendingUp className="w-3.5 h-3.5 text-primary" />
+                            <span className="text-[10px] font-bold text-primary uppercase">{(idea as any).reachEstimate} Est. Reach</span>
+                          </div>
+                        )}
+                      </div>
+
+                      <p className="text-sm italic text-muted-foreground leading-relaxed">"{idea.description}"</p>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-2 text-primary/70">
+                            <Award className="w-3.5 h-3.5" />
+                            <span className="text-[10px] font-bold uppercase tracking-widest">Mechanics</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground">{idea.mechanics}</p>
+                        </div>
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-2 text-primary/70">
+                            <Share2 className="w-3.5 h-3.5" />
+                            <span className="text-[10px] font-bold uppercase tracking-widest">Platforms</span>
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {idea.platforms.map(p => (
+                              <span key={p} className="text-[10px] bg-muted px-2 py-0.5 rounded border border-border/50 font-medium">{p}</span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-primary/5 rounded-xl p-4 border border-primary/10">
+                        <div className="flex items-center gap-2 text-primary mb-1">
+                          <Users className="w-3.5 h-3.5" />
+                          <span className="text-[10px] font-bold uppercase tracking-widest">Virality Hook</span>
+                        </div>
+                        <p className="text-xs font-medium text-foreground/80">{idea.whyItWorks}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         ))}

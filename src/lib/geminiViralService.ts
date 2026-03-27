@@ -35,21 +35,31 @@ export async function generateViralIdeas(
         competitors: ""
       } : null;
 
-      const result = await generateProfessionalViralIdeas(prompt, companyData);
+      const response = await generateProfessionalViralIdeas(prompt, companyData);
       
-      if (typeof result === 'string') {
-          return {
-              summary: "Viral concepts generated via Lovable AI Gateway.",
-              ideas: [{
-                  title: "Professional Viral Strategy",
-                  description: result,
-                  mechanics: "Refer to description",
-                  platforms: ["Cross-platform"],
-                  whyItWorks: "High-engagement professional framing"
-              }]
-          };
+      try {
+        const cleaned = typeof response === 'string'
+          ? response.replace(/```json\n?/gi, '').replace(/```\n?/g, '').trim()
+          : JSON.stringify(response);
+          
+        const parsed = JSON.parse(cleaned);
+        return {
+          summary: parsed.summary || "Viral concepts generated via Gemini.",
+          ideas: Array.isArray(parsed.ideas) ? parsed.ideas : []
+        };
+      } catch (parseErr) {
+        console.warn("Failed to parse viral JSON:", parseErr);
+        return {
+          summary: "Viral concepts generated via Gemini.",
+          ideas: [{
+              title: "Professional Viral Strategy",
+              description: typeof response === 'string' ? response : JSON.stringify(response),
+              mechanics: "Refer to description",
+              platforms: ["Cross-platform"],
+              whyItWorks: "Professional framing"
+          }]
+        };
       }
-      return result as ViralCampaignResult;
     } catch (err) {
       console.warn("Lovable gateway failed, falling back to edge function:", err);
     }

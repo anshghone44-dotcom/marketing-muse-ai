@@ -48,7 +48,13 @@ function buildProfessionalKeywordPrompt(prompt: string, factors: string[], data:
     `Focus factors: ${factors.join(", ")}.`,
     data ? `Brand Context: ${data.name} in ${data.industry}. Product: ${data.product}. Audience: ${data.audience}.` : "",
     "Generate a professional keyword strategy.",
-    "Return a summary and categorized keyword clusters in a polished format.",
+    "Return the result as a raw JSON object only (no markdown, no blocks) with this structure:",
+    "{",
+    '  "summary": "High-level strategic overview",',
+    '  "clusters": [',
+    '    { "factor": "Category Name", "keywords": ["kw1", "kw2"], "difficulty": "Low/Medium/High", "intent": "Informational/Transactional/etc" }',
+    '  ]',
+    "}",
   ].join(" ");
 }
 
@@ -67,7 +73,13 @@ function buildProfessionalViralPrompt(prompt: string, data: CompanyData | null):
     `Goal: ${prompt}`,
     data ? `Brand: ${data.name}. Product: ${data.product}. Audience: ${data.audience}.` : "",
     "Generate 3 innovative viral marketing ideas.",
-    "Each idea should include: Title, Description, Mechanics, and 'Why it works'.",
+    "Return the result as a raw JSON object only (no markdown, no blocks) with this structure:",
+    "{",
+    '  "summary": "Overall viral growth strategy",',
+    '  "ideas": [',
+    '    { "title": "...", "description": "...", "mechanics": "...", "platforms": ["..."], "whyItWorks": "...", "reachEstimate": "..." }',
+    '  ]',
+    "}",
   ].join(" ");
 }
 
