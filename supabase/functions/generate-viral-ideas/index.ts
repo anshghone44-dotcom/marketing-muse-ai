@@ -54,7 +54,7 @@ Return this exact JSON structure:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-flash-1.5",
+        model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: "You are a viral marketing strategist. Return only valid JSON, no markdown." },
           { role: "user", content: `Goal: ${userPrompt}\n\n${systemPrompt}` },
@@ -62,12 +62,21 @@ Return this exact JSON structure:
       }),
     });
 
+    if (response.status === 429) {
+      return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again later." }), {
+        status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    if (response.status === 402) {
+      return new Response(JSON.stringify({ error: "AI credits exhausted. Please add funds in Settings > Workspace > Usage." }), {
+        status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
     if (!response.ok) {
       const errorText = await response.text();
       console.error('AI gateway error:', response.status, errorText);
       return new Response(JSON.stringify({ error: 'AI gateway error' }), {
-        status: response.status,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
