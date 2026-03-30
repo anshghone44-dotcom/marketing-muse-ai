@@ -1,0 +1,1 @@
+Initial implementation of the Ad Template Generator component with asset upload, chatbot input, and live preview functionality.
