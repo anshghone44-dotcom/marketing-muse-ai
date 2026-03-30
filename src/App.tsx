@@ -10,6 +10,7 @@ import Index from "./pages/Index.tsx";
 import { LoginPage as Login } from "./pages/Login.tsx";
 import { SignupPage as Signup } from "./pages/Signup.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import AdTemplateGenerator from "@/components/marketing/AdTemplateGenerator";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Index />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/ad-template-generator"
+                element={
+                  <ProtectedRoute>
+                    <AdTemplateGenerator />
                   </ProtectedRoute>
                 }
               />
