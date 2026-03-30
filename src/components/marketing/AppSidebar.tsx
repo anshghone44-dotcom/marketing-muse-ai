@@ -17,9 +17,10 @@ export type TaskId =
   | "social"
   | "viral"
   | "competitor"
-  | "engagement";
+  | "engagement"
+  | "ad-template-generator"; // Added new task ID
 
-const tasks: { id: TaskId; label: string; icon: React.ElementType }[] = [
+const tasks: { id: TaskId; label: string; icon: React.ElementType; href?: string; subOptions?: { label: string; href: string }[] }[] = [
   { id: "ads", label: "Ad Creation", icon: Megaphone },
   { id: "keywords", label: "Keyword Gen", icon: Search },
   { id: "content", label: "Content Gen", icon: FileText },
@@ -30,6 +31,7 @@ const tasks: { id: TaskId; label: string; icon: React.ElementType }[] = [
   {
     id: "ad-template-generator",
     label: "Ad Template Generator",
+    icon: Megaphone, // Reusing the Megaphone icon for consistency
     href: "/ad-template-generator",
     subOptions: [
       {
