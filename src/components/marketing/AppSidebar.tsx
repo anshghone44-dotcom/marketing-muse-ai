@@ -27,6 +27,11 @@ const tasks: { id: TaskId; label: string; icon: React.ElementType }[] = [
   { id: "viral", label: "Viral Ideas", icon: Flame },
   { id: "competitor", label: "Competitor Analysis", icon: BarChart3 },
   { id: "engagement", label: "Engagement", icon: Users },
+  {
+    id: "ad-template-generator",
+    label: "Ad Template Generator",
+    href: "/ad-template-generator",
+  },
 ];
 
 interface Props {
