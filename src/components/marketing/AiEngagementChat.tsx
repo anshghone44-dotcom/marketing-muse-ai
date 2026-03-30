@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from "react";
-import { 
+import {
   Paperclip,
   Loader2,
-  Send, 
-  Sparkles, 
-  RefreshCcw, 
+  Send,
+  Sparkles,
+  RefreshCcw,
   Target,
   Heart,
   MessageCircle,
@@ -50,14 +50,17 @@ export default function AiEngagementChat({ companyData, onCompanySubmit }: Props
       return;
     }
 
-    const userMessage: Message = { id: Date.now().toString(), role: "user", content: input };
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: "user",
+      content: input.trim(),
+    };
     setMessages((prev) => [...prev, userMessage]);
-    setInput("");
     setIsLoading(true);
+    setInput("");
 
     try {
-      const result = await generateEngagementStrategies(input, companyData);
-      
+      const result = await generateEngagementStrategies(input.trim(), companyData);
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
@@ -65,103 +68,68 @@ export default function AiEngagementChat({ companyData, onCompanySubmit }: Props
         type: "results",
         result,
       };
-      
       setMessages((prev) => [...prev, aiResponse]);
-    } catch (err: unknown) {
-      console.error(err);
-      toast.error("Failed to generate strategies. Please try again.");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to generate engagement strategies. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
   return (
-    <div className="flex flex-col h-[85vh] w-full max-w-4xl mx-auto relative bg-background/60 backdrop-blur-lg rounded-3xl border border-border/40 shadow-xl overflow-hidden">
-      {/* ── Engagement Header ── */}
-      <div className="px-4 py-5 sm:px-6 rounded-2xl bg-background/70 border border-border/40 shadow-sm backdrop-blur-lg mb-4">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
-              <MessageCircle className="w-5 h-5" />
-            </div>
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">Audience Engagement Architect</h1>
-              <p className="text-sm text-muted-foreground">Craft professional user engagement plans with modern, data-driven tactics.</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => { setMessages([]); setInput(""); }}>
-              <RefreshCcw className="w-4 h-4 mr-1" />
-              Reset
-            </Button>
-            <Button variant="secondary" size="sm" onClick={() => toast.success("Use clear, goal-focused prompts to get the best engagement blueprint.") }>
-              <Sparkles className="w-4 h-4 mr-1" />
-              Pro Tip
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Chat / Strategy Output ── */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto w-full px-4 md:px-6 pb-32 pt-2 space-y-6 scroll-smooth">
-        {messages.length === 0 && !isLoading && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none px-4 text-center">
-            <h2 className="text-4xl md:text-5xl font-extrabold leading-tight text-foreground">Let’s build your engagement blueprint</h2>
-            <p className="text-sm md:text-base text-muted-foreground max-w-2xl mt-2">
-              Chat just like Grok: ask your growth question and receive clear, structured audience engagement actions.
-            </p>
-          </div>
+    <div className="flex flex-col h-[85vh] w-full max-w-4xl mx-auto relative overflow-hidden">
+      {/* Chat Area / Results */}
+      <div
+        ref={scrollRef}
+        className={cn(
+          "flex-1 overflow-y-auto w-full px-4 md:px-8 pb-32 pt-8 space-y-8 scroll-smooth",
+          messages.length === 0 ? "hidden" : "block"
         )}
-
+      >
         {messages.map((m) => (
-          <div key={m.id} className={cn("flex w-full animate-in fade-in duration-500", m.role === "user" ? "justify-end" : "justify-start")}>
+          <div
+            key={m.id}
+            className={cn(
+              "flex w-full animate-in fade-in duration-500",
+              m.role === "user" ? "justify-end" : "justify-start"
+            )}
+          >
             {m.role === "assistant" && (
-              <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center mr-3 shrink-0 mt-1">
-                <span className="text-primary text-[11px] font-bold">AI</span>
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-4 shrink-0 mt-1">
+                <span className="text-primary text-xs font-bold">AI</span>
               </div>
             )}
-            <div className={cn("max-w-[90%] rounded-2xl px-5 py-4 text-[15px] leading-relaxed shadow-sm",
-              m.role === "user"
-                ? "bg-primary/5 text-foreground border border-primary/10"
-                : "bg-background/80 text-foreground border border-border/30"
-            )}>
+            <div
+              className={cn(
+                "max-w-[85%] rounded-2xl px-5 py-4 text-[15px] leading-relaxed",
+                m.role === "user"
+                  ? "bg-primary/5 text-foreground border border-primary/10 shadow-sm"
+                  : "prose prose-sm dark:prose-invert font-normal text-foreground max-w-none text-left bg-transparent"
+              )}
+            >
               <ReactMarkdown>{m.content}</ReactMarkdown>
 
               {m.type === "results" && m.result && (
-                <div className="mt-5 space-y-4">
-                  <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
-                    <p className="text-sm font-semibold text-primary">Executive Summary</p>
-                    <p className="text-sm text-foreground/85 mt-2">{m.result.summary}</p>
-                  </div>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    {m.result.strategies.map((strat, i) => (
-                      <article key={i} className="rounded-2xl border border-border/50 bg-background/90 p-5 shadow-sm hover:shadow-md transition-all">
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <h3 className="text-base font-bold text-foreground">{strat.title}</h3>
-                            <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground mt-1">{strat.difficulty} effort</p>
-                          </div>
-                          <span className={cn(
-                            "text-[10px] px-2 py-1 rounded-full font-bold uppercase",
-                            strat.difficulty === "High" ? "bg-red-100 text-red-700" : strat.difficulty === "Medium" ? "bg-orange-100 text-orange-700" : "bg-emerald-100 text-emerald-700"
-                          )}>
-                            {strat.difficulty}
-                          </span>
-                        </div>
-                        <p className="text-sm text-foreground/85 mt-4">{strat.description}</p>
-                        <div className="grid grid-cols-1 gap-3 mt-4 text-sm">
-                          <div className="flex items-center gap-2 text-muted-foreground">
+                <div className="mt-6 space-y-6 border-t border-border/10 pt-6 animate-in fade-in duration-700">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {m.result.strategies.map((strategy, i) => (
+                      <div key={i} className="bg-white dark:bg-muted/30 border border-border/50 rounded-2xl p-5 space-y-4 shadow-sm hover:shadow-md transition-all">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-primary">
                             <Target className="w-4 h-4" />
-                            <span>Implementation</span>
+                            <span className="text-[10px] font-bold uppercase tracking-widest">{strategy.title}</span>
                           </div>
-                          <p className="text-foreground/90 pl-6">{strat.implementation}</p>
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <TrendingUp className="w-4 h-4" />
-                            <span>Primary benefit</span>
-                          </div>
-                          <p className="text-foreground/90 pl-6">{strat.benefit}</p>
                         </div>
-                      </article>
+                        <p>{strategy.description}</p>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -169,53 +137,69 @@ export default function AiEngagementChat({ companyData, onCompanySubmit }: Props
             </div>
           </div>
         ))}
-
         {isLoading && (
-          <div className="flex w-full animate-in fade-in duration-500 justify-start items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+          <div className="flex w-full animate-in fade-in duration-500 justify-start items-center">
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-4 shrink-0">
               <Loader2 className="w-4 h-4 text-primary animate-spin" />
             </div>
-            <span className="text-sm font-medium text-muted-foreground animate-pulse">Generating professional engagement recommendations...</span>
+            <div className="text-muted-foreground text-sm font-medium animate-pulse">
+              Generating engagement strategies...
+            </div>
           </div>
         )}
       </div>
 
-      {/* Input */}
-      <div className="absolute inset-x-0 bottom-0 px-4 pb-8 pt-4 transition-all duration-700 ease-in-out z-20 bg-gradient-to-t from-background via-background to-transparent">
+      {/* Empty State & Central Search */}
+      {messages.length === 0 && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-16 pointer-events-none px-4 text-center">
+          <div className="flex items-center gap-3 mb-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+            <h1 className="text-4xl md:text-5xl font-sans tracking-tight text-foreground">
+              <span className="font-bold">LeadBot</span> <span className="font-light drop-shadow-[0_2px_8px_rgba(0,0,0,0.1)]">Engagement Architect</span>
+            </h1>
+          </div>
+        </div>
+      )}
+
+      {/* Input Bar (Grok Style) */}
+      <div className={cn(
+        "absolute inset-x-0 bottom-0 px-4 pb-8 pt-4 transition-all duration-700 ease-in-out z-20",
+        messages.length > 0 ? "bg-gradient-to-t from-background via-background to-transparent" : "",
+        messages.length === 0 ? "top-1/2 -translate-y-1/2 pt-16 flex flex-col justify-center" : ""
+      )}>
         <div className="max-w-3xl mx-auto w-full relative group">
-          <div className="relative flex items-center bg-background rounded-[2rem] shadow-sm hover:shadow-md transition-all duration-300 p-1.5 pl-3">
+          <div className="relative flex items-center bg-background rounded-[2rem] shadow-sm hover:shadow-md transition-all duration-300 overflow-visible p-1.5 pl-3">
             <button
               onClick={() => fileInputRef.current?.click()}
               className="p-2.5 text-muted-foreground hover:opacity-80 transition-opacity shrink-0"
-              title="Upload context file"
+              title="Upload file constraints"
             >
               <Paperclip className="w-5 h-5" />
             </button>
             <input
               type="file"
               ref={fileInputRef}
-              onChange={() => toast.info("File upload currently appends text to the prompt")}
+              onChange={() => toast.info("File upload currently processes as simple text appending.")}
               className="hidden"
             />
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter" && !isLoading) { e.preventDefault(); handleSend(); } }}
-              placeholder="Ask: ‘How can we improve retention in Q3?’"
+              onKeyDown={handleKeyDown}
+              placeholder="Ask: 'How can we improve retention in Q3?'"
               className="flex-1 min-w-0 bg-transparent border-none focus:outline-none focus:ring-0 text-[15px] px-3 py-4 placeholder:text-muted-foreground/60 font-medium"
-              disabled={isLoading}
             />
-            <button
-              onClick={handleSend}
-              disabled={isLoading || !input.trim()}
-              className="flex items-center gap-2 px-4 py-1.5 rounded-full text-[13px] font-semibold text-primary bg-primary/10 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:pointer-events-none"
-            >
-              <Send className="w-4 h-4" />
-              Generate
-            </button>
+            <div className="flex items-center gap-1.5 shrink-0 pr-1">
+              <button
+                onClick={handleSend}
+                disabled={isLoading || !input.trim()}
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[13px] font-semibold text-primary bg-primary/10 hover:opacity-80 transition-opacity mr-1 disabled:opacity-50 disabled:pointer-events-none"
+              >
+                <Send className="w-4 h-4" />
+                Generate
+              </button>
+            </div>
           </div>
-          <p className="mt-2 text-center text-xs text-muted-foreground uppercase tracking-wider opacity-70">Professional, modern engagement strategy output</p>
         </div>
       </div>
     </div>
