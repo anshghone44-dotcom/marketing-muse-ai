@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { 
+  Paperclip,
+  Loader2,
   Send, 
   Sparkles, 
   RefreshCcw, 
@@ -9,7 +11,6 @@ import {
   TrendingUp
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { CompanyData } from "./CompanyForm";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
@@ -34,6 +35,7 @@ export default function AiEngagementChat({ companyData, onCompanySubmit }: Props
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -182,6 +184,19 @@ export default function AiEngagementChat({ companyData, onCompanySubmit }: Props
       <div className="absolute inset-x-0 bottom-0 px-4 pb-8 pt-4 transition-all duration-700 ease-in-out z-20 bg-gradient-to-t from-background via-background to-transparent">
         <div className="max-w-3xl mx-auto w-full relative group">
           <div className="relative flex items-center bg-background rounded-[2rem] shadow-sm hover:shadow-md transition-all duration-300 p-1.5 pl-3">
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="p-2.5 text-muted-foreground hover:opacity-80 transition-opacity shrink-0"
+              title="Upload context file"
+            >
+              <Paperclip className="w-5 h-5" />
+            </button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={() => toast.info("File upload currently appends text to the prompt")}
+              className="hidden"
+            />
             <input
               type="text"
               value={input}
