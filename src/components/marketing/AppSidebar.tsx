@@ -31,11 +31,12 @@ const tasks: { id: TaskId; label: string; icon: React.ElementType }[] = [
     id: "ad-template-generator",
     label: "Ad Template Generator",
     href: "/ad-template-generator",
-  },
-  {
-    id: "ai-ad-creator-chatbot",
-    label: "AI Ad Creator Chatbot",
-    href: "/ai-ad-creator-chatbot",
+    subOptions: [
+      {
+        label: "AI Ad Creator Chatbot",
+        href: "/ai-ad-creator-chatbot",
+      },
+    ],
   },
 ];
 
