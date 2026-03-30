@@ -21,11 +21,10 @@ import {
 } from "@/lib/geminiKeywordService";
 
 export const KEYWORD_FACTORS = [
-  "Lead-Gen",
-  "Catchy",
-  "Awareness",
-  "Long-Tail",
-  "Trending"
+  "Lead Generation",
+  "Brand Endorsement",
+  "Product Advertisement",
+  "Professional Marketing"
 ];
 
 interface Message {
