@@ -76,7 +76,7 @@ export default function AiEngagementChat({ companyData, onCompanySubmit }: Props
   };
 
   return (
-    <div className="flex flex-col h-[85vh] w-full max-w-4xl mx-auto relative bg-transparent overflow-hidden">
+    <div className="flex flex-col h-[85vh] w-full max-w-4xl mx-auto relative bg-background/60 backdrop-blur-lg rounded-3xl border border-border/40 shadow-xl overflow-hidden">
       {/* ── Engagement Header ── */}
       <div className="px-4 py-5 sm:px-6 rounded-2xl bg-background/70 border border-border/40 shadow-sm backdrop-blur-lg mb-4">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -105,10 +105,10 @@ export default function AiEngagementChat({ companyData, onCompanySubmit }: Props
       {/* ── Chat / Strategy Output ── */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto w-full px-4 md:px-6 pb-32 pt-2 space-y-6 scroll-smooth">
         {messages.length === 0 && !isLoading && (
-          <div className="h-full flex flex-col items-center justify-center text-center gap-4 px-4">
-            <h2 className="text-4xl md:text-5xl font-bold leading-tight text-foreground">Let’s build your engagement blueprint</h2>
-            <p className="text-sm md:text-base text-muted-foreground max-w-2xl">
-              Type a business challenge and get professional audience engagement protocols, loyalty frameworks, and campaign activation plans.
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none px-4 text-center">
+            <h2 className="text-4xl md:text-5xl font-extrabold leading-tight text-foreground">Let’s build your engagement blueprint</h2>
+            <p className="text-sm md:text-base text-muted-foreground max-w-2xl mt-2">
+              Chat just like Grok: ask your growth question and receive clear, structured audience engagement actions.
             </p>
           </div>
         )}
