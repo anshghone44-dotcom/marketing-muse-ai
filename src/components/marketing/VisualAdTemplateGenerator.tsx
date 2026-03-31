@@ -252,7 +252,11 @@ function AdPreview({
             src={assets.logo}
             alt="Logo"
             className="object-contain"
-            style={{ maxHeight: isLinkedIn ? "2.5rem" : "3rem", maxWidth: "7rem" }}
+            style={{ 
+              maxHeight: isLinkedIn ? "3rem" : "4rem", 
+              maxWidth: "10rem",
+              imageRendering: "high-quality" 
+            }}
             draggable={false}
           />
         </div>
@@ -473,7 +477,9 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
 
       updateDesign({
         templateId: matchedTemplate.id,
-        // Generated copy is intentionally ignored; only templates are generated
+        headline: result.headline || "Your powerful headline",
+        body: result.body || "Supporting description",
+        cta: result.cta || "Apply Now",
         logoPosition: (result.logoPosition as LogoPosition) ?? "top-left",
         textAlign: (result.textAlign as TextAlign) ?? "center",
         overlayStrength: 0,
@@ -485,10 +491,14 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
       const summaryMd = [
         `FORMAT:`,
         `• ${matchedTemplate.label}`,
+        `\nGENERATED COPY:`,
+        `• Headline: ${result.headline || "Custom"}`,
+        `• Body: ${result.body || "Custom"}`,
+        `• CTA: ${result.cta || "Apply Now"}`,
         result.campaignObjective ? `\nSTRATEGIC OBJECTIVE:\n• ${result.campaignObjective}` : "",
         result.visualDirection   ? `\nVISUAL DIRECTION:\n• ${result.visualDirection}` : "",
         result.logoPosition      ? `\nLAYOUT DETAILS:\n• Logo positioned at ${result.logoPosition}` : "",
-        `\n---\nAd structure generated successfully. Please proceed to the Design panel to add your custom copy.`
+        `\n---\nAd structure and copy integrated successfully. You can refine the text manually in the Design panel.`
       ].filter(Boolean).join("\n");
 
       const aiMsg: Message = { id: (Date.now() + 1).toString(), role: "assistant", content: summaryMd };
@@ -512,7 +522,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
       const template = AD_TEMPLATES.find((t) => t.id === design.templateId)!;
       const canvas = await html2canvas(previewRef.current, {
         useCORS: true,
-        scale: 2,
+        scale: 3,
         width: previewRef.current.offsetWidth,
         height: previewRef.current.offsetHeight,
         backgroundColor: null,
