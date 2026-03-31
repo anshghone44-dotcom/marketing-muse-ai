@@ -80,6 +80,7 @@ export default function ResultsCanvas({
     viral: "Describe the viral hook, audience emotion and channel...",
     competitor: "Enter competitor name or URL for analysis...",
     engagement: "Share customer segment and engagement goal...",
+    "visual-ad": "Describe the ad you want to create...",
   };
 
   return (
