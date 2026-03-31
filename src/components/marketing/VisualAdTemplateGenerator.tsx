@@ -94,13 +94,13 @@ const defaultDesign: DesignState = {
   cta: "",
   logoPosition: "top-left",
   textAlign: "center",
-  overlayStrength: 55,
+  overlayStrength: 0,
   fontSize: 100,
   ctaStyle: "filled",
   themeId: "blue",
   customBg: "#1a2b6b",
   customAccent: "#3b82f6",
-  overlayColor: "#0f172a",
+  overlayColor: "transparent",
   campaignObjective: "",
   visualDirection: "",
 };
@@ -476,19 +476,19 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
         // Generated copy is intentionally ignored; only templates are generated
         logoPosition: (result.logoPosition as LogoPosition) ?? "top-left",
         textAlign: (result.textAlign as TextAlign) ?? "center",
-        overlayStrength: result.overlayStrength ?? 55,
-        overlayColor: result.overlayColor ?? "#0f172a",
+        overlayStrength: 0,
+        overlayColor: "transparent",
         campaignObjective: result.campaignObjective ?? "",
         visualDirection: result.visualDirection ?? "",
       });
 
       const summaryMd = [
-        `**Format:** ${matchedTemplate.label}`,
-        result.campaignObjective ? `**Objective:** ${result.campaignObjective}` : "",
-        result.visualDirection   ? `**Visual Direction:** ${result.visualDirection}` : "",
-        result.logoPosition      ? `**Logo Position:** ${result.logoPosition}` : "",
-        result.overlayStrength !== undefined ? `**Overlay Strength:** ${result.overlayStrength}%` : "",
-        `\n*Template configured successfully. Add your custom copy in the Design panel.*`
+        `FORMAT:`,
+        `• ${matchedTemplate.label}`,
+        result.campaignObjective ? `\nSTRATEGIC OBJECTIVE:\n• ${result.campaignObjective}` : "",
+        result.visualDirection   ? `\nVISUAL DIRECTION:\n• ${result.visualDirection}` : "",
+        result.logoPosition      ? `\nLAYOUT DETAILS:\n• Logo positioned at ${result.logoPosition}` : "",
+        `\n---\nAd structure generated successfully. Please proceed to the Design panel to add your custom copy.`
       ].filter(Boolean).join("\n");
 
       const aiMsg: Message = { id: (Date.now() + 1).toString(), role: "assistant", content: summaryMd };
