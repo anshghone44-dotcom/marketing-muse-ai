@@ -414,7 +414,7 @@ function Slider({
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full h-1.5 appearance-none rounded-full bg-zinc-800 accent-zinc-400 cursor-pointer"
+        className="w-full h-1.5 appearance-none rounded-full bg-slate-100 accent-slate-500 cursor-pointer"
       />
     </div>
   );
@@ -473,9 +473,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
 
       updateDesign({
         templateId: matchedTemplate.id,
-        headline: result.headline,
-        body: result.body,
-        cta: result.cta,
+        // Generated copy is intentionally ignored; only templates are generated
         logoPosition: (result.logoPosition as LogoPosition) ?? "top-left",
         textAlign: (result.textAlign as TextAlign) ?? "center",
         overlayStrength: result.overlayStrength ?? 55,
@@ -486,13 +484,11 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
 
       const summaryMd = [
         `**Format:** ${matchedTemplate.label}`,
-        `**Headline:** ${result.headline}`,
-        `**Body:** ${result.body}`,
-        `**CTA:** ${result.cta}`,
         result.campaignObjective ? `**Objective:** ${result.campaignObjective}` : "",
         result.visualDirection   ? `**Visual Direction:** ${result.visualDirection}` : "",
         result.logoPosition      ? `**Logo Position:** ${result.logoPosition}` : "",
         result.overlayStrength !== undefined ? `**Overlay Strength:** ${result.overlayStrength}%` : "",
+        `\n*Template configured successfully. Add your custom copy in the Design panel.*`
       ].filter(Boolean).join("\n");
 
       const aiMsg: Message = { id: (Date.now() + 1).toString(), role: "assistant", content: summaryMd };
@@ -546,7 +542,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
   const currentTheme    = COLOR_THEMES.find((t) => t.id === design.themeId)!;
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 w-full min-h-[85vh] px-4 py-2 bg-[#09090b] text-zinc-200 font-sans rounded-3xl border border-zinc-800 shadow-2xl">
+    <div className="flex flex-col lg:flex-row gap-6 w-full min-h-[85vh] px-4 py-2 bg-white text-slate-800 font-sans rounded-3xl border border-slate-200 shadow-lg">
 
       {/* ══ LEFT PANEL ══════════════════════════════════════════════ */}
       <div className="w-full lg:w-[420px] xl:w-[460px] flex flex-col gap-4 shrink-0">
@@ -554,12 +550,12 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
         {/* Panel Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-serif tracking-tight text-zinc-100">AI Ad Template Builder</h2>
-            <p className="text-xs text-zinc-500 mt-0.5 font-mono uppercase tracking-wider">Grok-Powered • Template Generator</p>
+            <h2 className="text-xl font-serif tracking-tight text-slate-900">AI Ad Template Builder</h2>
+            <p className="text-xs text-slate-500 mt-0.5 font-mono uppercase tracking-wider">AI-Powered • Template Generator</p>
           </div>
           <button
             onClick={resetAll}
-            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-lg hover:bg-muted transition-all"
+            className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-all"
           >
             <RefreshCcw className="w-3.5 h-3.5" />
             Reset
@@ -567,11 +563,11 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
         </div>
 
         {/* ── Chatbot Section ──────────────────────────────────── */}
-        <div className="rounded-xl border border-zinc-800/80 bg-zinc-950 overflow-hidden flex flex-col shadow-inner"
+        <div className="rounded-xl border border-slate-200 bg-white overflow-hidden flex flex-col shadow-sm"
           style={{ minHeight: "260px", maxHeight: "320px" }}>
           <div className="px-4 py-3 border-b border-border/30 flex items-center gap-2 bg-primary/5">
             <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-serif font-semibold text-zinc-200 tracking-wide">Grok Ad Architect</span>
+            <span className="text-sm font-serif font-semibold text-slate-800 tracking-wide">AI Ad Architect</span>
           </div>
 
           {/* Chat history */}
@@ -583,7 +579,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
                   <button
                     key={i}
                     onClick={() => setChatInput(p)}
-                    className="block w-full text-left text-xs px-4 py-2.5 rounded-xl border border-zinc-800/50 bg-zinc-900/50 hover:bg-zinc-800 hover:border-zinc-700 transition-all text-zinc-400 hover:text-zinc-200 font-serif"
+                    className="block w-full text-left text-xs px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 transition-all text-slate-600 hover:text-slate-800 font-serif"
                   >
                     "{p}"
                   </button>
@@ -593,16 +589,16 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
               messages.map((m) => (
                 <div key={m.id} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
                   {m.role === "assistant" && (
-                    <div className="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center mr-3 shrink-0 mt-1 shadow-sm">
-                      <Sparkles className="w-4 h-4 text-zinc-400" />
+                    <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center mr-3 shrink-0 mt-1 shadow-sm">
+                      <Sparkles className="w-4 h-4 text-slate-600" />
                     </div>
                   )}
                   <div
                     className={cn(
                       "max-w-[88%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
                       m.role === "user"
-                        ? "bg-zinc-800 text-zinc-100 border border-zinc-700/50 self-end rounded-br-sm font-sans shadow-sm"
-                        : "text-zinc-300 whitespace-pre-wrap bg-transparent border-l-2 border-zinc-700 pl-4 rounded-none font-serif text-[15px] leading-7"
+                        ? "bg-slate-100 text-slate-900 border border-slate-200 self-end rounded-br-sm font-sans shadow-sm"
+                        : "text-slate-700 whitespace-pre-wrap bg-transparent border-l-2 border-slate-300 pl-4 rounded-none font-serif text-[15px] leading-7"
                     )}
                   >
                     {m.content}
@@ -622,7 +618,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
 
           {/* Input */}
           <div className="px-3 pb-3 pt-1 border-t border-border/20">
-            <div className="flex items-center gap-2 rounded-full bg-zinc-900/80 px-4 py-2.5 border border-zinc-800 focus-within:border-zinc-600 focus-within:ring-1 focus-within:ring-zinc-600 transition-all shadow-inner">
+            <div className="flex items-center gap-2 rounded-full bg-slate-50 px-4 py-2.5 border border-slate-200 focus-within:border-slate-300 focus-within:ring-1 focus-within:ring-slate-400 transition-all shadow-sm">
               <textarea
                 rows={2}
                 value={chatInput}
@@ -631,12 +627,12 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
                   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleGenerate(); }
                 }}
                 placeholder="Describe your ad (platform, service, tone…)"
-                className="flex-1 bg-transparent text-sm resize-none border-none text-zinc-200 focus:outline-none placeholder:text-zinc-600 leading-relaxed"
+                className="flex-1 bg-transparent text-sm resize-none border-none text-slate-800 focus:outline-none placeholder:text-slate-400 leading-relaxed"
               />
               <button
                 onClick={handleGenerate}
                 disabled={isGenerating || !chatInput.trim()}
-                className="p-2 rounded-full bg-zinc-200 text-zinc-900 hover:bg-white transition-colors disabled:opacity-40 disabled:pointer-events-none shrink-0"
+                className="p-2 rounded-full bg-slate-900 text-white hover:bg-white transition-colors disabled:opacity-40 disabled:pointer-events-none shrink-0"
               >
                 {isGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
               </button>
@@ -645,7 +641,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
         </div>
 
         {/* ── Panel Tabs ──────────────────────────────────────── */}
-        <div className="flex rounded-xl bg-zinc-900 p-1 border border-zinc-800/80 shadow-sm">
+        <div className="flex rounded-xl bg-slate-50 p-1 border border-slate-200 shadow-sm">
           {[
             { id: "assets" as const, label: "Assets", icon: ImageIcon },
             { id: "design" as const, label: "Design", icon: Palette },
@@ -656,8 +652,8 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
               className={cn(
                 "flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-semibold rounded-lg transition-all",
                 activePanel === id
-                  ? "bg-zinc-800 text-zinc-100 shadow-md ring-1 ring-zinc-700"
-                  : "text-zinc-500 hover:text-zinc-300"
+                  ? "bg-slate-100 text-slate-900 shadow-md ring-1 ring-slate-300"
+                  : "text-slate-500 hover:text-slate-700"
               )}
             >
               <Icon className="w-3.5 h-3.5" /> {label}
@@ -667,7 +663,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
 
         {/* ── Assets Panel ─────────────────────────────────────── */}
         {activePanel === "assets" && (
-          <div className="rounded-xl border border-zinc-800/80 bg-zinc-950 p-5 space-y-4">
+          <div className="rounded-xl border border-slate-200 bg-white p-5 space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <AssetUploadZone
                 label="Logo" hint="PNG/SVG preferred"
@@ -703,7 +699,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
 
         {/* ── Design Panel ─────────────────────────────────────── */}
         {activePanel === "design" && (
-          <div className="rounded-xl border border-zinc-800/80 bg-zinc-950 p-5 space-y-6 overflow-y-auto" style={{ maxHeight: "520px" }}>
+          <div className="rounded-xl border border-slate-200 bg-white p-5 space-y-6 overflow-y-auto" style={{ maxHeight: "520px" }}>
 
             {/* Editable text */}
             <div className="space-y-3">
@@ -715,7 +711,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
                   value={design.headline}
                   onChange={(e) => updateDesign({ headline: e.target.value })}
                   placeholder="Your powerful headline"
-                  className="w-full text-sm px-4 py-2.5 rounded-xl bg-zinc-900/80 border border-zinc-800 text-zinc-200 focus:outline-none focus:border-zinc-600 transition-colors placeholder:text-zinc-600 font-serif"
+                  className="w-full text-sm px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-slate-300 transition-colors placeholder:text-slate-400 font-serif"
                 />
               </div>
               <div className="space-y-1.5">
@@ -725,7 +721,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
                   value={design.body}
                   onChange={(e) => updateDesign({ body: e.target.value })}
                   placeholder="Supporting description"
-                  className="w-full text-sm px-4 py-2.5 rounded-xl bg-zinc-900/80 border border-zinc-800 text-zinc-200 focus:outline-none focus:border-zinc-600 transition-colors resize-none placeholder:text-zinc-600 font-serif"
+                  className="w-full text-sm px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-slate-300 transition-colors resize-none placeholder:text-slate-400 font-serif"
                 />
               </div>
               <div className="space-y-1.5">
@@ -735,7 +731,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
                   value={design.cta}
                   onChange={(e) => updateDesign({ cta: e.target.value })}
                   placeholder="e.g. Check Eligibility"
-                  className="w-full text-sm px-4 py-2.5 rounded-xl bg-zinc-900/80 border border-zinc-800 text-zinc-200 focus:outline-none focus:border-zinc-600 transition-colors placeholder:text-zinc-600 font-serif"
+                  className="w-full text-sm px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-slate-300 transition-colors placeholder:text-slate-400 font-serif"
                 />
               </div>
             </div>
@@ -756,8 +752,8 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
                       className={cn(
                         "flex-1 flex items-center justify-center py-2 rounded-lg border text-xs transition-all",
                         design.textAlign === a
-                          ? "bg-zinc-800 border-zinc-600 text-zinc-100 shadow-sm"
-                          : "border-zinc-800 text-zinc-500 hover:bg-zinc-900 hover:text-zinc-300"
+                          ? "bg-slate-100 border-slate-300 text-slate-900 shadow-sm"
+                          : "border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700"
                       )}
                     >
                       {a === "left" ? <AlignLeft className="w-4 h-4" /> : a === "center" ? <AlignCenter className="w-4 h-4" /> : <AlignRight className="w-4 h-4" />}
@@ -771,7 +767,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
                 <select
                   value={design.logoPosition}
                   onChange={(e) => updateDesign({ logoPosition: e.target.value as LogoPosition })}
-                  className="w-full text-sm px-4 py-2.5 rounded-xl bg-zinc-900/80 border border-zinc-800 text-zinc-200 focus:outline-none focus:border-zinc-600 transition-colors appearance-none font-serif"
+                  className="w-full text-sm px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-slate-300 transition-colors appearance-none font-serif"
                 >
                   {LOGO_POSITIONS.map((p) => (
                     <option key={p.id} value={p.id}>{p.label}</option>
@@ -789,8 +785,8 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
                       className={cn(
                         "flex-1 py-2 rounded-lg border text-xs font-medium transition-all capitalize",
                         design.ctaStyle === s
-                          ? "bg-zinc-800 border-zinc-600 text-zinc-100 shadow-sm"
-                          : "border-zinc-800 text-zinc-500 hover:bg-zinc-900 hover:text-zinc-300"
+                          ? "bg-slate-100 border-slate-300 text-slate-900 shadow-sm"
+                          : "border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700"
                       )}
                     >
                       {s}
@@ -876,7 +872,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
           <div className="relative">
             <button
               onClick={() => setShowTemplateMenu((v) => !v)}
-              className="flex items-center gap-2 px-4 py-2 rounded-full border border-zinc-800 bg-zinc-900 text-zinc-300 hover:border-zinc-600 hover:text-zinc-100 transition-all text-sm font-medium shadow-sm"
+              className="flex items-center gap-2 px-4 py-2 rounded-full border border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 hover:text-slate-900 transition-all text-sm font-medium shadow-sm"
             >
               <span>{currentTemplate.icon}</span>
               <span>{currentTemplate.label}</span>
@@ -915,7 +911,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
             <button
               onClick={() => exportAd("png")}
               disabled={isExporting}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold bg-zinc-100 text-zinc-900 hover:bg-white transition-all disabled:opacity-50 shadow-sm"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold bg-slate-900 text-white hover:bg-white transition-all disabled:opacity-50 shadow-sm"
             >
               {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
               PNG
@@ -923,7 +919,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
             <button
               onClick={() => exportAd("jpeg")}
               disabled={isExporting}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold border border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 transition-all disabled:opacity-50"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold border border-slate-300 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-all disabled:opacity-50"
             >
               <Download className="w-3.5 h-3.5" />
               JPG
@@ -932,7 +928,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
         </div>
 
         {/* Live Preview */}
-        <div className="flex-1 rounded-2xl border border-zinc-800 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-900/50 to-zinc-950 flex items-center justify-center p-6 relative overflow-hidden shadow-2xl">
+        <div className="flex-1 rounded-2xl border border-slate-200 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-50 to-slate-100 flex items-center justify-center p-6 relative overflow-hidden shadow-lg">
           <div
             className="w-full"
             style={{
