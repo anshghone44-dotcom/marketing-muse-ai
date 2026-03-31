@@ -782,7 +782,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
               <div className="space-y-1.5">
                 <label className="text-xs text-muted-foreground font-medium">CTA Style</label>
                 <div className="flex gap-1.5">
-                  {(["filled", "outline", "ghost"] as CTA_STYLES).map((s) => (
+                  {(["filled", "outline", "ghost"] as CtaStyle[]).map((s) => (
                     <button
                       key={s}
                       onClick={() => updateDesign({ ctaStyle: s })}
