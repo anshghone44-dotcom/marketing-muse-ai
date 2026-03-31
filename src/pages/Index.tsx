@@ -8,6 +8,7 @@ import AiContentGeneratorChat from "@/components/marketing/AiContentGeneratorCha
 import AiViralGeneratorChat from "@/components/marketing/AiViralGeneratorChat";
 import AiCompetitorAnalysisChat from "@/components/marketing/AiCompetitorAnalysisChat";
 import AiEngagementChat from "@/components/marketing/AiEngagementChat";
+import VisualAdTemplateGenerator from "@/components/marketing/VisualAdTemplateGenerator";
 import { toast } from "sonner";
 import {
   generateProfessionalAdCopies,
@@ -39,6 +40,9 @@ function generateMockContent(task: TaskId, data: CompanyData): string[] {
     ],
     engagement: [
       `### Attract Users\n\n1. **Free ${industry} Resource:** Create a downloadable guide that solves a key pain point for ${audience.toLowerCase()}\n2. **Interactive Quiz:** "What type of ${product.toLowerCase()} user are you?"`
+    ],
+    "visual-ad": [
+      `### Visual Ad Template\n\nUse the Visual Ad Builder to upload assets and generate ready-to-render ad templates for ${name}.`
     ],
   };
 
@@ -130,6 +134,11 @@ export default function Index() {
           <AiAdGeneratorChat 
             companyData={companyData} 
             onCompanySubmit={handleCompanySubmit} 
+          />
+        ) : activeTask === "visual-ad" ? (
+          <VisualAdTemplateGenerator
+            companyData={companyData}
+            onCompanySubmit={handleCompanySubmit}
           />
         ) : activeTask === "keywords" ? (
           <AiKeywordGenerator

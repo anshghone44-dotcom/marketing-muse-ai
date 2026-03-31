@@ -12,34 +12,23 @@ import {
 } from "lucide-react";
 export type TaskId =
   | "ads"
+  | "visual-ad"
   | "keywords"
   | "content"
   | "social"
   | "viral"
   | "competitor"
-  | "engagement"
-  | "ad-template-generator"; // Added new task ID
+  | "engagement";
 
-const tasks: { id: TaskId; label: string; icon: React.ElementType; href?: string; subOptions?: { label: string; href: string }[] }[] = [
+const tasks: { id: TaskId; label: string; icon: React.ElementType }[] = [
   { id: "ads", label: "Ad Creation", icon: Megaphone },
+  { id: "visual-ad", label: "Visual Ad Builder", icon: Megaphone },
   { id: "keywords", label: "Keyword Gen", icon: Search },
   { id: "content", label: "Content Gen", icon: FileText },
   { id: "social", label: "Social Strategy", icon: Share2 },
   { id: "viral", label: "Viral Ideas", icon: Flame },
   { id: "competitor", label: "Competitor Analysis", icon: BarChart3 },
   { id: "engagement", label: "Engagement", icon: Users },
-  {
-    id: "ad-template-generator",
-    label: "Ad Template Generator",
-    icon: Megaphone, // Reusing the Megaphone icon for consistency
-    href: "/ad-template-generator",
-    subOptions: [
-      {
-        label: "AI Ad Creator Chatbot",
-        href: "/ai-ad-creator-chatbot",
-      },
-    ],
-  },
 ];
 
 interface Props {

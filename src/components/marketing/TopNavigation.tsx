@@ -17,6 +17,7 @@ import { useTheme } from "@/hooks/use-theme";
 
 export type TaskId =
   | "ads"
+  | "visual-ad"
   | "keywords"
   | "content"
   | "social"
@@ -89,10 +90,12 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
                 {buttonElement}
                 
                 <div className="absolute top-12 left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100] transform scale-95 group-hover:scale-100 origin-top-left">
-                  <div className="w-72 bg-background border border-border rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.1)] animate-in fade-in zoom-in-95 duration-200">
+                  <div className="w-80 bg-background border border-border rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.1)] animate-in fade-in zoom-in-95 duration-200">
                     <div className="px-3 py-2 text-[10px] font-bold text-muted-foreground uppercase tracking-[0.15em] opacity-50">
                       Productivity Suite
                     </div>
+
+                    {/* Primary task option */}
                     <button
                       onClick={() => onTaskChange(task.id)}
                       className="group/item w-full flex items-center justify-between rounded-xl px-3 py-3 text-sm cursor-pointer hover:bg-muted transition-all duration-200"
@@ -108,7 +111,26 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
                       </div>
                       <div className="h-2 w-2 rounded-full bg-primary/40 opacity-0 group-hover/item:opacity-100 transition-all scale-50 group-hover/item:scale-100" />
                     </button>
-                    
+
+                    {/* Visual Ad Builder sub-option for 'ads' */}
+                    {task.id === "ads" && (
+                      <button
+                        onClick={() => onTaskChange("visual-ad")}
+                        className="group/item w-full flex items-center justify-between rounded-xl px-3 py-3 text-sm cursor-pointer hover:bg-muted transition-all duration-200"
+                      >
+                        <div className="flex items-center space-x-4">
+                          <div className="p-2.5 rounded-xl bg-violet-500/10 text-violet-500 group-hover/item:bg-violet-500/20 group-hover/item:scale-105 transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                          </div>
+                          <div className="flex flex-col items-start translate-y-[-1px]">
+                            <span className="font-bold text-[14px] text-foreground tracking-tight">Visual Ad Builder</span>
+                            <span className="text-[11px] text-muted-foreground group-hover/item:text-foreground/70 transition-colors uppercase font-medium tracking-wide leading-none mt-1">Upload assets · Live preview</span>
+                          </div>
+                        </div>
+                        <div className="h-2 w-2 rounded-full bg-violet-500/60 opacity-0 group-hover/item:opacity-100 transition-all scale-50 group-hover/item:scale-100" />
+                      </button>
+                    )}
+
                     <div className="mt-2 px-3 py-2 border-t border-border/40">
                        <p className="text-[11px] text-muted-foreground leading-relaxed italic">
                          {task.description}
