@@ -48,6 +48,10 @@ const TASK_CONFIG: Record<TaskId, { title: string; description: string }> = {
     title: "Customer Engagement",
     description: "Methods to attract users, increase shares, and convert followers",
   },
+  "visual-ad": {
+    title: "Visual Ad Builder",
+    description: "Create stunning visual ad templates with AI-powered layout and copy.",
+  },
 };
 
 export default function ResultsCanvas({
