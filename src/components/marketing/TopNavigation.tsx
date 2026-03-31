@@ -112,7 +112,7 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
                       <div className="h-2 w-2 rounded-full bg-primary/40 opacity-0 group-hover/item:opacity-100 transition-all scale-50 group-hover/item:scale-100" />
                     </button>
 
-                    {/* Visual Ad Builder sub-option for 'ads' */}
+                    {/* AI Ad Template Builder sub-option for 'ads' */}
                     {task.id === "ads" && (
                       <button
                         onClick={() => onTaskChange("visual-ad")}
@@ -123,7 +123,7 @@ export default function TopNavigation({ activeTask, onTaskChange, hasCompanyData
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
                           </div>
                           <div className="flex flex-col items-start translate-y-[-1px]">
-                            <span className="font-bold text-[14px] text-foreground tracking-tight">Visual Ad Builder</span>
+                            <span className="font-bold text-[14px] text-foreground tracking-tight">AI Ad Template Builder</span>
                             <span className="text-[11px] text-muted-foreground group-hover/item:text-foreground/70 transition-colors uppercase font-medium tracking-wide leading-none mt-1">Upload assets · Live preview</span>
                           </div>
                         </div>

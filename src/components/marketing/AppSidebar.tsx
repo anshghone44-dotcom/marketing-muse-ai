@@ -22,7 +22,7 @@ export type TaskId =
 
 const tasks: { id: TaskId; label: string; icon: React.ElementType }[] = [
   { id: "ads", label: "Ad Creation", icon: Megaphone },
-  { id: "visual-ad", label: "Visual Ad Builder", icon: Megaphone },
+  { id: "visual-ad", label: "AI Ad Template Builder", icon: Megaphone },
   { id: "keywords", label: "Keyword Gen", icon: Search },
   { id: "content", label: "Content Gen", icon: FileText },
   { id: "social", label: "Social Strategy", icon: Share2 },
