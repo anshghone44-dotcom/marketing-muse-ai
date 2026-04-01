@@ -61,6 +61,7 @@ interface Message {
   design?: DesignState;
   backgroundUrl?: string;
   companyName?: string;
+  logoUrl?: string;
 }
 
 interface Props {
@@ -69,7 +70,7 @@ interface Props {
 }
 
 // ─── Inline Ad Preview Component ────────────────────────────────────
-function InlineAdPreview({ design, backgroundUrl, companyName }: { design: DesignState, backgroundUrl: string, companyName: string }) {
+function InlineAdPreview({ design, backgroundUrl, companyName, logoUrl }: { design: DesignState, backgroundUrl: string, companyName: string, logoUrl?: string }) {
   const previewRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -158,12 +159,16 @@ function InlineAdPreview({ design, backgroundUrl, companyName }: { design: Desig
           </>
         )}
 
-        {/* Autonomous Text Logo */}
+        {/* Autonomous or Uploaded Logo */}
         <div className="absolute z-20 flex items-center" style={logoPos}>
-           <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/20">
-              <Sparkles className="w-4 h-4 text-white" />
-              <span className="font-bold text-white text-sm tracking-tight">{companyName || "YourBrand"}</span>
-           </div>
+           {logoUrl ? (
+             <img src={logoUrl} alt="Logo" className="object-contain" style={{ maxHeight: isLinkedIn ? "3rem" : "4rem", maxWidth: "10rem", imageRendering: "auto" }} crossOrigin="anonymous" />
+           ) : (
+             <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/20">
+                <Sparkles className="w-4 h-4 text-white" />
+                <span className="font-bold text-white text-sm tracking-tight">{companyName || "YourBrand"}</span>
+             </div>
+           )}
         </div>
 
         {/* Ad Text Content */}
@@ -212,6 +217,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [uploadedLogo, setUploadedLogo] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -276,6 +282,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
         design: design,
         backgroundUrl: randomBg,
         companyName: companyName,
+        logoUrl: uploadedLogo || undefined,
       };
       
       setMessages((prev) => [...prev, aiResponse]);
@@ -291,6 +298,22 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       generateAd();
+    }
+  };
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Logo must be less than 5MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setUploadedLogo(event.target?.result as string);
+        toast.success("Logo uploaded and ready!");
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -374,11 +397,16 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
           <div className="relative flex items-center bg-white rounded-[2rem] overflow-visible p-1.5 pl-3">
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="p-2.5 text-slate-400 hover:text-slate-600 transition-colors shrink-0"
+              className={cn(
+                "p-2.5 transition-colors shrink-0 flex items-center gap-2", 
+                uploadedLogo ? "text-blue-600 bg-blue-50 rounded-xl" : "text-slate-400 hover:text-slate-600"
+              )}
+              title="Upload custom logo"
             >
               <Paperclip className="w-5 h-5" />
+              {uploadedLogo && <span className="text-xs font-semibold mr-1">Logo Added</span>}
             </button>
-            <input type="file" ref={fileInputRef} onChange={() => toast.info("Autonomous mode ignores manual uploads.")} className="hidden" />
+            <input type="file" ref={fileInputRef} onChange={handleLogoUpload} accept="image/*" className="hidden" />
 
             <input
               type="text"
