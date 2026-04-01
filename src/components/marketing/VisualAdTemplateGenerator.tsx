@@ -56,16 +56,6 @@ const AUTONOMOUS_BACKGROUNDS = [
   "https://images.unsplash.com/photo-1503614472-8c93d56e92ce?auto=format&fit=crop&w=1200&q=80", // Canadian Landscape / Lake Louise
 ];
 
-const FONT_OPTIONS = [
-  { label: "Inter", value: "Inter, sans-serif" },
-  { label: "Playfair Display", value: "'Playfair Display', serif" },
-  { label: "Poppins", value: "Poppins, sans-serif" },
-  { label: "Oswald", value: "Oswald, sans-serif" },
-  { label: "Montserrat", value: "Montserrat, sans-serif" },
-  { label: "Lato", value: "Lato, sans-serif" },
-  { label: "Raleway", value: "Raleway, sans-serif" },
-];
-
 interface Message {
   id: string;
   role: "user" | "assistant";
@@ -74,7 +64,6 @@ interface Message {
   backgroundUrl?: string;
   companyName?: string;
   logoUrl?: string;
-  fontFamily?: string;
 }
 
 interface Props {
@@ -83,7 +72,7 @@ interface Props {
 }
 
 // ─── Inline Ad Preview Component ────────────────────────────────────
-function InlineAdPreview({ design, backgroundUrl, companyName, logoUrl, fontFamily = "Inter, sans-serif" }: { design: DesignState, backgroundUrl: string, companyName: string, logoUrl?: string, fontFamily?: string }) {
+function InlineAdPreview({ design, backgroundUrl, companyName, logoUrl }: { design: DesignState, backgroundUrl: string, companyName: string, logoUrl?: string }) {
   const previewRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -102,10 +91,10 @@ function InlineAdPreview({ design, backgroundUrl, companyName, logoUrl, fontFami
   const isLinkedIn  = design.templateId === "linkedin-banner";
   const isYouTube   = design.templateId === "youtube-thumb";
 
-  const contentVAlign = isLinkedIn ? "center" : isStory ? "flex-end" : "center";
+  const contentVAlign = "flex-end"; // always anchor text to bottom for consistent professional look
   const fontScale = design.fontSize / 100;
-  const headlineSize = isLinkedIn ? `${1.4 * fontScale}rem` : isStory || isYouTube ? `${2 * fontScale}rem` : `${1.75 * fontScale}rem`;
-  const bodySize     = `${0.875 * fontScale}rem`;
+  const headlineSize = isLinkedIn ? `${1.6 * fontScale}rem` : isStory || isYouTube ? `${2.2 * fontScale}rem` : `${2 * fontScale}rem`;
+  const bodySize     = `${0.9 * fontScale}rem`;
 
   const exportAd = async (format: "png" | "jpeg") => {
     if (!previewRef.current) return;
@@ -139,13 +128,13 @@ function InlineAdPreview({ design, backgroundUrl, companyName, logoUrl, fontFami
       {/* ── Template Canvas ── */}
       <div
         className="w-full relative overflow-hidden rounded-2xl border border-slate-200"
-        style={{ backgroundColor: bgColor, aspectRatio: template.aspect, fontFamily }}
+        style={{ backgroundColor: bgColor, aspectRatio: template.aspect }}
         ref={previewRef}
       >
-        {/* Clean, sharp edge-to-edge background — no blur */}
+        {/* Clean edge-to-edge background */}
         <img src={backgroundUrl} alt="Background" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" />
-        {/* Lightweight readability gradient — no heavy fog */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+        {/* Strong bottom gradient to ensure text & CTA always pop */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/5" />
 
         {/* Logo — visibly enlarged, no backdrop blur */}
         <div className="absolute z-20 flex items-center" style={logoPos}>
@@ -165,35 +154,37 @@ function InlineAdPreview({ design, backgroundUrl, companyName, logoUrl, fontFami
            )}
         </div>
 
-        {/* Ad Copy — using chosen font */}
+        {/* Ad Content — Headline, Body, CTA anchored to bottom */}
         <div
-          className="relative z-10 w-full h-full p-6 sm:p-10 flex flex-col"
-          style={{ justifyContent: contentVAlign, alignItems: design.textAlign === "center" ? "center" : design.textAlign === "right" ? "flex-end" : "flex-start", textAlign: design.textAlign }}
+          className="relative z-10 w-full h-full px-6 pb-8 pt-4 sm:px-10 sm:pb-10 flex flex-col justify-end"
+          style={{ alignItems: design.textAlign === "center" ? "center" : design.textAlign === "right" ? "flex-end" : "flex-start", textAlign: design.textAlign }}
         >
+          {/* Intro label */}
+          <p className="text-white/70 text-xs font-semibold uppercase tracking-widest mb-2">Sponsored · {companyName || "YourBrand"}</p>
+
           {design.headline && (
             <h1
-              className="font-bold tracking-tight text-white mb-3 leading-tight"
-              style={{ fontSize: headlineSize, textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}
+              className="font-bold tracking-tight text-white mb-2 leading-tight"
+              style={{ fontSize: headlineSize, textShadow: "0 2px 12px rgba(0,0,0,0.7)" }}
             >
               {design.headline}
             </h1>
           )}
           {design.body && (
             <p
-              className="font-medium text-white/95 mb-6"
-              style={{ fontSize: bodySize, maxWidth: isLinkedIn ? "60%" : "88%", textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}
+              className="font-medium text-white/90 mb-5"
+              style={{ fontSize: bodySize, maxWidth: isLinkedIn ? "60%" : "90%", textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}
             >
               {design.body}
             </p>
           )}
           {design.cta && (
             <div
-              className="px-7 py-3 rounded-full font-bold text-sm tracking-wide border"
+              className="inline-block mt-1 px-7 py-3 rounded-full font-bold text-sm tracking-wide"
               style={{
-                backgroundColor: design.ctaStyle === "filled" ? accentColor : "transparent",
-                color: design.ctaStyle === "filled" ? "#ffffff" : accentColor,
-                borderColor: design.ctaStyle === "outline" ? accentColor : "transparent",
-                boxShadow: "0 4px 14px rgba(0,0,0,0.3)",
+                backgroundColor: accentColor,
+                color: "#ffffff",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
               }}
             >
               {design.cta}
@@ -221,7 +212,6 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [uploadedLogo, setUploadedLogo] = useState<string | null>(null);
   const [uploadedBg, setUploadedBg] = useState<string | null>(null);
-  const [selectedFont, setSelectedFont] = useState(FONT_OPTIONS[0].value);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bgFileInputRef = useRef<HTMLInputElement>(null);
@@ -288,7 +278,6 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
         backgroundUrl: randomBg,
         companyName: companyName,
         logoUrl: uploadedLogo || undefined,
-        fontFamily: selectedFont,
       };
       
       setMessages((prev) => [...prev, aiResponse]);
@@ -382,7 +371,6 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
                     backgroundUrl={m.backgroundUrl}
                     companyName={m.companyName}
                     logoUrl={m.logoUrl}
-                    fontFamily={m.fontFamily || selectedFont}
                   />
                )}
             </div>
@@ -420,27 +408,6 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
         messages.length > 0 ? "bg-gradient-to-t from-white via-white to-transparent" : "",
         messages.length === 0 ? "top-[60%] -translate-y-1/2 pt-16 flex flex-col justify-center" : ""
       )}>
-        {/* Font Selector Row — only visible after first template */}
-        {messages.some((m) => m.design) && (
-          <div className="max-w-3xl mx-auto w-full mb-3 flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider mr-1">Font:</span>
-            {FONT_OPTIONS.map((f) => (
-              <button
-                key={f.value}
-                onClick={() => setSelectedFont(f.value)}
-                className={cn(
-                  "px-3 py-1 rounded-full text-xs font-medium border transition-all",
-                  selectedFont === f.value
-                    ? "bg-slate-900 text-white border-slate-900"
-                    : "bg-white text-slate-600 border-slate-200 hover:border-slate-400"
-                )}
-                style={{ fontFamily: f.value }}
-              >
-                {f.label}
-              </button>
-            ))}
-          </div>
-        )}
         <div className="max-w-3xl mx-auto w-full relative group shadow-2xl rounded-[2rem] border border-slate-200">
           
           <div className="relative flex items-center bg-white rounded-[2rem] overflow-visible p-1.5 pl-3">
