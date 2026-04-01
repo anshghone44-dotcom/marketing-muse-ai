@@ -56,6 +56,16 @@ const AUTONOMOUS_BACKGROUNDS = [
   "https://images.unsplash.com/photo-1503614472-8c93d56e92ce?auto=format&fit=crop&w=1200&q=80", // Canadian Landscape / Lake Louise
 ];
 
+const FONT_OPTIONS = [
+  { label: "Inter", value: "Inter, sans-serif" },
+  { label: "Playfair Display", value: "'Playfair Display', serif" },
+  { label: "Poppins", value: "Poppins, sans-serif" },
+  { label: "Oswald", value: "Oswald, sans-serif" },
+  { label: "Montserrat", value: "Montserrat, sans-serif" },
+  { label: "Lato", value: "Lato, sans-serif" },
+  { label: "Raleway", value: "Raleway, sans-serif" },
+];
+
 interface Message {
   id: string;
   role: "user" | "assistant";
@@ -64,6 +74,7 @@ interface Message {
   backgroundUrl?: string;
   companyName?: string;
   logoUrl?: string;
+  fontFamily?: string;
 }
 
 interface Props {
@@ -72,7 +83,7 @@ interface Props {
 }
 
 // ─── Inline Ad Preview Component ────────────────────────────────────
-function InlineAdPreview({ design, backgroundUrl, companyName, logoUrl }: { design: DesignState, backgroundUrl: string, companyName: string, logoUrl?: string }) {
+function InlineAdPreview({ design, backgroundUrl, companyName, logoUrl, fontFamily = "Inter, sans-serif" }: { design: DesignState, backgroundUrl: string, companyName: string, logoUrl?: string, fontFamily?: string }) {
   const previewRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -124,52 +135,65 @@ function InlineAdPreview({ design, backgroundUrl, companyName, logoUrl }: { desi
   };
 
   return (
-    <div className="mt-6 flex flex-col gap-4 max-w-[600px]">
+    <div className="mt-6 flex flex-col gap-4 max-w-[620px]">
+      {/* ── Template Canvas ── */}
       <div
-        className="w-full relative overflow-hidden rounded-xl shadow-lg border border-slate-200"
-        style={{ backgroundColor: bgColor, aspectRatio: template.aspect }}
+        className="w-full relative overflow-hidden rounded-2xl border border-slate-200"
+        style={{ backgroundColor: bgColor, aspectRatio: template.aspect, fontFamily }}
         ref={previewRef}
       >
-        {/* Unified Edge-To-Edge Professional Layout */}
-        <>
-          <img src={backgroundUrl} alt="Background" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/40 to-slate-900/10" />
-        </>
+        {/* Clean, sharp edge-to-edge background — no blur */}
+        <img src={backgroundUrl} alt="Background" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" />
+        {/* Lightweight readability gradient — no heavy fog */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
 
-        {/* Autonomous or Uploaded Logo */}
+        {/* Logo — visibly enlarged, no backdrop blur */}
         <div className="absolute z-20 flex items-center" style={logoPos}>
            {logoUrl ? (
-             <img src={logoUrl} alt="Logo" className="object-contain" style={{ maxHeight: isLinkedIn ? "3rem" : "4rem", maxWidth: "10rem", imageRendering: "auto" }} crossOrigin="anonymous" />
+             <img
+               src={logoUrl}
+               alt="Logo"
+               className="object-contain drop-shadow-lg"
+               style={{ maxHeight: isLinkedIn ? "4rem" : "6rem", maxWidth: "14rem" }}
+               crossOrigin="anonymous"
+             />
            ) : (
-             <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/20">
-                <Sparkles className="w-4 h-4 text-white" />
-                <span className="font-bold text-white text-sm tracking-tight">{companyName || "YourBrand"}</span>
+             <div className="flex items-center gap-2 bg-black/40 px-4 py-2 rounded-xl border border-white/30">
+                <Sparkles className="w-5 h-5 text-white" />
+                <span className="font-bold text-white text-base tracking-tight drop-shadow">{companyName || "YourBrand"}</span>
              </div>
            )}
         </div>
 
-        {/* Ad Text Content */}
+        {/* Ad Copy — using chosen font */}
         <div
           className="relative z-10 w-full h-full p-6 sm:p-10 flex flex-col"
           style={{ justifyContent: contentVAlign, alignItems: design.textAlign === "center" ? "center" : design.textAlign === "right" ? "flex-end" : "flex-start", textAlign: design.textAlign }}
         >
           {design.headline && (
-            <h1 className="font-bold tracking-tight text-white mb-3 drop-shadow-md leading-tight" style={{ fontSize: headlineSize }}>
+            <h1
+              className="font-bold tracking-tight text-white mb-3 leading-tight"
+              style={{ fontSize: headlineSize, textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}
+            >
               {design.headline}
             </h1>
           )}
           {design.body && (
-            <p className="font-medium text-white/90 mb-6 drop-shadow" style={{ fontSize: bodySize, maxWidth: isLinkedIn ? "60%" : "90%" }}>
+            <p
+              className="font-medium text-white/95 mb-6"
+              style={{ fontSize: bodySize, maxWidth: isLinkedIn ? "60%" : "88%", textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}
+            >
               {design.body}
             </p>
           )}
           {design.cta && (
             <div
-              className="px-6 py-2.5 rounded-full font-bold text-sm tracking-wide shadow-lg border border-transparent"
+              className="px-7 py-3 rounded-full font-bold text-sm tracking-wide border"
               style={{
                 backgroundColor: design.ctaStyle === "filled" ? accentColor : "transparent",
                 color: design.ctaStyle === "filled" ? "#ffffff" : accentColor,
                 borderColor: design.ctaStyle === "outline" ? accentColor : "transparent",
+                boxShadow: "0 4px 14px rgba(0,0,0,0.3)",
               }}
             >
               {design.cta}
@@ -178,12 +202,13 @@ function InlineAdPreview({ design, backgroundUrl, companyName, logoUrl }: { desi
         </div>
       </div>
 
+      {/* ── Controls Bar — Download + platform label ── */}
       <div className="flex items-center gap-3">
         <Button onClick={() => exportAd("png")} variant="outline" size="sm" disabled={isExporting} className="rounded-full shadow-sm text-xs font-semibold">
           {isExporting ? <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" /> : <Download className="w-3.5 h-3.5 mr-2" />}
           Download PNG
         </Button>
-        <span className="text-xs text-slate-500 font-medium">Auto-generated {template.label} format</span>
+        <span className="text-xs text-slate-500 font-medium">Auto-generated · {template.label}</span>
       </div>
     </div>
   );
@@ -196,6 +221,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [uploadedLogo, setUploadedLogo] = useState<string | null>(null);
   const [uploadedBg, setUploadedBg] = useState<string | null>(null);
+  const [selectedFont, setSelectedFont] = useState(FONT_OPTIONS[0].value);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bgFileInputRef = useRef<HTMLInputElement>(null);
@@ -262,6 +288,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
         backgroundUrl: randomBg,
         companyName: companyName,
         logoUrl: uploadedLogo || undefined,
+        fontFamily: selectedFont,
       };
       
       setMessages((prev) => [...prev, aiResponse]);
@@ -350,7 +377,13 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
                
                {/* Autonomous Template Preview */}
                {m.design && m.backgroundUrl && m.companyName && (
-                  <InlineAdPreview design={m.design} backgroundUrl={m.backgroundUrl} companyName={m.companyName} logoUrl={m.logoUrl} />
+                  <InlineAdPreview
+                    design={m.design}
+                    backgroundUrl={m.backgroundUrl}
+                    companyName={m.companyName}
+                    logoUrl={m.logoUrl}
+                    fontFamily={m.fontFamily || selectedFont}
+                  />
                )}
             </div>
           </div>
@@ -387,6 +420,27 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
         messages.length > 0 ? "bg-gradient-to-t from-white via-white to-transparent" : "",
         messages.length === 0 ? "top-[60%] -translate-y-1/2 pt-16 flex flex-col justify-center" : ""
       )}>
+        {/* Font Selector Row — only visible after first template */}
+        {messages.some((m) => m.design) && (
+          <div className="max-w-3xl mx-auto w-full mb-3 flex items-center gap-2 flex-wrap">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider mr-1">Font:</span>
+            {FONT_OPTIONS.map((f) => (
+              <button
+                key={f.value}
+                onClick={() => setSelectedFont(f.value)}
+                className={cn(
+                  "px-3 py-1 rounded-full text-xs font-medium border transition-all",
+                  selectedFont === f.value
+                    ? "bg-slate-900 text-white border-slate-900"
+                    : "bg-white text-slate-600 border-slate-200 hover:border-slate-400"
+                )}
+                style={{ fontFamily: f.value }}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        )}
         <div className="max-w-3xl mx-auto w-full relative group shadow-2xl rounded-[2rem] border border-slate-200">
           
           <div className="relative flex items-center bg-white rounded-[2rem] overflow-visible p-1.5 pl-3">
