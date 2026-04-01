@@ -5,6 +5,7 @@ import {
   ArrowUp,
   Sparkles,
   Paperclip,
+  ImagePlus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ReactMarkdown from "react-markdown";
@@ -129,36 +130,11 @@ function InlineAdPreview({ design, backgroundUrl, companyName, logoUrl }: { desi
         style={{ backgroundColor: bgColor, aspectRatio: template.aspect }}
         ref={previewRef}
       >
-        {/* Dynamic Professional Layouts */}
-        {isLinkedIn ? (
-          <>
-            <div className="absolute inset-y-0 right-0 w-[60%] overflow-hidden">
-               <img src={backgroundUrl} alt="Background" className="w-full h-full object-cover" crossOrigin="anonymous" />
-               <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-transparent to-transparent" />
-            </div>
-            <div className="absolute inset-y-0 left-0 w-[55%] bg-slate-900 shadow-2xl" style={{ clipPath: "polygon(0 0, 100% 0, 85% 100%, 0 100%)", backgroundColor: bgColor }} />
-          </>
-        ) : isStory ? (
-          <>
-            <img src={backgroundUrl} alt="Background" className="absolute inset-x-0 top-0 h-[70%] w-full object-cover" crossOrigin="anonymous" />
-            <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-slate-900 via-slate-900 to-transparent" />
-            <div className="absolute top-20 right-[-20px] w-32 h-32 rounded-full border-[8px] border-white/10" />
-          </>
-        ) : design.templateId === "instagram-square" ? (
-          <>
-            <img src={backgroundUrl} alt="Background" className="absolute inset-0 w-full h-full object-cover scale-150 blur-sm brightness-50" crossOrigin="anonymous" />
-            <div className="absolute inset-4 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 overflow-hidden shadow-2xl">
-               <img src={backgroundUrl} alt="Background" className="absolute inset-0 w-full h-full object-cover opacity-80" crossOrigin="anonymous" />
-               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
-            </div>
-          </>
-        ) : (
-          <>
-            <img src={backgroundUrl} alt="Background" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" />
-            <div className="absolute inset-0 bg-gradient-to-tl from-slate-900/95 via-slate-900/80 to-transparent" style={{ backgroundColor: bgColor !== "#0f172a" ? bgColor : undefined }} />
-            <div className="absolute bottom-[-10%] right-[-5%] w-[120%] h-[40%] bg-blue-500/20 blur-3xl rotate-12 rounded-full" />
-          </>
-        )}
+        {/* Unified Edge-To-Edge Professional Layout */}
+        <>
+          <img src={backgroundUrl} alt="Background" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/40 to-slate-900/10" />
+        </>
 
         {/* Autonomous or Uploaded Logo */}
         <div className="absolute z-20 flex items-center" style={logoPos}>
@@ -219,8 +195,10 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
   const [input, setInput] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [uploadedLogo, setUploadedLogo] = useState<string | null>(null);
+  const [uploadedBg, setUploadedBg] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const bgFileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -274,7 +252,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
 
       const summaryMd = `### Auto-Generated Template Complete\n\nI've generated a high-converting **${matchedTemplate.label}** ad template for your campaign. The layout, sizing, and styling have been aligned securely.\n\n**Campaign Objective:** ${result.campaignObjective}\n**Visual Strategy:** ${result.visualDirection}`;
       
-      const randomBg = AUTONOMOUS_BACKGROUNDS[Math.floor(Math.random() * AUTONOMOUS_BACKGROUNDS.length)];
+      const randomBg = uploadedBg || AUTONOMOUS_BACKGROUNDS[Math.floor(Math.random() * AUTONOMOUS_BACKGROUNDS.length)];
 
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
@@ -299,6 +277,22 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       generateAd();
+    }
+  };
+
+  const handleBgUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Background must be less than 5MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setUploadedBg(event.target?.result as string);
+        toast.success("Background uploaded and ready!");
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -397,9 +391,22 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
           
           <div className="relative flex items-center bg-white rounded-[2rem] overflow-visible p-1.5 pl-3">
             <button
+              onClick={() => bgFileInputRef.current?.click()}
+              className={cn(
+                "p-2 transition-colors shrink-0 flex items-center gap-2", 
+                uploadedBg ? "text-indigo-600 bg-indigo-50 rounded-xl" : "text-slate-400 hover:text-slate-600"
+              )}
+              title="Upload custom background"
+            >
+              <ImagePlus className="w-5 h-5" />
+              {uploadedBg && <span className="text-xs font-semibold mr-1">Bg Added</span>}
+            </button>
+            <input type="file" ref={bgFileInputRef} onChange={handleBgUpload} accept="image/*" className="hidden" />
+
+            <button
               onClick={() => fileInputRef.current?.click()}
               className={cn(
-                "p-2.5 transition-colors shrink-0 flex items-center gap-2", 
+                "p-2 transition-colors shrink-0 flex items-center gap-2", 
                 uploadedLogo ? "text-blue-600 bg-blue-50 rounded-xl" : "text-slate-400 hover:text-slate-600"
               )}
               title="Upload custom logo"
