@@ -200,8 +200,12 @@ function InlineAdPreview({ design, backgroundUrl, companyName, logoUrl }: { desi
                style={{
                  maxHeight: isLinkedIn ? "4rem" : "6rem",
                  maxWidth: "14rem",
-                 // Apply white filter when background is dark
-                 filter: isDark ? "brightness(0) invert(1) drop-shadow(0 2px 6px rgba(0,0,0,0.6))" : "drop-shadow(0 2px 6px rgba(0,0,0,0.3))",
+                 // Safe logo rendering: use a sleek white pill on dark backgrounds to protect colored/transparent/solid logos
+                 backgroundColor: isDark ? "rgba(255, 255, 255, 0.95)" : "transparent",
+                 padding: isDark ? "0.5rem 1rem" : "0",
+                 borderRadius: isDark ? "0.75rem" : "0",
+                 boxShadow: isDark ? "0 4px 12px rgba(0,0,0,0.2)" : "none",
+                 filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.2))",
                }}
                crossOrigin="anonymous"
              />
