@@ -159,9 +159,6 @@ function InlineAdPreview({ design, backgroundUrl, companyName, logoUrl }: { desi
           className="relative z-10 w-full h-full px-6 pb-8 pt-4 sm:px-10 sm:pb-10 flex flex-col justify-end"
           style={{ alignItems: design.textAlign === "center" ? "center" : design.textAlign === "right" ? "flex-end" : "flex-start", textAlign: design.textAlign }}
         >
-          {/* Intro label */}
-          <p className="text-white/70 text-xs font-semibold uppercase tracking-widest mb-2">Sponsored · {companyName || "YourBrand"}</p>
-
           {design.headline && (
             <h1
               className="font-bold tracking-tight text-white mb-2 leading-tight"
