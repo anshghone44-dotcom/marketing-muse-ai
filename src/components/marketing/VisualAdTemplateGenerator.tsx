@@ -46,12 +46,13 @@ interface DesignState {
 }
 
 const AUTONOMOUS_BACKGROUNDS = [
-  "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1200&q=80", // Aviation / Clouds
+  "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80", // Vintage Luggage & Maps
+  "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80", // Tropical Beach
+  "https://images.unsplash.com/photo-1500835556837-99ac94a94552?auto=format&fit=crop&w=1200&q=80", // Modern Airport Terminal
+  "https://images.unsplash.com/photo-1526778548025-fa2f459cd5ce?auto=format&fit=crop&w=1200&q=80", // Global Travel / Globe
+  "https://images.unsplash.com/photo-1454391304352-2bf4678b1a7a?auto=format&fit=crop&w=1200&q=80", // Stunning Horizon
+  "https://images.unsplash.com/photo-1503614472-8c93d56e92ce?auto=format&fit=crop&w=1200&q=80", // Canadian Landscape / Lake Louise
 ];
 
 interface Message {
@@ -355,7 +356,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
                
                {/* Autonomous Template Preview */}
                {m.design && m.backgroundUrl && m.companyName && (
-                  <InlineAdPreview design={m.design} backgroundUrl={m.backgroundUrl} companyName={m.companyName} />
+                  <InlineAdPreview design={m.design} backgroundUrl={m.backgroundUrl} companyName={m.companyName} logoUrl={m.logoUrl} />
                )}
             </div>
           </div>
