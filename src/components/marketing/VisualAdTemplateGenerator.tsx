@@ -193,23 +193,15 @@ function InlineAdPreview({ design, backgroundUrl, companyName, logoUrl }: { desi
         {/* Logo — auto-whitened on dark backgrounds */}
         <div className="absolute z-20 flex items-center" style={logoPos}>
            {logoUrl ? (
-             <div 
-               className="flex items-center justify-center overflow-hidden"
-               style={{
-                 backgroundColor: isDark ? "rgba(255, 255, 255, 0.95)" : "transparent",
-                 padding: isDark ? "0.5rem 0.75rem" : "0",
-                 borderRadius: isDark ? "0.75rem" : "0",
-                 boxShadow: isDark ? "0 4px 12px rgba(0,0,0,0.2)" : "none",
-               }}
-             >
+             <div className="flex items-center justify-center">
                <img
                  src={logoUrl}
                  alt="Logo"
                  className="object-contain"
                  style={{
-                   maxHeight: isLinkedIn ? "3.5rem" : "5rem",
-                   maxWidth: "12rem",
-                   filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.15))",
+                   maxHeight: isLinkedIn ? "4.5rem" : "7rem",
+                   maxWidth: "16rem",
+                   filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.3))",
                  }}
                  crossOrigin="anonymous"
                />
