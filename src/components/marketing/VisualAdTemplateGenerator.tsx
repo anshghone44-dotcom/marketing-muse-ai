@@ -183,8 +183,12 @@ function InlineAdPreview({ design, backgroundUrl, companyName, logoUrl }: { desi
       >
         {/* Clean edge-to-edge background */}
         <img src={backgroundUrl} alt="Background" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" />
-        {/* Strong bottom gradient to ensure text & CTA always pop */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/5" />
+        {/* Themed gradient: dark bottom tinted with the autonomous accent color */}
+        <div className="absolute inset-0" style={{
+          background: `linear-gradient(to top, ${accentColor}cc 0%, rgba(0,0,0,0.75) 35%, rgba(0,0,0,0.15) 70%, transparent 100%)`
+        }} />
+        {/* Slim accent color strip at the very bottom edge */}
+        <div className="absolute bottom-0 inset-x-0 h-1" style={{ backgroundColor: accentColor, opacity: 0.9 }} />
 
         {/* Logo — auto-whitened on dark backgrounds */}
         <div className="absolute z-20 flex items-center" style={logoPos}>
@@ -262,7 +266,10 @@ function InlineAdPreview({ design, backgroundUrl, companyName, logoUrl }: { desi
           {isExporting ? <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" /> : <Download className="w-3.5 h-3.5 mr-2" />}
           Download PNG
         </Button>
-        <span className="text-xs text-slate-500 font-medium">Auto-generated · {template.label}</span>
+        <span className="text-xs text-slate-500 font-medium flex items-center gap-1.5">
+          <span className="inline-block w-2.5 h-2.5 rounded-full border border-white/20" style={{ backgroundColor: accentColor }} />
+          Auto-generated &middot; {template.label}
+        </span>
       </div>
     </div>
   );
