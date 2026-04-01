@@ -55,6 +55,30 @@ const AUTONOMOUS_BACKGROUNDS = [
   "https://images.unsplash.com/photo-1454391304352-2bf4678b1a7a?auto=format&fit=crop&w=1200&q=80", // Stunning Horizon
   "https://images.unsplash.com/photo-1503614472-8c93d56e92ce?auto=format&fit=crop&w=1200&q=80", // Canadian Landscape / Lake Louise
 ];
+// ─── Autonomous Color Palettes ──────────────────────────────────────
+const THEME_PALETTES: { keywords: string[]; accent: string; bg: string }[] = [
+  { keywords: ["canada", "pr", "immigration", "visa", "residency", "passport"],         accent: "#dc2626", bg: "#1a0a0a" }, // Canada Red
+  { keywords: ["travel", "holiday", "vacation", "trip", "tour", "fly", "airline"],       accent: "#0ea5e9", bg: "#0c1a2e" }, // Sky Blue
+  { keywords: ["luxury", "premium", "gold", "elite", "vip", "exclusive"],                accent: "#d97706", bg: "#0f0b00" }, // Gold
+  { keywords: ["health", "medical", "wellness", "clinic", "doctor", "pharma"],           accent: "#10b981", bg: "#021814" }, // Emerald
+  { keywords: ["linkedin", "professional", "corporate", "b2b", "business", "career"],   accent: "#2563eb", bg: "#0a1628" }, // LinkedIn Blue
+  { keywords: ["real estate", "property", "home", "house", "apartment", "mortgage"],     accent: "#7c3aed", bg: "#120a1f" }, // Purple
+  { keywords: ["food", "restaurant", "delivery", "chef", "cuisine", "menu"],             accent: "#f97316", bg: "#1a0800" }, // Orange
+  { keywords: ["tech", "app", "software", "ai", "digital", "startup", "saas"],           accent: "#8b5cf6", bg: "#0d0d1a" }, // Violet
+  { keywords: ["education", "course", "learn", "school", "university", "training"],      accent: "#14b8a6", bg: "#001a18" }, // Teal
+  { keywords: ["fashion", "style", "clothing", "brand", "beauty", "cosmetics"],          accent: "#ec4899", bg: "#1a001a" }, // Pink
+  { keywords: ["finance", "bank", "invest", "crypto", "trading", "money", "fund"],       accent: "#22c55e", bg: "#001a0a" }, // Green
+];
+
+function pickTheme(prompt: string): { accent: string; bg: string } {
+  const lower = prompt.toLowerCase();
+  for (const palette of THEME_PALETTES) {
+    if (palette.keywords.some((k) => lower.includes(k))) {
+      return { accent: palette.accent, bg: palette.bg };
+    }
+  }
+  return { accent: "#3b82f6", bg: "#0f172a" }; // default blue
+}
 
 interface Message {
   id: string;
@@ -87,9 +111,35 @@ function InlineAdPreview({ design, backgroundUrl, companyName, logoUrl }: { desi
     design.logoPosition === "bottom-left"  ? { bottom: "5%", left: "5%" } :
     { bottom: "5%", right: "5%" };
 
-  const isStory     = design.templateId === "story" || design.templateId === "whatsapp-story";
-  const isLinkedIn  = design.templateId === "linkedin-banner";
-  const isYouTube   = design.templateId === "youtube-thumb";
+  const isStory    = design.templateId === "story" || design.templateId === "whatsapp-story";
+  const isLinkedIn = design.templateId === "linkedin-banner";
+  const isYouTube  = design.templateId === "youtube-thumb";
+
+  const [isDark, setIsDark] = useState(true); // assume dark until measured
+
+  useEffect(() => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = backgroundUrl;
+    img.onload = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = 50; canvas.height = 50;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        ctx.drawImage(img, 0, 0, 50, 50);
+        const data = ctx.getImageData(0, 0, 50, 50).data;
+        let brightness = 0;
+        for (let i = 0; i < data.length; i += 4) {
+          brightness += (data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114);
+        }
+        const avg = brightness / (data.length / 4);
+        setIsDark(avg < 140); // dark if average brightness below 140
+      } catch {
+        setIsDark(true); // default to dark on CORS failure
+      }
+    };
+  }, [backgroundUrl]);
 
   const contentVAlign = "flex-end"; // always anchor text to bottom for consistent professional look
   const fontScale = design.fontSize / 100;
@@ -136,20 +186,36 @@ function InlineAdPreview({ design, backgroundUrl, companyName, logoUrl }: { desi
         {/* Strong bottom gradient to ensure text & CTA always pop */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/5" />
 
-        {/* Logo — visibly enlarged, no backdrop blur */}
+        {/* Logo — auto-whitened on dark backgrounds */}
         <div className="absolute z-20 flex items-center" style={logoPos}>
            {logoUrl ? (
              <img
                src={logoUrl}
                alt="Logo"
                className="object-contain drop-shadow-lg"
-               style={{ maxHeight: isLinkedIn ? "4rem" : "6rem", maxWidth: "14rem" }}
+               style={{
+                 maxHeight: isLinkedIn ? "4rem" : "6rem",
+                 maxWidth: "14rem",
+                 // Apply white filter when background is dark
+                 filter: isDark ? "brightness(0) invert(1) drop-shadow(0 2px 6px rgba(0,0,0,0.6))" : "drop-shadow(0 2px 6px rgba(0,0,0,0.3))",
+               }}
                crossOrigin="anonymous"
              />
            ) : (
-             <div className="flex items-center gap-2 bg-black/40 px-4 py-2 rounded-xl border border-white/30">
-                <Sparkles className="w-5 h-5 text-white" />
-                <span className="font-bold text-white text-base tracking-tight drop-shadow">{companyName || "YourBrand"}</span>
+             <div
+               className="flex items-center gap-2 px-4 py-2 rounded-xl border"
+               style={{
+                 backgroundColor: isDark ? "rgba(0,0,0,0.45)" : "rgba(255,255,255,0.85)",
+                 borderColor: isDark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.1)",
+               }}
+             >
+                <Sparkles className="w-5 h-5" style={{ color: isDark ? "#ffffff" : design.customAccent }} />
+                <span
+                  className="font-bold text-base tracking-tight drop-shadow"
+                  style={{ color: isDark ? "#ffffff" : "#0f172a" }}
+                >
+                  {companyName || "YourBrand"}
+                </span>
              </div>
            )}
         </div>
@@ -243,6 +309,9 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
 
       const matchedTemplate = AD_TEMPLATES.find((t) => t.id === selectedTemplateId) || AD_TEMPLATES[0];
 
+      // Autonomous color theme from prompt
+      const theme = pickTheme(trimmed);
+
       // Autonomous parameter generation
       const design: DesignState = {
         templateId: matchedTemplate.id,
@@ -255,8 +324,8 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
         fontSize: 100,
         ctaStyle: "filled",
         themeId: "custom",
-        customBg: "#0f172a",
-        customAccent: "#3b82f6",
+        customBg: theme.bg,
+        customAccent: theme.accent,
         overlayColor: "transparent",
         campaignObjective: result.campaignObjective ?? "",
         visualDirection: result.visualDirection ?? "",
