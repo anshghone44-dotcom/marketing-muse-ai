@@ -5,7 +5,7 @@ import {
   ArrowUp,
   Sparkles,
   Paperclip,
-  ImagePlus,
+  UploadCloud,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ReactMarkdown from "react-markdown";
@@ -211,7 +211,6 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
   const [uploadedBg, setUploadedBg] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const bgFileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -293,36 +292,30 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
     }
   };
 
-  const handleBgUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUnifiedUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("Background must be less than 5MB");
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setUploadedBg(event.target?.result as string);
-        toast.success("Background uploaded and ready!");
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File must be less than 10MB");
+      return;
     }
-  };
-
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("Logo must be less than 5MB");
-        return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const result = event.target?.result as string;
+      const name = file.name.toLowerCase();
+      // Auto-detect: treat as logo if filename suggests it, otherwise use as background
+      const isLogo = name.includes("logo") || name.includes("icon") || name.includes("brand");
+      if (isLogo || file.type === "image/png" || file.type === "image/svg+xml") {
+        setUploadedLogo(result);
+        toast.success("Logo ready – will appear on generated templates!");
+      } else {
+        setUploadedBg(result);
+        toast.success("Background image ready – will be used in the next template!");
       }
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setUploadedLogo(event.target?.result as string);
-        toast.success("Logo uploaded and ready!");
-      };
-      reader.readAsDataURL(file);
-    }
+    };
+    reader.readAsDataURL(file);
+    // Reset input so the same file can be re-selected
+    e.target.value = "";
   };
 
   return (
@@ -408,31 +401,31 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
         <div className="max-w-3xl mx-auto w-full relative group shadow-2xl rounded-[2rem] border border-slate-200">
           
           <div className="relative flex items-center bg-white rounded-[2rem] overflow-visible p-1.5 pl-3">
-            <button
-              onClick={() => bgFileInputRef.current?.click()}
-              className={cn(
-                "p-2 transition-colors shrink-0 flex items-center gap-2", 
-                uploadedBg ? "text-indigo-600 bg-indigo-50 rounded-xl" : "text-slate-400 hover:text-slate-600"
-              )}
-              title="Upload custom background"
-            >
-              <ImagePlus className="w-5 h-5" />
-              {uploadedBg && <span className="text-xs font-semibold mr-1">Bg Added</span>}
-            </button>
-            <input type="file" ref={bgFileInputRef} onChange={handleBgUpload} accept="image/*" className="hidden" />
-
+            {/* Unified Upload Button */}
             <button
               onClick={() => fileInputRef.current?.click()}
               className={cn(
-                "p-2 transition-colors shrink-0 flex items-center gap-2", 
-                uploadedLogo ? "text-blue-600 bg-blue-50 rounded-xl" : "text-slate-400 hover:text-slate-600"
+                "p-2.5 transition-all shrink-0 flex items-center gap-2 rounded-xl",
+                (uploadedLogo || uploadedBg)
+                  ? "text-blue-600 bg-blue-50 border border-blue-200"
+                  : "text-slate-400 hover:text-slate-700 hover:bg-slate-50"
               )}
-              title="Upload custom logo"
+              title="Upload logo, background image, or any file"
             >
-              <Paperclip className="w-5 h-5" />
-              {uploadedLogo && <span className="text-xs font-semibold mr-1">Logo Added</span>}
+              <UploadCloud className="w-5 h-5" />
+              {(uploadedLogo || uploadedBg) && (
+                <span className="text-xs font-semibold">
+                  {uploadedLogo && uploadedBg ? "2 files" : uploadedLogo ? "Logo" : "Bg"} ✓
+                </span>
+              )}
             </button>
-            <input type="file" ref={fileInputRef} onChange={handleLogoUpload} accept="image/*" className="hidden" />
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleUnifiedUpload}
+              accept="image/*,application/pdf,.svg,.png,.jpg,.jpeg,.webp"
+              className="hidden"
+            />
 
             <input
               type="text"
