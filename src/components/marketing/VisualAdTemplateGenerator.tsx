@@ -85,7 +85,7 @@ interface Message {
   role: "user" | "assistant";
   content: string;
   design?: DesignState;
-  backgroundUrl?: string;
+  backgroundUrls?: string[];
   companyName?: string;
   logoUrl?: string;
 }
@@ -96,7 +96,7 @@ interface Props {
 }
 
 // ─── Inline Ad Preview Component ────────────────────────────────────
-function InlineAdPreview({ design, backgroundUrl, companyName, logoUrl }: { design: DesignState, backgroundUrl: string, companyName: string, logoUrl?: string }) {
+function InlineAdPreview({ design, backgroundUrls, companyName, logoUrl }: { design: DesignState, backgroundUrls: string[], companyName: string, logoUrl?: string }) {
   const previewRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -118,9 +118,10 @@ function InlineAdPreview({ design, backgroundUrl, companyName, logoUrl }: { desi
   const [isDark, setIsDark] = useState(true); // assume dark until measured
 
   useEffect(() => {
+    if (!backgroundUrls || backgroundUrls.length === 0) return;
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = backgroundUrl;
+    img.src = backgroundUrls[0];
     img.onload = () => {
       try {
         const canvas = document.createElement("canvas");
@@ -139,7 +140,7 @@ function InlineAdPreview({ design, backgroundUrl, companyName, logoUrl }: { desi
         setIsDark(true); // default to dark on CORS failure
       }
     };
-  }, [backgroundUrl]);
+  }, [backgroundUrls]);
 
   const contentVAlign = "flex-end"; // always anchor text to bottom for consistent professional look
   const fontScale = design.fontSize / 100;
@@ -177,20 +178,41 @@ function InlineAdPreview({ design, backgroundUrl, companyName, logoUrl }: { desi
     <div className="mt-6 flex flex-col gap-4 max-w-[620px]">
       {/* ── Template Canvas ── */}
       <div
-        className="w-full relative overflow-hidden rounded-2xl border border-slate-200"
-        style={{ backgroundColor: bgColor, aspectRatio: template.aspect }}
+        className="w-full relative overflow-hidden bg-white shadow-xl isolate"
+        style={{ aspectRatio: template.aspect }}
         ref={previewRef}
       >
-        {/* Clean edge-to-edge background */}
-        <img src={backgroundUrl} alt="Background" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" />
-        {/* Themed gradient: dark bottom tinted with the autonomous accent color */}
-        <div className="absolute inset-0" style={{
-          background: `linear-gradient(to top, ${accentColor}cc 0%, rgba(0,0,0,0.75) 35%, rgba(0,0,0,0.15) 70%, transparent 100%)`
-        }} />
-        {/* Slim accent color strip at the very bottom edge */}
-        <div className="absolute bottom-0 inset-x-0 h-1" style={{ backgroundColor: accentColor, opacity: 0.9 }} />
+        {/* Innovative Combined Backgrounds */}
+        {backgroundUrls && backgroundUrls.length > 0 ? (
+          backgroundUrls.length === 1 ? (
+             <img src={backgroundUrls[0]} alt="Background" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" />
+          ) : (
+             <div className="absolute inset-0 grid" style={{ gridTemplateColumns: `repeat(${backgroundUrls.length > 2 ? 2 : backgroundUrls.length}, 1fr)` }}>
+               {backgroundUrls.map((url, i) => (
+                  <div key={i} className="w-full h-full relative overflow-hidden group">
+                    <img src={url} alt={`Background ${i}`} className="w-full h-full object-cover transition-transform duration-700" crossOrigin="anonymous" />
+                  </div>
+               ))}
+             </div>
+          )
+        ) : null}
 
-        {/* Logo — auto-whitened on dark backgrounds */}
+        {/* Professional Elegant Gradient Overlays */}
+        <div className="absolute inset-0" style={{
+          background: `linear-gradient(to top, ${isDark ? '#000000' : '#ffffff'} 0%, transparent 100%)`, 
+          opacity: 0.85,
+          mixBlendMode: isDark ? 'normal' : 'screen'
+        }} />
+        <div className="absolute inset-0" style={{
+          background: `linear-gradient(135deg, ${accentColor}aa 0%, transparent 100%)`,
+          mixBlendMode: isDark ? 'color' : 'multiply',
+          opacity: 0.6
+        }} />
+        
+        {/* Formal Top Border */}
+        <div className="absolute top-0 inset-x-0 h-[6px]" style={{ backgroundColor: accentColor }} />
+
+        {/* Logo — Auto Mode matching template design (Dark/Light modes) */}
         <div className="absolute z-20 flex items-center" style={logoPos}>
            {logoUrl ? (
              <div className="flex items-center justify-center">
@@ -201,58 +223,70 @@ function InlineAdPreview({ design, backgroundUrl, companyName, logoUrl }: { desi
                  style={{
                    maxHeight: isLinkedIn ? "4.5rem" : "7rem",
                    maxWidth: "16rem",
-                   filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.3))",
+                   filter: isDark 
+                     ? "brightness(0) invert(1) drop-shadow(0 4px 12px rgba(0,0,0,0.5))" 
+                     : "drop-shadow(0 4px 12px rgba(0,0,0,0.08))", 
                  }}
                  crossOrigin="anonymous"
                />
              </div>
            ) : (
              <div
-               className="flex items-center gap-2 px-4 py-2 rounded-xl border"
+               className="flex items-center gap-2 px-4 py-2 rounded border"
                style={{
-                 backgroundColor: isDark ? "rgba(0,0,0,0.45)" : "rgba(255,255,255,0.85)",
-                 borderColor: isDark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.1)",
+                 backgroundColor: isDark ? "rgba(0,0,0,0.7)" : "rgba(255,255,255,0.9)",
+                 borderColor: isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.1)",
                }}
              >
-                <Sparkles className="w-5 h-5" style={{ color: isDark ? "#ffffff" : design.customAccent }} />
+                <Sparkles className="w-4 h-4" style={{ color: isDark ? "#ffffff" : design.customAccent }} />
                 <span
-                  className="font-bold text-base tracking-tight drop-shadow"
+                  className="font-extrabold text-sm uppercase tracking-widest drop-shadow-sm"
                   style={{ color: isDark ? "#ffffff" : "#0f172a" }}
                 >
-                  {companyName || "YourBrand"}
+                  {companyName || "BRAND"}
                 </span>
              </div>
            )}
         </div>
 
-        {/* Ad Content — Headline, Body, CTA anchored to bottom */}
+        {/* Ad Content — Professional Formal Layout */}
         <div
-          className="relative z-10 w-full h-full px-6 pb-8 pt-4 sm:px-10 sm:pb-10 flex flex-col justify-end"
+          className="relative z-10 w-full h-full px-8 pb-10 pt-4 sm:px-12 sm:pb-12 flex flex-col justify-end"
           style={{ alignItems: design.textAlign === "center" ? "center" : design.textAlign === "right" ? "flex-end" : "flex-start", textAlign: design.textAlign }}
         >
           {design.headline && (
             <h1
-              className="font-bold tracking-tight text-white mb-2 leading-tight"
-              style={{ fontSize: headlineSize, textShadow: "0 2px 12px rgba(0,0,0,0.7)" }}
+              className="font-black tracking-tight mb-4 leading-[1.1]"
+              style={{ 
+                fontSize: headlineSize, 
+                color: isDark ? "#ffffff" : "#1e293b", 
+                textShadow: isDark ? "0 4px 24px rgba(0,0,0,0.8)" : "none" 
+              }}
             >
               {design.headline}
             </h1>
           )}
           {design.body && (
             <p
-              className="font-medium text-white/90 mb-5"
-              style={{ fontSize: bodySize, maxWidth: isLinkedIn ? "60%" : "90%", textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}
+              className="font-medium mb-6 leading-relaxed"
+              style={{ 
+                fontSize: bodySize, 
+                color: isDark ? "rgba(255,255,255,0.9)" : "rgba(51,65,85,0.95)", 
+                maxWidth: isLinkedIn ? "60%" : "85%", 
+                textShadow: isDark ? "0 2px 10px rgba(0,0,0,0.6)" : "none" 
+              }}
             >
               {design.body}
             </p>
           )}
           {design.cta && (
             <div
-              className="inline-block mt-1 px-7 py-3 rounded-full font-bold text-sm tracking-wide"
+              className="inline-flex mt-2 px-8 py-3.5 rounded font-bold text-sm tracking-[0.15em] uppercase hover:scale-105 transition-transform cursor-pointer"
               style={{
-                backgroundColor: accentColor,
+                backgroundColor: isDark ? accentColor : "#0f172a",
                 color: "#ffffff",
-                boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
+                boxShadow: isDark ? "0 8px 32px rgba(0,0,0,0.4)" : "0 8px 24px rgba(15,23,42,0.25)",
+                border: "1px solid rgba(255,255,255,0.15)"
               }}
             >
               {design.cta}
@@ -282,7 +316,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
   const [input, setInput] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [uploadedLogo, setUploadedLogo] = useState<string | null>(null);
-  const [uploadedBg, setUploadedBg] = useState<string | null>(null);
+  const [uploadedBgs, setUploadedBgs] = useState<string[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -341,14 +375,16 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
 
       const summaryMd = `### Auto-Generated Template Complete\n\nI've generated a high-converting **${matchedTemplate.label}** ad template for your campaign. The layout, sizing, and styling have been aligned securely.\n\n**Campaign Objective:** ${result.campaignObjective}\n**Visual Strategy:** ${result.visualDirection}`;
       
-      const randomBg = uploadedBg || AUTONOMOUS_BACKGROUNDS[Math.floor(Math.random() * AUTONOMOUS_BACKGROUNDS.length)];
+      const randomBgs = uploadedBgs.length > 0
+        ? uploadedBgs
+        : [AUTONOMOUS_BACKGROUNDS[Math.floor(Math.random() * AUTONOMOUS_BACKGROUNDS.length)]];
 
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
         content: summaryMd,
         design: design,
-        backgroundUrl: randomBg,
+        backgroundUrls: randomBgs,
         companyName: companyName,
         logoUrl: uploadedLogo || undefined,
       };
@@ -370,27 +406,31 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
   };
 
   const handleUnifiedUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error("File must be less than 10MB");
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const result = event.target?.result as string;
-      const name = file.name.toLowerCase();
-      // Auto-detect: treat as logo if filename suggests it, otherwise use as background
-      const isLogo = name.includes("logo") || name.includes("icon") || name.includes("brand");
-      if (isLogo || file.type === "image/png" || file.type === "image/svg+xml") {
-        setUploadedLogo(result);
-        toast.success("Logo ready – will appear on generated templates!");
-      } else {
-        setUploadedBg(result);
-        toast.success("Background image ready – will be used in the next template!");
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    files.forEach(file => {
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("File must be less than 10MB");
+        return;
       }
-    };
-    reader.readAsDataURL(file);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const result = event.target?.result as string;
+        const name = file.name.toLowerCase();
+        // Auto-detect: treat as logo if filename suggests it, otherwise use as background
+        const isLogo = name.includes("logo") || name.includes("icon") || name.includes("brand");
+        if (isLogo || file.type === "image/png" || file.type === "image/svg+xml") {
+          setUploadedLogo(result);
+          toast.success("Logo ready – will appear on generated templates!");
+        } else {
+          setUploadedBgs(prev => [...prev, result]);
+          toast.success(`Background image (${file.name}) added to mixture!`);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
     // Reset input so the same file can be re-selected
     e.target.value = "";
   };
@@ -432,10 +472,10 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
                 </div>
                
                {/* Autonomous Template Preview */}
-               {m.design && m.backgroundUrl && m.companyName && (
+               {m.design && m.backgroundUrls && m.companyName && (
                   <InlineAdPreview
                     design={m.design}
-                    backgroundUrl={m.backgroundUrl}
+                    backgroundUrls={m.backgroundUrls}
                     companyName={m.companyName}
                     logoUrl={m.logoUrl}
                   />
@@ -483,21 +523,22 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
               onClick={() => fileInputRef.current?.click()}
               className={cn(
                 "p-2.5 transition-all shrink-0 flex items-center gap-2 rounded-xl",
-                (uploadedLogo || uploadedBg)
+                (uploadedLogo || uploadedBgs.length > 0)
                   ? "text-blue-600 bg-blue-50 border border-blue-200"
                   : "text-slate-400 hover:text-slate-700 hover:bg-slate-50"
               )}
-              title="Upload logo, background image, or any file"
+              title="Upload logo, background images (multiple supported)"
             >
               <UploadCloud className="w-5 h-5" />
-              {(uploadedLogo || uploadedBg) && (
+              {(uploadedLogo || uploadedBgs.length > 0) && (
                 <span className="text-xs font-semibold">
-                  {uploadedLogo && uploadedBg ? "2 files" : uploadedLogo ? "Logo" : "Bg"} ✓
+                  {uploadedLogo && uploadedBgs.length > 0 ? `${uploadedBgs.length + 1} files` : uploadedLogo ? "Logo" : `${uploadedBgs.length} Bgs`} ✓
                 </span>
               )}
             </button>
             <input
               type="file"
+              multiple
               ref={fileInputRef}
               onChange={handleUnifiedUpload}
               accept="image/*,application/pdf,.svg,.png,.jpg,.jpeg,.webp"
