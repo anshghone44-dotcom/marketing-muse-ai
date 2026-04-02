@@ -182,31 +182,55 @@ function InlineAdPreview({ design, backgroundUrls, companyName, logoUrl }: { des
         style={{ aspectRatio: template.aspect }}
         ref={previewRef}
       >
-        {/* Innovative Combined Backgrounds */}
+        {/* Innovative Combined Backgrounds - Unified Mixture */}
         {backgroundUrls && backgroundUrls.length > 0 ? (
-          backgroundUrls.length === 1 ? (
-             <img src={backgroundUrls[0]} alt="Background" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" />
-          ) : (
-             <div className="absolute inset-0 grid" style={{ gridTemplateColumns: `repeat(${backgroundUrls.length > 2 ? 2 : backgroundUrls.length}, 1fr)` }}>
-               {backgroundUrls.map((url, i) => (
-                  <div key={i} className="w-full h-full relative overflow-hidden group">
-                    <img src={url} alt={`Background ${i}`} className="w-full h-full object-cover transition-transform duration-700" crossOrigin="anonymous" />
-                  </div>
-               ))}
-             </div>
-          )
+           <div className="absolute inset-0 bg-slate-900 overflow-hidden isolate">
+             {backgroundUrls.map((url, i) => {
+                let mask = 'none';
+                // Unified seamless blending masks for multiple images
+                if (backgroundUrls.length === 2) {
+                   mask = i === 0 ? 'linear-gradient(to right, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)' : 'linear-gradient(to left, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)';
+                } else if (backgroundUrls.length > 2) {
+                   if (i === 0) mask = 'linear-gradient(to bottom right, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 100%)';
+                   else if (i === 1) mask = 'linear-gradient(to bottom left, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 100%)';
+                   else if (i === 2) mask = 'linear-gradient(to top, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 100%)';
+                   else mask = `linear-gradient(${i * 90}deg, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 80%)`;
+                }
+
+                return (
+                  <img 
+                    key={i} 
+                    src={url} 
+                    alt={`Background ${i}`} 
+                    className="absolute inset-0 w-full h-full object-cover" 
+                    style={{
+                      WebkitMaskImage: backgroundUrls.length > 1 ? mask : 'none',
+                      maskImage: backgroundUrls.length > 1 ? mask : 'none',
+                      mixBlendMode: 'normal',
+                      opacity: backgroundUrls.length === 1 ? 1 : 0.85
+                    }} 
+                    crossOrigin="anonymous" 
+                  />
+                );
+             })}
+             
+             {/* Unified Ambient Brand Wash to Glue Multi-Images Together */}
+             {backgroundUrls.length > 1 && (
+               <div className="absolute inset-0" style={{ backgroundColor: accentColor, mixBlendMode: 'color', opacity: 0.25 }} />
+             )}
+           </div>
         ) : null}
 
-        {/* Professional Elegant Gradient Overlays */}
+        {/* Professional Elegant Gradient Overlays for Text Readability */}
         <div className="absolute inset-0" style={{
-          background: `linear-gradient(to top, ${isDark ? '#000000' : '#ffffff'} 0%, transparent 100%)`, 
-          opacity: 0.85,
-          mixBlendMode: isDark ? 'normal' : 'screen'
+          background: `linear-gradient(to top, ${isDark ? 'rgba(0,0,0,0.95)' : 'rgba(255,255,255,0.95)'} 0%, ${isDark ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.6)'} 40%, transparent 80%)`, 
+          opacity: 1,
+          mixBlendMode: 'normal'
         }} />
         <div className="absolute inset-0" style={{
-          background: `linear-gradient(135deg, ${accentColor}aa 0%, transparent 100%)`,
+          background: `linear-gradient(135deg, ${accentColor}cc 0%, transparent 60%)`,
           mixBlendMode: isDark ? 'color' : 'multiply',
-          opacity: 0.6
+          opacity: 0.35
         }} />
         
         {/* Formal Top Border */}
@@ -256,11 +280,11 @@ function InlineAdPreview({ design, backgroundUrls, companyName, logoUrl }: { des
         >
           {design.headline && (
             <h1
-              className="font-black tracking-tight mb-4 leading-[1.1]"
+              className="font-black tracking-tight mb-4 leading-[1.12]"
               style={{ 
                 fontSize: headlineSize, 
-                color: isDark ? "#ffffff" : "#1e293b", 
-                textShadow: isDark ? "0 4px 24px rgba(0,0,0,0.8)" : "none" 
+                color: isDark ? "#ffffff" : "#0f172a", 
+                textShadow: isDark ? "0 4px 24px rgba(0,0,0,0.9)" : "0 4px 24px rgba(255,255,255,0.7)" 
               }}
             >
               {design.headline}
@@ -271,9 +295,9 @@ function InlineAdPreview({ design, backgroundUrls, companyName, logoUrl }: { des
               className="font-medium mb-6 leading-relaxed"
               style={{ 
                 fontSize: bodySize, 
-                color: isDark ? "rgba(255,255,255,0.9)" : "rgba(51,65,85,0.95)", 
+                color: isDark ? "rgba(255,255,255,0.9)" : "rgba(15,23,42,0.85)", 
                 maxWidth: isLinkedIn ? "60%" : "85%", 
-                textShadow: isDark ? "0 2px 10px rgba(0,0,0,0.6)" : "none" 
+                textShadow: isDark ? "0 2px 10px rgba(0,0,0,0.7)" : "0 2px 10px rgba(255,255,255,0.6)" 
               }}
             >
               {design.body}
@@ -406,7 +430,7 @@ export default function VisualAdTemplateGenerator({ companyData }: Props) {
   };
 
   const handleUnifiedUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
+    const files = Array.from(e.target.files || []) as File[];
     if (files.length === 0) return;
 
     files.forEach(file => {
